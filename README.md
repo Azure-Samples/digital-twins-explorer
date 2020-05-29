@@ -3,9 +3,10 @@ page_type: sample
 languages:
 - csharp
 products:
-- dotnet
-description: "Add 150 character max description"
-urlFragment: "update-this-to-unique-url-stub"
+- azure-digital-twins
+name: Azure Digital Twins explorer
+description: A code sample for visualizing Azure Digital Twins graphs
+urlFragment: digital-twins-explorer
 ---
 
 # Official Microsoft Sample
