@@ -14,11 +14,12 @@ Node.js 10+
     * [Set up an Azure Digital Twins instance](https://github.com/Azure/azure-digital-twins/blob/private-preview/Documentation/how-to-set-up-instance.md)
     * [Authenticate against Azure Digital Twins](https://github.com/Azure/azure-digital-twins/blob/private-preview/Documentation/how-to-authenticate.md): part 1 only (i.e. creating the app registration)
       > When adding callback URLs, make sure to add `http://localhost:3000`. While it is possible to customize the port used by ADT Explorer, this is the default.
-1. From a command prompt in the `src` folder, run `npm install`.
+1. From a command prompt in the `client/src` folder, run `npm install`.
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
     >  * Linux/Mac (Bash): `PORT=8080 npm run start`
     >  * Windows (cmd): `set PORT=8080 && npm run start`
+    > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. localhost:7000 if that is the port you are using.
 1. Your browser should open and the app should appear.
 
 ### Running in the cloud
