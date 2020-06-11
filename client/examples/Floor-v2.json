@@ -1,0 +1,19 @@
+{
+  "@id": "dtmi:com:example:adtexplorer:Floor;2",
+  "@type": "Interface",
+  "displayName": "Floor",
+  "contents": [
+    {
+      "@type": "Relationship",
+      "name": "contains",
+      "target": "dtmi:com:example:adtexplorer:Room;2"
+    },
+    {
+      "@type": "Property",
+      "name": "AverageTemperature",
+      "schema": "double",
+      "writeable": true
+    }
+  ],
+  "@context": "dtmi:dtdl:context;2"
+}

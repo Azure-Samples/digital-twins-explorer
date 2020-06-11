@@ -1,0 +1,31 @@
+{
+  "@id": "dtmi:com:example:adtexplorer:HVAC;1",
+  "@type": "Interface",
+  "displayName": "HVAC",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "Efficiency",
+      "schema": "double",
+      "writeable": true
+    },
+    {
+      "@type": "Property",
+      "name": "TargetTemperature",
+      "schema": "double",
+      "writeable": true
+    },
+    {
+      "@type": "Property",
+      "name": "TargetHumidity",
+      "schema": "double",
+      "writeable": true
+    },
+    {
+      "@type": "Relationship",
+      "name": "cools",
+      "target": "dtmi:com:example:adtexplorer:Floor;1"
+    }
+  ],
+  "@context": "dtmi:dtdl:context;2"
+}

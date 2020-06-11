@@ -1,0 +1,26 @@
+@import "../../theme/theme.scss";
+
+.oc-output {
+  background-color: $backgroundColor2;
+  overflow: scroll;
+  height: 100%;
+  font-family: $fontFamilyConsole;
+  font-size: 10px;
+  margin: 2px;
+}
+
+.oc-error {
+  color: $textColorError;
+}
+
+.oc-warning {
+  color: $textColorWarning;
+}
+
+.oc-info {
+  color: $textColorLight1;
+}
+
+.oc-ok {
+  color: $textColorSuccess;
+}

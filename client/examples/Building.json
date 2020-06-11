@@ -1,0 +1,24 @@
+{
+  "@id": "dtmi:com:example:adtexplorer:Building;1",
+  "@type": "Interface",
+  "displayName": "Building",
+  "contents": [
+    {
+      "@type": "Relationship",
+      "name": "has",
+      "target": "dtmi:com:example:adtexplorer:Floor;1"
+    },
+    {
+      "@type": "Relationship",
+      "name": "isEquippedWith",
+      "target": "dtmi:com:example:adtexplorer:HVAC;1"
+    },
+    {
+      "@type": "Property",
+      "name": "AverageTemperature",
+      "schema": "double",
+      "writeable": true
+    }
+  ],
+  "@context": "dtmi:dtdl:context;2"
+}

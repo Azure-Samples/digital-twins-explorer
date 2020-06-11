@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "digitalTwinsInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "ADT instance name connected to EventGrid"
+      }
+    },
+    "uniqueSuffix": {
+      "defaultValue": "[substring(uniqueString(resourceGroup().id), 0, 6)]",
+      "type": "string",
+      "metadata": {
+        "description": "Label to add to your service name to ensure uniqueness of DNS names"
+      }
+    }
+  },
+  "variables": {
+    "eventGridFunctionUrl": "[concat('https://', variables('functionAppName'), '.azurewebsites.net/runtime/webhooks/eventgrid?functionName=eventgrid&code=')]",
+    "eventGridSubscriptionName": "[concat('webhook-', parameters('uniqueSuffix'))]",
+    "eventGridTopicName": "[parameters('digitalTwinsInstance')]",
+    "functionAppName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('eventGridTopicName')]",
+      "type": "Microsoft.EventGrid/topics",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-01-01"
+    },
+    {
+      "name": "[concat(variables('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridSubscriptionName'))]",
+      "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "destination": {
+          "endpointType": "WebHook",
+          "properties": {
+            "endpointUrl": "[concat(variables('eventGridFunctionUrl'), listKeys(resourceId('Microsoft.Web/sites/host/', variables('functionAppName'), 'default'),'2016-08-01').systemkeys.eventgrid_extension)]"
+          }
+        },
+        "filter": {
+          "includedEventTypes": [
+            "All"
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicName'))]"
+      ]
+    }
+  ]
+}

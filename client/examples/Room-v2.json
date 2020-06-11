@@ -1,0 +1,32 @@
+{
+  "@id": "dtmi:com:example:adtexplorer:Room;2",
+  "@type": "Interface",
+  "displayName": "Room",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "Temperature",
+      "schema": "double",
+      "writeable": true
+    },
+    {
+      "@type": "Property",
+      "name": "Humidity",
+      "schema": "double",
+      "writeable": true
+    },
+    {
+      "@type": "Property",
+      "name": "IsOccupied",
+      "schema": "boolean",
+      "writeable": true
+    },
+    {
+      "@type": "Property",
+      "name": "EmployeeId",
+      "schema": "string",
+      "writeable": true
+    }
+  ],
+  "@context": "dtmi:dtdl:context;2"
+}

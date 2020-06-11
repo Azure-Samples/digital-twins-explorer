@@ -1,0 +1,18 @@
+{
+    "version": "2.0",
+    "logging": {
+      "applicationInsights": {
+        "samplingExcludedTypes": "Request",
+        "samplingSettings": {
+            "isEnabled": true
+        }
+      },
+      "logLevel": {
+        "AdtExplorer.Functions.EventGrid": "Information",
+        "AdtExplorer.Functions.SignalR": "Information",
+        "AdtExplorer.Functions.Proxy": "Information",
+        "AdtExplorer.Functions.Utilities.EndpointService": "Information",
+        "AdtExplorer.Functions.Utilities.RequestProcessor": "Information"
+      }
+    }
+}

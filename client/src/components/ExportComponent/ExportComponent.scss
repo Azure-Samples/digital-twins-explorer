@@ -1,0 +1,13 @@
+@import "../../theme/theme.scss";
+
+.ev-grid {
+  background-color: $backgroundColor3;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ev-control {
+  font-family: $fontFamilyMain;
+  padding: 12px;
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "signalrPricingTier": {
+      "type": "string",
+      "defaultValue": "Standard_S1",
+      "allowedValues": [
+        "Free_F1",
+        "Standard_S1"
+      ],
+      "metadata": {
+        "description": "The pricing tier of the SignalR resource."
+      }
+    },
+    "signalrCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "allowedValues": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ],
+      "metadata": {
+        "description": "The number of SignalR Unit."
+      }
+    },
+    "uniqueSuffix": {
+      "defaultValue": "[substring(uniqueString(resourceGroup().id), 0, 6)]",
+      "type": "string",
+      "metadata": {
+        "description": "Label to add to your service name to ensure uniqueness of DNS names"
+      }
+    }
+  },
+  "variables": {
+    "appInsightsName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
+    "functionAppName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
+    "signalrName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
+    "siteContainerName": "web",
+    "storageAccountName": "[concat('adtexplorerstore', parameters('uniqueSuffix'))]",
+    "storageAccountSiteSas": {
+      "canonicalizedResource": "[concat('/blob/', variables('storageAccountName'), '/', variables('siteContainerName'))]",
+      "signedResource": "c",
+      "signedPermission": "r",
+      "signedExpiry": "2050-01-01T00:00:00Z"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "resources": [
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-03-01-preview",
+          "name": "[concat('default/', variables('siteContainerName'))]",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('functionAppName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components/', variables('appInsightsName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "AzureSignalRConnectionString",
+              "value": "[listkeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalrName')), '2018-10-01').primaryConnectionString]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "EndpointOptions:EndpointName",
+              "value": "[variables('functionAppName')]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "SITE_STORAGE_ACCOUNT_NAME",
+              "value": "[variables('storageAccountName')]"
+            },
+            {
+              "name": "SITE_CONTAINER_NAME",
+              "value": "[variables('siteContainerName')]"
+            },
+            {
+              "name": "SITE_CONTAINER_SAS",
+              "value": "[listServiceSas(variables('storageAccountName'), '2018-02-01', variables('storageAccountSiteSas')).serviceSasToken]"
+            },
+            {
+              "name": "SecurityOptions:AllowedTenant",
+              "value": "*"
+            },
+            {
+              "name": "SecurityOptions:AllowedHosts",
+              "value": "*"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[variables('functionAppName')]"
+            }
+          ],
+          "httpsOnly": true,
+          "reserved": true
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "web",
+          "type": "config",
+          "tags": {
+            "displayName": "WebSettings"
+          },
+          "properties": {
+            "cors": {
+              "allowedOrigins": [
+                "https://functions.azure.com",
+                "https://functions-staging.azure.com",
+                "https://functions-next.azure.com",
+                "http://localhost:3000"
+              ],
+              "supportCredentials": true
+            }
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.SignalRService/SignalR', variables('signalrName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('appInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionAppName'))]": "Resource"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('appInsightsName')]"
+      }
+    },
+    {
+      "apiVersion": "2018-10-01",
+      "name": "[variables('signalrName')]",
+      "type": "Microsoft.SignalRService/SignalR",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hostNamePrefix": "[variables('signalrName')]",
+        "features": [
+          {
+            "flag": "ServiceMode",
+            "value": "Serverless"
+          }
+        ],
+        "cors": {
+          "allowedOrigins": [
+            "http://localhost:3000",
+            "[concat('https://', variables('functionAppName'), '.azurewebsites.net')]"
+          ]
+        }
+      },
+      "sku": {
+        "capacity": "[parameters('signalrCapacity')]",
+        "name": "[parameters('signalrPricingTier')]"
+      }
+    }
+  ]
+}

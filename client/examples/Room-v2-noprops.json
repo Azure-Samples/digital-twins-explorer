@@ -1,0 +1,8 @@
+{
+  "@id": "dtmi:com:example:adtexplorer:Roomnoprops;2",
+  "@type": "Interface",
+  "displayName": "Room",
+  "contents": [
+  ],
+  "@context": "dtmi:dtdl:context;2"
+}
