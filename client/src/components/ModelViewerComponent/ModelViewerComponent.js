@@ -89,7 +89,8 @@ export class ModelViewerComponent extends Component {
     if (list.length > 0) {
       try {
         const res = await apiService.addModels(list);
-        print(`*** Upload result: ${JSON.stringify(res)}`, "info");
+        print("*** Upload result:", "info");
+        print(JSON.stringify(res, null, 2), "info");
       } catch (exc) {
         print(`*** Upload error: ${exc}`, "error");
         eventService.publishError(`*** Upload error: ${exc}`);

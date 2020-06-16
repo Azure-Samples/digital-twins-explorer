@@ -55,10 +55,12 @@ export class ModelViewerCreateComponent extends Component {
       const model = await apiService.getModelById(item.key);
 
       const payload = new ModelService().createPayload(model.model["@id"]);
-      print(`Generated model payload: ${JSON.stringify(payload)}`);
+      print("Generated model payload:", "info");
+      print(JSON.stringify(payload, null, 2), "info");
 
       const twinResult = await apiService.addTwin(name, payload);
-      print(`*** Creation result: ${JSON.stringify(twinResult)}`, "info");
+      print("*** Creation result:", "info");
+      print(JSON.stringify(twinResult, null, 2), "info");
 
       eventService.publishCreateTwin({ $dtId: name, $metadata: { $model: item.key } });
     } catch (exc) {

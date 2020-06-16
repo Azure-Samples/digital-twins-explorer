@@ -25,13 +25,17 @@ export class OutputComponent extends React.Component {
       && newtype !== "ok") {
       newtypeWithFallback = "info";
     }
-
-    const nlog = {
-      data: newdata,
-      method: newtypeWithFallback
-    };
-
-    this.setState(prevState => ({ logs: [ ...prevState.logs, nlog ] }));
+    const lines = newdata.split(/\r\n|\r|\n/);
+    if (lines.length > 1) {
+      const nlog = lines.map(line => ({ data: line, method: newtypeWithFallback }));
+      this.setState(prevState => ({ logs: [ ...prevState.logs, ...nlog ] }));
+    } else {
+      const nlog = {
+        data: newdata,
+        method: newtypeWithFallback
+      };
+      this.setState(prevState => ({ logs: [ ...prevState.logs, nlog ] }));
+    }
   }
 
   componentDidUpdate() {
@@ -46,7 +50,7 @@ export class OutputComponent extends React.Component {
     return (
       <div id="oc-scroll" className="oc-output">
         {logs.map((log, i) =>
-          <div key={`log-${i}`} className={`oc-${log.method}`}>{log.data}</div>
+          <pre key={`log-${i}`} className={`oc-${log.method}`}>{log.data}</pre>
         )}
       </div>
     );

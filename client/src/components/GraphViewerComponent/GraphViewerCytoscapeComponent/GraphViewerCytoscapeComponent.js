@@ -8,6 +8,7 @@ import klay from "cytoscape-klay";
 import dblclick from "cytoscape-dblclick";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions } from "./config";
+import { getUniqueRelationshipId } from "../../../utils/utilities";
 
 import "./GraphViewerCytoscapeComponent.scss";
 
@@ -71,15 +72,15 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   addRelationships(relationships) {
     const mapped = relationships
-      .filter(x => this.graphControl.$id(x.$relationshipId).length === 0)
       .map(x => ({
         data: {
           source: x.$sourceId,
           target: x.$targetId,
           label: x.$relationshipName,
-          id: x.$relationshipId
+          id: getUniqueRelationshipId(x)
         }
-      }));
+      }))
+      .filter(x => this.graphControl.$id(x.id).length === 0);
 
     const checked = [];
     for (const rel of mapped) {

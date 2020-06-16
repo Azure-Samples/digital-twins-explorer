@@ -7,6 +7,10 @@
   font-family: $fontFamilyConsole;
   font-size: 10px;
   margin: 2px;
+  user-select: text;
+  pre {
+    margin: 0;
+  }
 }
 
 .oc-error {

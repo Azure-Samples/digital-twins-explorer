@@ -65,8 +65,8 @@ class ApiService {
     let continuationToken = null;
     do {
       const response = await this.client.query.queryTwins({ query, continuationToken }, this.clientOptions);
-      print(`Ran query for twins, page ${page}: ${JSON.stringify(response.items)}`, "info");
-
+      print(`Ran query for twins, page ${page}:`, "info");
+      print(JSON.stringify(response.items, null, 2), "info");
       await callback(getTwinsFromQueryResponse(response.items));
 
       continuationToken = response.continuationToken;
@@ -118,7 +118,8 @@ class ApiService {
         const response = nextLink
           ? await this.client.digitalTwins[`${baseOperationName}Next`](`${this.client.baseUri}${nextLink}`, this.clientOptions)
           : await this.client.digitalTwins[baseOperationName](twinId, this.clientOptions);
-        print(`Ran query for relationships for twin ${twinId}, page ${page}: ${JSON.stringify(response)}`, "info");
+        print(`Ran query for relationships for twin ${twinId}, page ${page}:`, "info");
+        print(JSON.stringify(response, null, 2), "info");
 
         // The response type for the incoming relationships doesn't match the outgoing call so we'll remap it
         if (op === REL_TYPE_INCOMING) {

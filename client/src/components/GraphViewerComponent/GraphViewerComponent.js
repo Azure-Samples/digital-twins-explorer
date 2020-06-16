@@ -10,6 +10,7 @@ import { print } from "../../services/LoggingService";
 import { BatchService } from "../../services/BatchService";
 import { settingsService } from "../../services/SettingsService";
 import { REL_TYPE_OUTGOING } from "../../services/Constants";
+import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
 
@@ -39,11 +40,7 @@ export class GraphViewerComponent extends React.Component {
     eventService.subscribeAddRelationship(data => data && this.onRelationshipCreate(data));
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
-      if (data.$dtId) {
-        this.cyRef.current.addTwins([ data ]);
-      } else if (data.$relationshipId) {
-        this.cyRef.current.addRelationships([ data ]);
-      }
+      this.cyRef.current.addTwins([ data ]);
       this.cyRef.current.doLayout();
     });
     eventService.subscribeConfigure(evt => {
@@ -169,7 +166,7 @@ export class GraphViewerComponent extends React.Component {
     }
 
     if (clearExisting) {
-      const removeRels = existingRels.filter(x => allRels.every(y => y.$relationshipId !== x));
+      const removeRels = existingRels.filter(x => allRels.every(y => getUniqueRelationshipId(y) !== x));
       this.cyRef.current.removeRelationships(removeRels);
     }
   }
@@ -222,7 +219,7 @@ export class GraphViewerComponent extends React.Component {
 
   onRelationshipDelete = async relationship => {
     if (relationship) {
-      this.cyRef.current.removeRelationships([ relationship ]);
+      this.cyRef.current.removeRelationships([ getUniqueRelationshipId(relationship) ]);
       await this.cyRef.current.doLayout();
     }
   }

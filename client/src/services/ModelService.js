@@ -3,12 +3,13 @@ import { JsonldGraph } from "jsonld-graph";
 import { apiService } from "./ApiService";
 import context from "./ref/context";
 
+const REL_TARGET_ANY = "*";
 const getPropertyName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:name;2");
 const getPropertyWriteable = vertex => vertex.getAttributeValue("dtmi:dtdl:property:writeable;2") || false;
 
 const inferTarget = vertex => {
   const targetEdge = vertex.getOutgoing("dtmi:dtdl:property:target;2").first();
-  return targetEdge ? targetEdge.toVertex.id : null;
+  return targetEdge ? targetEdge.toVertex.id : REL_TARGET_ANY;
 };
 
 const inferSchema = vertex => {
@@ -64,7 +65,7 @@ export class ModelService {
     const targetModel = this._getModel(targetModelId);
     return sourceModel
       .relationships
-      .filter(x => x.target === targetModelId || targetModel.bases.some(y => y === x.target))
+      .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
       .map(x => x.name);
   }
 
