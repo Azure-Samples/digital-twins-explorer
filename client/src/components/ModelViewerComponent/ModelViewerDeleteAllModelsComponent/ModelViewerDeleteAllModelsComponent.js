@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { DefaultButton } from "office-ui-fabric-react";
-import { apiService } from "../../../services/ApiService";
 import { eventService } from "../../../services/EventService";
 import { print } from "../../../services/LoggingService";
+import { ModelService } from "../../../services/ModelService";
 
 export default class ModelViewerDeleteAllModelsComponent extends Component {
 
@@ -20,7 +20,8 @@ export default class ModelViewerDeleteAllModelsComponent extends Component {
 
     print(`*** Deleting all models`, "info");
     try {
-      await apiService.deleteAllModels();
+      const modelService = new ModelService();
+      await modelService.deleteAll();
       eventService.publishClearData();
     } catch (exc) {
       print(`*** Error deleting models: ${exc}`, "error");

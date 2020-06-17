@@ -231,13 +231,6 @@ class ApiService {
     }
   }
 
-  async deleteAllModels() {
-    const models = await this.queryModels();
-    for (const model of models) {
-      this.deleteModel(model.id);
-    }
-  }
-
   async deleteAllTwins(ids) {
     await this.initialize();
 
@@ -314,11 +307,6 @@ class CachedApiService extends ApiService {
   async deleteAllTwins(ids) {
     this.cache.relationships = {};
     return await super.deleteAllTwins(ids);
-  }
-
-  async deleteAllModels() {
-    this.cache.models = [];
-    return await super.deleteAllModels();
   }
 
   async updateModelCache() {

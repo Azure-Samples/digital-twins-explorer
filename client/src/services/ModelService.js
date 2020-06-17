@@ -81,6 +81,32 @@ export class ModelService {
     return sourceModel.telemetries;
   }
 
+  async getBases(modelId) {
+    await this.initialize();
+    const sourceModel = this._getModel(modelId);
+    return sourceModel.bases;
+  }
+
+  async deleteAll() {
+    await this.initialize();
+    const models = this.modelGraph.getVertices(x => x.isType("dtmi:dtdl:class:Interface;2")).items();
+
+    while (models.length > 0) {
+      const referenced = {};
+      for (const m of models) {
+        m.getOutgoing("dtmi:dtdl:property:extends;2")
+          .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
+          .items()
+          .forEach(x => referenced[x.toVertex.id] = x.toVertex);
+      }
+
+      for (const m of models.filter(x => !referenced[x.id])) {
+        await apiService.deleteModel(m.id);
+        models.splice(models.indexOf(m), 1);
+      }
+    }
+  }
+
   createPayload(modelId) {
     return { $metadata: { $model: modelId } };
   }

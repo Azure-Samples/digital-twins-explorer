@@ -131,35 +131,42 @@ export class GraphViewerComponent extends React.Component {
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
         items: currentTwins,
         action: (twin, resolve, reject) =>
-          apiService.queryRelationshipsPaged(twin.$dtId, async rels => {
-            try {
-              let presentRels = rels;
-              if (settingsService.eagerLoading || loadTargets) {
-                const missingTwins = [];
-                for (const rel of rels) {
-                  for (const prop of [ "$sourceId", "$targetId" ]) {
-                    // eslint-disable-next-line max-depth
-                    if (rel[prop] && allTwins.every(x => x.$dtId !== rel[prop])) {
-                      const missingTwin = await apiService.getTwinById(rel[prop]);
-                      [ missingTwins, allTwins ].forEach(x => x.push(missingTwin.body));
+          apiService
+            .queryRelationshipsPaged(twin.$dtId, async rels => {
+              try {
+                let presentRels = rels;
+                if (settingsService.eagerLoading || loadTargets) {
+                  const missingTwins = [];
+                  for (const rel of rels) {
+                    for (const prop of [ "$sourceId", "$targetId" ]) {
+                      // eslint-disable-next-line max-depth
+                      if (rel[prop] && allTwins.every(x => x.$dtId !== rel[prop])) {
+                        const missingTwin = await apiService.getTwinById(rel[prop]);
+                        [ missingTwins, allTwins ].forEach(x => x.push(missingTwin.body));
+                      }
                     }
                   }
+
+                  this.cyRef.current.addTwins(missingTwins);
+                } else {
+                  presentRels = rels.filter(x =>
+                    allTwins.some(y => y.$dtId === x.$sourceId) && allTwins.some(y => y.$dtId === x.$targetId));
                 }
 
-                this.cyRef.current.addTwins(missingTwins);
-              } else {
-                presentRels = rels.filter(x => allTwins.some(y => y.$dtId === x.$sourceId) && allTwins.some(y => y.$dtId === x.$targetId));
+                this.cyRef.current.addRelationships(presentRels);
+                presentRels.forEach(x => allRels.push(x));
+                if (!rels.nextLink) {
+                  resolve();
+                }
+              } catch (e) {
+                reject(e);
               }
-
-              this.cyRef.current.addRelationships(presentRels);
-              presentRels.forEach(x => allRels.push(x));
-              if (!rels.nextLink) {
-                resolve();
-              }
-            } catch (e) {
-              reject(e);
-            }
-          }, relTypeLoading)
+            }, relTypeLoading)
+            .then(null, exc => {
+              // If the twin has been deleted, warn but don't block the graph render
+              print(`*** Error fetching data for twin: ${exc}`, "warning");
+              resolve();
+            })
       });
 
       await bs.run();
@@ -174,9 +181,14 @@ export class GraphViewerComponent extends React.Component {
   onNodeClicked = async e => {
     this.setState({ selectedNode: e.selectedNode, selectedNodes: e.selectedNodes });
     if (e.selectedNode) {
-      const data = await apiService.getTwinById(e.selectedNode.id);
-      if (data) {
-        eventService.publishSelection(data.body);
+      try {
+        const data = await apiService.getTwinById(e.selectedNode.id);
+        if (data) {
+          eventService.publishSelection(data.body);
+        }
+      } catch (exc) {
+        print(`*** Error fetching data for twin: ${exc}`, "error");
+        eventService.publishSelection();
       }
     } else {
       eventService.publishSelection();
@@ -187,9 +199,9 @@ export class GraphViewerComponent extends React.Component {
     try {
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
-    } catch (exp) {
-      print(`*** Error fetching data for graph: ${exp}`, "error");
-      eventService.publishError(`*** Error fetching data for graph: ${exp}`);
+    } catch (exc) {
+      print(`*** Error fetching data for graph: ${exc}`, "error");
+      eventService.publishError(`*** Error fetching data for graph: ${exc}`);
     }
 
     this.setState({ isLoading: false, progress: 0 });
