@@ -3,12 +3,13 @@ import { JsonldGraph } from "jsonld-graph";
 import { apiService } from "./ApiService";
 import context from "./ref/context";
 
+const REL_TARGET_ANY = "*";
 const getPropertyName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:name;2");
 const getPropertyWriteable = vertex => vertex.getAttributeValue("dtmi:dtdl:property:writeable;2") || false;
 
 const inferTarget = vertex => {
   const targetEdge = vertex.getOutgoing("dtmi:dtdl:property:target;2").first();
-  return targetEdge ? targetEdge.toVertex.id : null;
+  return targetEdge ? targetEdge.toVertex.id : REL_TARGET_ANY;
 };
 
 const inferSchema = vertex => {
@@ -64,7 +65,7 @@ export class ModelService {
     const targetModel = this._getModel(targetModelId);
     return sourceModel
       .relationships
-      .filter(x => x.target === targetModelId || targetModel.bases.some(y => y === x.target))
+      .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
       .map(x => x.name);
   }
 
@@ -78,6 +79,32 @@ export class ModelService {
     await this.initialize();
     const sourceModel = this._getModel(sourceModelId);
     return sourceModel.telemetries;
+  }
+
+  async getBases(modelId) {
+    await this.initialize();
+    const sourceModel = this._getModel(modelId);
+    return sourceModel.bases;
+  }
+
+  async deleteAll() {
+    await this.initialize();
+    const models = this.modelGraph.getVertices(x => x.isType("dtmi:dtdl:class:Interface;2")).items();
+
+    while (models.length > 0) {
+      const referenced = {};
+      for (const m of models) {
+        m.getOutgoing("dtmi:dtdl:property:extends;2")
+          .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
+          .items()
+          .forEach(x => referenced[x.toVertex.id] = x.toVertex);
+      }
+
+      for (const m of models.filter(x => !referenced[x.id])) {
+        await apiService.deleteModel(m.id);
+        models.splice(models.indexOf(m), 1);
+      }
+    }
   }
 
   createPayload(modelId) {

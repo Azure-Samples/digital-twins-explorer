@@ -1,19 +1,12 @@
 import React, { Component } from "react";
-import { TextField, FocusZone, FocusZoneTabbableElements, ChoiceGroup, Toggle, IconButton } from "office-ui-fabric-react";
+import { FocusZone, FocusZoneTabbableElements, Toggle, IconButton } from "office-ui-fabric-react";
 
 import { eventService } from "../../services/EventService";
 import { settingsService } from "../../services/SettingsService";
 import { capitalizeName } from "../../utils/utilities";
-import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "../../services/Constants";
 import ModalComponent from "../ModalComponent/ModalComponent";
 
 import "./PreferencesFormComponent.scss";
-
-const relationshipTypeOptions = [
-  { key: REL_TYPE_INCOMING, text: "In" },
-  { key: REL_TYPE_OUTGOING, text: "Out" },
-  { key: REL_TYPE_ALL, text: "In/Out" }
-];
 
 export class PreferencesFormComponent extends Component {
 
@@ -21,8 +14,6 @@ export class PreferencesFormComponent extends Component {
     super(props);
     this.state = {
       showModal: false,
-      relTypeLoading: REL_TYPE_OUTGOING,
-      relExpansionLevel: 0,
       eagerLoading: false,
       caching: false
     };
@@ -35,8 +26,6 @@ export class PreferencesFormComponent extends Component {
   loadExistingSettings = () => {
     this.setState({
       showModal: true,
-      relTypeLoading: settingsService.relTypeLoading,
-      relExpansionLevel: settingsService.relExpansionLevel,
       eagerLoading: settingsService.eagerLoading,
       caching: settingsService.caching
     });
@@ -49,8 +38,6 @@ export class PreferencesFormComponent extends Component {
   resetModalState = () => {
     this.setState({
       showModal: false,
-      relTypeLoading: REL_TYPE_OUTGOING,
-      relExpansionLevel: 0,
       eagerLoading: false,
       caching: false
     });
@@ -61,16 +48,6 @@ export class PreferencesFormComponent extends Component {
       width: 250
     }
   })
-
-  onSelectedRelTypeChange = (evt, item) => {
-    this.setState({ relTypeLoading: item.key });
-    settingsService.relTypeLoading = item.key;
-  }
-
-  onExpansionLevelChange = evt => {
-    this.setState({ relExpansionLevel: evt.target.value });
-    settingsService.relExpansionLevel = evt.target.value;
-  }
 
   onEagerLoadingChange = (evt, checked) => {
     this.setState({ eagerLoading: checked });
@@ -86,7 +63,7 @@ export class PreferencesFormComponent extends Component {
 
   render() {
     const { optionalComponentsState } = this.props;
-    const { showModal, relTypeLoading, relExpansionLevel, eagerLoading, caching } = this.state;
+    const { showModal, eagerLoading, caching } = this.state;
 
     return (
       <ModalComponent isVisible={showModal} className="preference-settings">
@@ -104,12 +81,6 @@ export class PreferencesFormComponent extends Component {
               <Toggle key={comp} id={`show${capitalizeName(comp)}Field`} className="configuration-input"
                 checked={optionalComponentsState[comp].visible} onChange={() => this.onToggleOptionalComponentChange(comp)}
                 label={capitalizeName(comp)} inlineLabel />))}
-            <h2 className="heading-2">Layer controls</h2>
-            <TextField id="relExpansionLevelField" label="Select number of layers to expand"
-              className="configuration-input numeric-input" styles={this.getStyles} value={relExpansionLevel}
-              onChange={this.onExpansionLevelChange} type="number" min="1" max="5" />
-            <ChoiceGroup defaultSelectedKey={relTypeLoading} options={relationshipTypeOptions} className="configuration-input"
-              onChange={this.onSelectedRelTypeChange} label="Set expansion direction" />
           </form>
         </FocusZone>
       </ModalComponent>

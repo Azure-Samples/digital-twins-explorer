@@ -10,6 +10,7 @@ import { print } from "../../services/LoggingService";
 import { BatchService } from "../../services/BatchService";
 import { settingsService } from "../../services/SettingsService";
 import { REL_TYPE_OUTGOING } from "../../services/Constants";
+import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
 
@@ -39,11 +40,7 @@ export class GraphViewerComponent extends React.Component {
     eventService.subscribeAddRelationship(data => data && this.onRelationshipCreate(data));
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
-      if (data.$dtId) {
-        this.cyRef.current.addTwins([ data ]);
-      } else if (data.$relationshipId) {
-        this.cyRef.current.addRelationships([ data ]);
-      }
+      this.cyRef.current.addTwins([ data ]);
       this.cyRef.current.doLayout();
     });
     eventService.subscribeConfigure(evt => {
@@ -134,42 +131,49 @@ export class GraphViewerComponent extends React.Component {
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
         items: currentTwins,
         action: (twin, resolve, reject) =>
-          apiService.queryRelationshipsPaged(twin.$dtId, async rels => {
-            try {
-              let presentRels = rels;
-              if (settingsService.eagerLoading || loadTargets) {
-                const missingTwins = [];
-                for (const rel of rels) {
-                  for (const prop of [ "$sourceId", "$targetId" ]) {
-                    // eslint-disable-next-line max-depth
-                    if (rel[prop] && allTwins.every(x => x.$dtId !== rel[prop])) {
-                      const missingTwin = await apiService.getTwinById(rel[prop]);
-                      [ missingTwins, allTwins ].forEach(x => x.push(missingTwin.body));
+          apiService
+            .queryRelationshipsPaged(twin.$dtId, async rels => {
+              try {
+                let presentRels = rels;
+                if (settingsService.eagerLoading || loadTargets) {
+                  const missingTwins = [];
+                  for (const rel of rels) {
+                    for (const prop of [ "$sourceId", "$targetId" ]) {
+                      // eslint-disable-next-line max-depth
+                      if (rel[prop] && allTwins.every(x => x.$dtId !== rel[prop])) {
+                        const missingTwin = await apiService.getTwinById(rel[prop]);
+                        [ missingTwins, allTwins ].forEach(x => x.push(missingTwin.body));
+                      }
                     }
                   }
+
+                  this.cyRef.current.addTwins(missingTwins);
+                } else {
+                  presentRels = rels.filter(x =>
+                    allTwins.some(y => y.$dtId === x.$sourceId) && allTwins.some(y => y.$dtId === x.$targetId));
                 }
 
-                this.cyRef.current.addTwins(missingTwins);
-              } else {
-                presentRels = rels.filter(x => allTwins.some(y => y.$dtId === x.$sourceId) && allTwins.some(y => y.$dtId === x.$targetId));
+                this.cyRef.current.addRelationships(presentRels);
+                presentRels.forEach(x => allRels.push(x));
+                if (!rels.nextLink) {
+                  resolve();
+                }
+              } catch (e) {
+                reject(e);
               }
-
-              this.cyRef.current.addRelationships(presentRels);
-              presentRels.forEach(x => allRels.push(x));
-              if (!rels.nextLink) {
-                resolve();
-              }
-            } catch (e) {
-              reject(e);
-            }
-          }, relTypeLoading)
+            }, relTypeLoading)
+            .then(null, exc => {
+              // If the twin has been deleted, warn but don't block the graph render
+              print(`*** Error fetching data for twin: ${exc}`, "warning");
+              resolve();
+            })
       });
 
       await bs.run();
     }
 
     if (clearExisting) {
-      const removeRels = existingRels.filter(x => allRels.every(y => y.$relationshipId !== x));
+      const removeRels = existingRels.filter(x => allRels.every(y => getUniqueRelationshipId(y) !== x));
       this.cyRef.current.removeRelationships(removeRels);
     }
   }
@@ -177,9 +181,14 @@ export class GraphViewerComponent extends React.Component {
   onNodeClicked = async e => {
     this.setState({ selectedNode: e.selectedNode, selectedNodes: e.selectedNodes });
     if (e.selectedNode) {
-      const data = await apiService.getTwinById(e.selectedNode.id);
-      if (data) {
-        eventService.publishSelection(data.body);
+      try {
+        const data = await apiService.getTwinById(e.selectedNode.id);
+        if (data) {
+          eventService.publishSelection(data.body);
+        }
+      } catch (exc) {
+        print(`*** Error fetching data for twin: ${exc}`, "error");
+        eventService.publishSelection();
       }
     } else {
       eventService.publishSelection();
@@ -190,9 +199,9 @@ export class GraphViewerComponent extends React.Component {
     try {
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
-    } catch (exp) {
-      print(`*** Error fetching data for graph: ${exp}`, "error");
-      eventService.publishError(`*** Error fetching data for graph: ${exp}`);
+    } catch (exc) {
+      print(`*** Error fetching data for graph: ${exc}`, "error");
+      eventService.publishError(`*** Error fetching data for graph: ${exc}`);
     }
 
     this.setState({ isLoading: false, progress: 0 });
@@ -222,7 +231,7 @@ export class GraphViewerComponent extends React.Component {
 
   onRelationshipDelete = async relationship => {
     if (relationship) {
-      this.cyRef.current.removeRelationships([ relationship ]);
+      this.cyRef.current.removeRelationships([ getUniqueRelationshipId(relationship) ]);
       await this.cyRef.current.doLayout();
     }
   }

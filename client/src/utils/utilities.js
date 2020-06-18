@@ -67,3 +67,7 @@ export function sortArray(array, ...propertyNames) {
 export function capitalizeName(name) {
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
+
+export function getUniqueRelationshipId(relationship) {
+  return `${relationship.$sourceId}_${relationship.$relationshipId}`;
+}

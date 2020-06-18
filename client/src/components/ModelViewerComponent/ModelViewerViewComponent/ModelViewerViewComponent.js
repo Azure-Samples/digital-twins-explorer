@@ -27,14 +27,14 @@ export class ModelViewerViewComponent extends Component {
   async open(item) {
     this.setState({ showModal: true, isLoading: true, model: null });
 
-    let model = {};
+    let data = {};
     try {
-      model = await apiService.getModelById(item.key);
+      data = await apiService.getModelById(item.key);
     } catch (exp) {
       print(`Error in retrieving model. Requested ${item.key}. Exception: ${exp}`, "error");
     }
 
-    this.setState({ model, isLoading: false });
+    this.setState({ model: data.model ? data.model : data, isLoading: false });
   }
 
   close = () => {

@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import { CommandBar } from "office-ui-fabric-react";
+import { CommandBar, TextField, Icon } from "office-ui-fabric-react";
 
 import { GraphViewerRelationshipCreateComponent } from "../GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "../GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "../GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
 import { eventService } from "../../../services/EventService";
+import { settingsService } from "../../../services/SettingsService";
+import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "../../../services/Constants";
 
 import "./GraphViewerCommandBarComponent.scss";
 
@@ -17,6 +19,11 @@ export class GraphViewerCommandBarComponent extends Component {
     this.create = React.createRef();
     this.delete = React.createRef();
     this.importModelRef = React.createRef();
+    this.settings = React.createRef();
+    this.state = {
+      relTypeLoading: settingsService.relTypeLoading,
+      relExpansionLevel: settingsService.relExpansionLevel
+    };
   }
 
   farItems = [
@@ -30,7 +37,7 @@ export class GraphViewerCommandBarComponent extends Component {
       className: this.buttonClass
     },
     {
-      key: "Get Relationship",
+      key: "getRelationship",
       text: "Get Relationship",
       ariaLabel: "get relationship",
       iconProps: { iconName: "Relationship" },
@@ -39,7 +46,7 @@ export class GraphViewerCommandBarComponent extends Component {
       className: this.buttonClass
     },
     {
-      key: "Add Relationship",
+      key: "addRelationship",
       text: "Add Relationship",
       ariaLabel: "add relationship",
       iconProps: { iconName: "AddLink" },
@@ -62,6 +69,49 @@ export class GraphViewerCommandBarComponent extends Component {
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
       className: this.buttonClass
+    },
+    {
+      key: "expansionLevel",
+      text: "Expansion Level",
+      ariaLabel: "Select number of layers to expand",
+      iconProps: { iconName: "Org" },
+      className: this.buttonClass,
+      iconOnly: true,
+      commandBarButtonAs: () => this.renderRelationshipExpansionItem()
+    },
+    {
+      key: "expansionMode",
+      text: "Expansion Mode",
+      ariaLabel: "select expansion mode",
+      iconOnly: true,
+      iconProps: { iconName: "ModelingView" },
+      className: `${this.buttonClass} command-bar-dropdown`,
+      split: true,
+      subMenuProps: {
+        items: [
+          {
+            key: REL_TYPE_INCOMING,
+            text: "In",
+            ariaLabel: "In",
+            iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_INCOMING ? "CheckMark" : "" },
+            onClick: () => this.onSelectedRelTypeChange(REL_TYPE_INCOMING)
+          },
+          {
+            key: REL_TYPE_OUTGOING,
+            text: "Out",
+            ariaLabel: "Out",
+            iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_OUTGOING ? "CheckMark" : "" },
+            onClick: () => this.onSelectedRelTypeChange(REL_TYPE_OUTGOING)
+          },
+          {
+            key: REL_TYPE_ALL,
+            text: "In/Out",
+            ariaLabel: "In/Out",
+            iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_ALL ? "CheckMark" : "" },
+            onClick: () => this.onSelectedRelTypeChange(REL_TYPE_ALL)
+          }
+        ]
+      }
     },
     {
       key: "relayout",
@@ -94,6 +144,25 @@ export class GraphViewerCommandBarComponent extends Component {
     }
   ]
 
+  renderRelationshipExpansionItem = () => (
+    <div className="expansion-level-option">
+      <Icon iconName="Org" />
+      <TextField id="relExpansionLevelField"
+        className="command-bar-input configuration-input numeric-input" styles={this.getStyles} value={this.state.relExpansionLevel}
+        onChange={this.onExpansionLevelChange} type="number" min="1" max="5" />
+    </div>
+  )
+
+  onSelectedRelTypeChange = type => {
+    settingsService.relTypeLoading = type;
+    this.setState({ relTypeLoading: type });
+  }
+
+  onExpansionLevelChange = evt => {
+    this.setState({ relExpansionLevel: evt.target.value });
+    settingsService.relExpansionLevel = evt.target.value;
+  }
+
   onImportGraphClicked = evt => {
     eventService.publishImport({ file: evt.target.files[0] });
     this.importModelRef.current.value = "";
@@ -106,16 +175,22 @@ export class GraphViewerCommandBarComponent extends Component {
 
   render() {
     const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes } = this.props;
-    this.farItems[0].disabled = this.farItems[1].disabled = !selectedNode;
-    this.farItems[2].disabled = !selectedNodes || selectedNodes.length !== 2;
-    this.farItems[3].disabled = this.farItems[5].disabled = !query;
-    this.farItems[5].subMenuProps.items = this.props.layouts.map(x => ({
+    this.farItems.find(i => i.key === "deleteTwin").disabled = !selectedNode;
+    this.farItems.find(i => i.key === "getRelationship").disabled = !selectedNodes || selectedNodes.length !== 1;
+    this.farItems.find(i => i.key === "addRelationship").disabled = !selectedNodes || selectedNodes.length !== 2;
+    this.farItems.find(i => i.key === "exportGraph").disabled = this.farItems.find(i => i.key === "relayout").disabled = !query;
+    this.farItems.find(i => i.key === "relayout").subMenuProps.items = this.props.layouts.map(x => ({
       key: x,
       text: x,
       ariaLabel: x.toLowerCase(),
       iconProps: { iconName: this.props.layout === x ? "CheckMark" : "" },
       onClick: () => this.props.onLayoutChanged(x)
     }));
+    this.farItems.find(item => item.key === "expansionMode").subMenuProps.items
+      = this.farItems.find(item => item.key === "expansionMode").subMenuProps.items.map(item => {
+        item.iconProps = { iconName: item.key === this.state.relTypeLoading ? "CheckMark" : "" };
+        return item;
+      });
 
     return (
       <>

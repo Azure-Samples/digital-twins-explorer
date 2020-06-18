@@ -51,7 +51,7 @@ export class ConsoleComponent extends Component {
         this.terminal.current.pushToStdout(`*** Error patching twin: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -64,7 +64,7 @@ export class ConsoleComponent extends Component {
         this.terminal.current.pushToStdout(`*** Error retrieving twin from ADT: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -79,7 +79,7 @@ export class ConsoleComponent extends Component {
         this.terminal.current.pushToStdout(`*** Error creating twin from ADT: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -88,12 +88,12 @@ export class ConsoleComponent extends Component {
       try {
         await apiService.deleteTwin(arg1);
         eventService.publishDeleteTwin(arg1);
-        this.terminal.current.pushToStdout(`*** Deleted Twin with ID:  ${arg1}`);
+        this.terminal.current.pushToStdout(`*** Deleted Twin with ID: ${arg1}`);
       } catch (exc) {
         this.terminal.current.pushToStdout(`*** Error deleting twin from ADT: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -114,7 +114,7 @@ export class ConsoleComponent extends Component {
         this.terminal.current.pushToStdout(`*** Error getting relationships: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -123,13 +123,13 @@ export class ConsoleComponent extends Component {
       try {
         const relId = uuidv4();
         const result = await apiService.addRelationship(arg1, arg2, arg3, relId);
-        eventService.publishAddRelationship({ $targetId: arg1, $sourceId: arg2, $relationship: arg3, $relationshipId: relId });
+        eventService.publishAddRelationship({ $sourceId: arg1, $relationshipId: relId, $relationshipName: arg3, $targetId: arg2 });
         this.terminal.current.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
         this.terminal.current.pushToStdout(`*** Error creating relationship: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -137,13 +137,13 @@ export class ConsoleComponent extends Component {
     if (arg1 && arg2) {
       try {
         await apiService.deleteRelationship(arg1, arg2);
-        eventService.publishDeleteRelationship(arg2);
-        this.terminal.current.pushToStdout(`*** Deleted relationship with ID:  ${arg2}`);
+        eventService.publishDeleteRelationship({ $sourceId: arg1, $relationshipId: arg2 });
+        this.terminal.current.pushToStdout(`*** Deleted relationship with ID: ${arg2}`);
       } catch (exc) {
         this.terminal.current.pushToStdout(`*** Error deleting relationship: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -156,7 +156,7 @@ export class ConsoleComponent extends Component {
         this.terminal.current.pushToStdout(`*** Error retrieving model from ADT: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -172,7 +172,7 @@ export class ConsoleComponent extends Component {
           `*** Error creating model - Ensure there are no spaces in your input. You should NOT escape your JSON string: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -181,12 +181,12 @@ export class ConsoleComponent extends Component {
       try {
         await apiService.deleteModel(arg1);
         eventService.publishDeleteModel(arg1);
-        this.terminal.current.pushToStdout(`*** Deleted model with ID:  ${arg1}`);
+        this.terminal.current.pushToStdout(`*** Deleted model with ID: ${arg1}`);
       } catch (exc) {
-        this.terminal.current.pushToStdout(`*** Error deleting model:  ${exc}`);
+        this.terminal.current.pushToStdout(`*** Error deleting model: ${exc}`);
       }
     } else {
-      this.terminal.current.pushToStdout("***  Not enough params");
+      this.terminal.current.pushToStdout("*** Not enough params");
     }
   }
 
@@ -194,52 +194,72 @@ export class ConsoleComponent extends Component {
     patchtwin: {
       description: "patch a digital twin",
       usage: "patchtwin <twinId:string> <operation:string> <propertyName:string> <value:string>",
-      fn: (arg1, arg2, arg3, arg4) => this.patchTwin(arg1, arg2, arg3, arg4)
+      fn: (arg1, arg2, arg3, arg4) => {
+        this.patchTwin(arg1, arg2, arg3, arg4);
+      }
     },
     gettwin: {
       description: "get a digital twin",
       usage: "gettwin <twinId:string>",
-      fn: arg1 => this.getTwin(arg1)
+      fn: arg1 => {
+        this.getTwin(arg1);
+      }
     },
     addtwin: {
       description: "add a digital twin",
       usage: "addtwin <modelId:string> <newTwinId:string>",
-      fn: (arg1, arg2) => this.addTwin(arg1, arg2)
+      fn: (arg1, arg2) => {
+        this.addTwin(arg1, arg2);
+      }
     },
     deltwin: {
       description: "delete a digital twin",
       usage: "deltwin <twinId:string>",
-      fn: arg1 => this.deleteTwin(arg1)
+      fn: arg1 => {
+        this.deleteTwin(arg1);
+      }
     },
     getrel: {
       description: "get relationships",
       usage: "getrel <twinId:string>",
-      fn: arg1 => this.getRelationships(arg1)
+      fn: arg1 => {
+        this.getRelationships(arg1);
+      }
     },
     addrel: {
       description: "add relationship",
       usage: "addrel <sourceId:string> <targetId:string> <relationshipName:string>",
-      fn: (arg1, arg2, arg3) => this.addRelationship(arg1, arg2, arg3)
+      fn: (arg1, arg2, arg3) => {
+        this.addRelationship(arg1, arg2, arg3);
+      }
     },
     delrel: {
       description: "delete relationship",
       usage: "delrel <twinId:string> <relationshipId:string>",
-      fn: (arg1, arg2) => this.deleteRelationship(arg1, arg2)
+      fn: (arg1, arg2) => {
+        this.deleteRelationship(arg1, arg2);
+      }
     },
     getmodel: {
       description: "get model info",
       usage: "getmodel <modelId:string>",
-      fn: arg1 => this.getModel(arg1)
+      fn: arg1 => {
+        this.getModel(arg1);
+      }
     },
     addmodel: {
       description: "add model (ensure JSON has no spaces and is not escaped)",
       usage: "addmodel <modelJSON:string>",
-      fn: arg1 => this.addModel(arg1)
+      fn: arg1 => {
+        this.addModel(arg1);
+      }
     },
     delmodel: {
       description: "delete model",
       usage: "delmodel <modelId:string>",
-      fn: arg1 => this.delModel(arg1)
+      fn: arg1 => {
+        this.delModel(arg1);
+      }
     }
   }
 

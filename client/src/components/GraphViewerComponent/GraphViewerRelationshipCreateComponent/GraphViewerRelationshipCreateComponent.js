@@ -63,7 +63,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
       const rel = relationshipItems[relationshipId];
       await apiService.addRelationship(sourceId, targetId, rel, id);
       if (onCreate) {
-        onCreate({ "$targetId": targetId, "$sourceId": sourceId, "$relationshipId": id, "$relationship": rel });
+        onCreate({ $sourceId: sourceId, $relationshipId: id, $relationshipName: rel, $targetId: targetId });
       }
     } catch (exc) {
       print(`*** Error creating relationship: ${exc}`, "error");
