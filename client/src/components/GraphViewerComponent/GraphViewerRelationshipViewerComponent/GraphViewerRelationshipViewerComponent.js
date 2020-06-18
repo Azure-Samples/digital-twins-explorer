@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { DefaultButton } from "office-ui-fabric-react";
-import { syntaxHighlight } from "../../../utils/utilities";
+import jsonMarkup from "json-markup";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -21,8 +21,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
   }
 
   getMarkup(relationships) {
-    const json = JSON.stringify(relationships || {}, null, 2);
-    return { __html: syntaxHighlight(json) };
+    return { __html: jsonMarkup(relationships || {}) };
   }
 
   async open() {

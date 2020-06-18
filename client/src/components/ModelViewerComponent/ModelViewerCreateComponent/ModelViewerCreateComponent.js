@@ -26,7 +26,8 @@ export class ModelViewerCreateComponent extends Component {
     this.setState({ item, showModal: true, name: "", error: "" });
   }
 
-  cancel = () => {
+  cancel = e => {
+    e.preventDefault();
     this.setState({ showModal: false });
   }
 
@@ -43,7 +44,6 @@ export class ModelViewerCreateComponent extends Component {
   save = async e => {
     e.preventDefault();
     const { name, item } = this.state;
-    this.setState({ isLoading: true });
     if (name === "") {
       this.setState({ error: "Please enter a value." });
       return;

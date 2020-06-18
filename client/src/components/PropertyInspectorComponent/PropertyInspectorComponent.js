@@ -99,7 +99,14 @@ export class PropertyInspectorComponent extends Component {
 
   subscribeSelection = () => {
     eventService.subscribeSelection(async selection => {
-      this.properties = selection ? await new ModelService().getProperties(selection.$metadata.$model) : null;
+      let properties = null;
+      try {
+        properties = selection ? await new ModelService().getProperties(selection.$metadata.$model) : null;
+      } catch (exc) {
+        print(`*** Error fetching twin properties: ${exc}`, "error");
+      }
+
+      this.properties = properties;
       this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
       this.setState({ changed: false, selection, patch: null });
       if (selection) {
@@ -122,7 +129,7 @@ export class PropertyInspectorComponent extends Component {
     }
 
     if (node && (NonPatchableFields.indexOf(node.path[0]) > -1
-      || this.properties.some(x => x.name === node.field && x.writeable !== false))) {
+      || this.properties.some(x => x.name === node.field && x.writeable === false))) {
       return { field: false, value: false };
     }
 
@@ -168,10 +175,9 @@ export class PropertyInspectorComponent extends Component {
       const deltaFromDefaults = compare(this.original, this.updated);
       const deltaFromOriginal = compare(selection, this.updated);
       const delta = deltaFromOriginal.filter(x => deltaFromDefaults.some(y => y.path === x.path));
+      this.setState({ patch: delta });
 
       const patch = JSON.stringify(delta, null, 2);
-      this.setState({ patch });
-
       print("*** PI Changes:", "info");
       print(patch, "info");
       if (patch.length > 0) {

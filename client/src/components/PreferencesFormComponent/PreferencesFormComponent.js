@@ -31,7 +31,8 @@ export class PreferencesFormComponent extends Component {
     });
   }
 
-  closeSettings = () => {
+  closeSettings = e => {
+    e.preventDefault();
     this.resetModalState();
   }
 

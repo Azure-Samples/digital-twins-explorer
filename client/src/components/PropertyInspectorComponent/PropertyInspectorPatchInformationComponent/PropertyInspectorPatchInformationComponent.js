@@ -1,10 +1,11 @@
 import React from "react";
 import { DefaultButton } from "office-ui-fabric-react";
-import { syntaxHighlight } from "../../../utils/utilities";
+import jsonMarkup from "json-markup";
+
 import ModalComponent from "../../ModalComponent/ModalComponent";
 
 export const PropertyInspectorPatchInformationComponent = ({ isVisible, patch, onCloseModal }) => {
-  const getMarkup = p => ({ __html: syntaxHighlight(p || "[]") });
+  const getMarkup = p => ({ __html: jsonMarkup(p || []) });
 
   return (
     <ModalComponent isVisible={isVisible} className="pi-patch-modal">

@@ -40,7 +40,8 @@ export class ConfigurationFormComponent extends Component {
     }
   }
 
-  closeConfigurationSettings = () => {
+  closeConfigurationSettings = e => {
+    e.preventDefault();
     eventService.publishConfigure({ type: "end" });
     this.resetModalState();
   }

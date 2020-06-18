@@ -105,25 +105,19 @@ body {
   background-color: #2d2d2d;
 }
 
-/**************************/
-/*
- For JSON Pretty Printer
-*/
-/**************************/
-
-.string {
+.json-markup-string {
   color: lightgreen;
 }
-.number {
+.json-markup-number {
   color: darkorange;
 }
-.boolean {
+.json-markup-bool {
   color: lightblue;
 }
-.null {
+.json-markup-null {
   color: magenta;
 }
-.key {
+.json-markup-key {
   color: orange;
 }
 

@@ -51,7 +51,7 @@ export class AppCommandBar extends Component {
           ariaLabel: "sign out",
           iconOnly: true,
           iconProps: { iconName: "SignOut" },
-          onClick: () => authService.logout(),
+          onClick: () => this.logout(),
           className: "app-toolbarButtons"
         }
       ]
@@ -66,6 +66,15 @@ export class AppCommandBar extends Component {
         print(`*** Error on login: ${e}`, "error");
         eventService.publishError(`*** Error on login: ${e}`);
       }
+    }
+  }
+
+  logout = () => {
+    try {
+      authService.logout();
+    } catch (e) {
+      print(`*** Error on logout: ${e}`, "error");
+      eventService.publishError(`*** Error on logout: ${e}`);
     }
   }
 

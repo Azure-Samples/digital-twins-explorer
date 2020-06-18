@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { DefaultButton, FocusZone, FocusZoneTabbableElements } from "office-ui-fabric-react";
+import jsonMarkup from "json-markup";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
-import { syntaxHighlight } from "../../../utils/utilities";
 import { apiService } from "../../../services/ApiService";
 import { print } from "../../../services/LoggingService";
 
@@ -20,8 +20,7 @@ export class ModelViewerViewComponent extends Component {
   }
 
   getMarkup(model) {
-    const json = JSON.stringify(model, null, 2);
-    return { __html: syntaxHighlight(json) };
+    return { __html: jsonMarkup(model) };
   }
 
   async open(item) {
@@ -37,7 +36,8 @@ export class ModelViewerViewComponent extends Component {
     this.setState({ model: data.model ? data.model : data, isLoading: false });
   }
 
-  close = () => {
+  close = e => {
+    e.preventDefault();
     this.setState({ showModal: false });
   }
 

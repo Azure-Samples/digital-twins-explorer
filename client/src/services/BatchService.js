@@ -34,7 +34,11 @@ export class BatchService {
           resolve();
         };
 
-        this._action(item, res, reject);
+        try {
+          this._action(item, res, reject);
+        } catch (e) {
+          reject(e);
+        }
       });
 
       promises.push(p);

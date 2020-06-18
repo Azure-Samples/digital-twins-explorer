@@ -67,7 +67,8 @@ export class QueryComponent extends Component {
     }
   }
 
-  overwriteQuery = () => {
+  overwriteQuery = e => {
+    e.preventDefault();
     const { queries, selectedQuery, newQueryName } = this.state;
     if (newQueryName) {
       const newQueries = [ ...queries ];
@@ -77,7 +78,8 @@ export class QueryComponent extends Component {
     }
   }
 
-  cancelSaveQuery = () => {
+  cancelSaveQuery = e => {
+    e.preventDefault();
     this.setState({ showSaveQueryModal: false, newQueryName: "", showConfirmOverwriteModal: false });
   }
 
@@ -85,12 +87,14 @@ export class QueryComponent extends Component {
     this.setState(prevState => ({ selectedQuery: prevState.queries.find(q => q.name === i.key).query, selectedQueryKey: i.key }));
   }
 
-  confirmDeleteQuery = () => {
+  confirmDeleteQuery = e => {
+    e.preventDefault();
     this.removeQuery();
     this.setState({ showConfirmDeleteModal: false, queryKeyToBeRemoved: "" });
   }
 
-  cancelDeleteQuery = () => {
+  cancelDeleteQuery = e => {
+    e.preventDefault();
     this.setState({ showConfirmDeleteModal: false, queryKeyToBeRemoved: "" });
   }
 
