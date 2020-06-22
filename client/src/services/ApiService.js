@@ -88,7 +88,8 @@ class ApiService {
   async getTwinById(twinId) {
     await this.initialize();
 
-    return await this.client.digitalTwins.getById(twinId, this.clientOptions);
+    const response = await this.client.digitalTwins.getById(twinId, this.clientOptions);
+    return response.body;
   }
 
   async addTwin(twinId, payload) {

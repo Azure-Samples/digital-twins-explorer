@@ -142,7 +142,7 @@ export class GraphViewerComponent extends React.Component {
                       // eslint-disable-next-line max-depth
                       if (rel[prop] && allTwins.every(x => x.$dtId !== rel[prop])) {
                         const missingTwin = await apiService.getTwinById(rel[prop]);
-                        [ missingTwins, allTwins ].forEach(x => x.push(missingTwin.body));
+                        [ missingTwins, allTwins ].forEach(x => x.push(missingTwin));
                       }
                     }
                   }
@@ -184,7 +184,7 @@ export class GraphViewerComponent extends React.Component {
       try {
         const data = await apiService.getTwinById(e.selectedNode.id);
         if (data) {
-          eventService.publishSelection(data.body);
+          eventService.publishSelection(data);
         }
       } catch (exc) {
         print(`*** Error fetching data for twin: ${exc}`, "error");

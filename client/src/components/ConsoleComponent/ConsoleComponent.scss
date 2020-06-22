@@ -1,15 +1,11 @@
-.cc-content {
-    font-family: 'Consolas','Courier New', Courier, monospace !important;
-    font-size: 10px !important;
-}
-
-.cc-input {
-    font-family: 'Consolas','Courier New', Courier, monospace !important;
-    font-size: 10px !important;
+.cc-content, .cc-input, .cc-message {
+  font-family: monospace !important;
+  font-size: 10px !important;
+  line-height: 15px !important;
 }
 
 .cc-console {
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
+  width: 100%;
+  max-width: 100%;
+  user-select: text;
 }

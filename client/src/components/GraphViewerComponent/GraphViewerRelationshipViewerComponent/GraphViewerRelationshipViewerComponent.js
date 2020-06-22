@@ -37,7 +37,6 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     let relationships = null;
     try {
       relationships = await apiService.queryRelationships(id);
-      relationships.forEach(x => print(JSON.stringify(x.data, null, 2)));
     } catch (exp) {
       print(`Error in retrieving relationships for ${id}, exception: ${exp}`, "error");
       eventService.publishError(`Error in retrieving relationships for ${id}, exception: ${exp}`);

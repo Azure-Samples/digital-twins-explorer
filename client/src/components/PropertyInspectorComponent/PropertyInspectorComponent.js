@@ -21,7 +21,7 @@ import "../ModalComponent/ModalComponent.scss";
 const NonPatchableFields = [ "$dtId", "$etag", "$metadata", "telemetry" ];
 
 const applyDefaultValues = (properties, selection) => {
-  if (!selection) {
+  if (!selection || !properties) {
     return selection;
   }
 
@@ -107,7 +107,7 @@ export class PropertyInspectorComponent extends Component {
       }
 
       this.properties = properties;
-      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
+      this.original = this.updated = selection ? await applyDefaultValues(properties, deepClone(selection)) : null;
       this.setState({ changed: false, selection, patch: null });
       if (selection) {
         this.editor.set(this.original);

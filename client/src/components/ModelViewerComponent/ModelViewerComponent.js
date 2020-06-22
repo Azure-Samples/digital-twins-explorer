@@ -144,7 +144,7 @@ export class ModelViewerComponent extends Component {
             <ModelViewerCommandBarComponent className="mv-commandbar" buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
               onUploadModelClicked={() => this.uploadModelRef.current.click()} />
-            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple
+            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
           </div>
           <div>

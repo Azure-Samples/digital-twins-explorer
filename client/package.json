@@ -25,7 +25,7 @@
     "node-sass": "^4.14.1",
     "office-ui-fabric-react": "^7.117.4",
     "react": "^16.13.1",
-    "react-console-emulator": "^3.0.5",
+    "react-console-emulator": "^4.0.1",
     "react-cytoscapejs": "^1.2.1",
     "react-dom": "^16.13.1",
     "react-error-boundary": "^2.0.1",

@@ -18,6 +18,10 @@ export class OutputComponent extends React.Component {
   }
 
   update = (newdata, newtype) => {
+    let newdataWithFallback = newdata;
+    if (!newdata) {
+      newdataWithFallback = "";
+    }
     let newtypeWithFallback = newtype;
     if (newtype !== "error"
       && newtype !== "info"
@@ -25,13 +29,13 @@ export class OutputComponent extends React.Component {
       && newtype !== "ok") {
       newtypeWithFallback = "info";
     }
-    const lines = newdata.split(/\r\n|\r|\n/);
+    const lines = newdataWithFallback.split(/\r\n|\r|\n/);
     if (lines.length > 1) {
       const nlog = lines.map(line => ({ data: line, method: newtypeWithFallback }));
       this.setState(prevState => ({ logs: [ ...prevState.logs, ...nlog ] }));
     } else {
       const nlog = {
-        data: newdata,
+        data: newdataWithFallback,
         method: newtypeWithFallback
       };
       this.setState(prevState => ({ logs: [ ...prevState.logs, nlog ] }));

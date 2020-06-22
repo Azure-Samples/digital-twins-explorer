@@ -2,14 +2,15 @@
 
 .oc-output {
   background-color: $backgroundColor2;
-  overflow: scroll;
-  height: 100%;
+  overflow-y: auto;
+  height: calc(100% - 4px);
   font-family: $fontFamilyConsole;
   font-size: 10px;
   margin: 2px;
   user-select: text;
   pre {
     margin: 0;
+    white-space: pre-wrap;
   }
 }
 
