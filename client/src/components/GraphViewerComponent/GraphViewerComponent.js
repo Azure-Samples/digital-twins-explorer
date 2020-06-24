@@ -122,7 +122,7 @@ export class GraphViewerComponent extends React.Component {
     const allTwins = [ ...twins ];
     const existingTwins = [];
     for (let i = 0; i < expansionLevel; i++) {
-      const baselineChunk = ((100 - baseline) / expansionLevel) * i;
+      const baselineChunk = (100 - baseline) / expansionLevel;
       const currentTwins = allTwins.filter(x => existingTwins.every(y => y.$dtId !== x.$dtId));
       existingTwins.push(...currentTwins);
 
