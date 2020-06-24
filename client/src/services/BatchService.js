@@ -30,8 +30,13 @@ export class BatchService {
       p.promise = new Promise((resolve, reject) => {
         const res = () => {
           promises.splice(promises.indexOf(p), 1);
-          this.update((i / this._items.length) * 100);
-          resolve();
+
+          try {
+            this.update((i / this._items.length) * 100);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
         };
 
         try {

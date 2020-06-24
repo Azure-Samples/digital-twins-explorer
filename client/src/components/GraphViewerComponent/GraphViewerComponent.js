@@ -130,7 +130,10 @@ export class GraphViewerComponent extends React.Component {
         refresh: () => this.cyRef.current.doLayout(),
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
         items: currentTwins,
-        action: (twin, resolve, reject) =>
+        action: (twin, resolve, reject) => {
+          if (this.canceled) {
+            resolve();
+          }
           apiService
             .queryRelationshipsPaged(twin.$dtId, async rels => {
               try {
@@ -166,7 +169,8 @@ export class GraphViewerComponent extends React.Component {
               // If the twin has been deleted, warn but don't block the graph render
               print(`*** Error fetching data for twin: ${exc}`, "warning");
               resolve();
-            })
+            });
+        }
       });
 
       await bs.run();
