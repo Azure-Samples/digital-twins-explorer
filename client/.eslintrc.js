@@ -46,6 +46,7 @@ module.exports = {
       "max-lines-per-function": ["error", 100],
       "max-params": 0,
       "max-statements": 0,
+      "multiline-comment-style": 0,
       "multiline-ternary": 0,
       "no-await-in-loop": 0,
       "no-confusing-arrow": 0,

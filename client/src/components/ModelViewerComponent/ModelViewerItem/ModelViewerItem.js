@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from "react";
 import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
 import { IconButton, Stack } from "office-ui-fabric-react";

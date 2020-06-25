@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { TokenCredentials } from "@azure/ms-rest-js";
 import { AzureDigitalTwinsAPI } from "./lib/azureDigitalTwinsAPI";
 import { authService } from "./AuthService";

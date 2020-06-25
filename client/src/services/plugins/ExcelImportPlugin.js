@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ExcelRenderer as excelRenderer } from "react-excel-renderer";
 import { v4 as uuidv4 } from "uuid";
 

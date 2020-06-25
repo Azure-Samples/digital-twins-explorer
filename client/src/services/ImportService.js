@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ExcelImportPlugin } from "./plugins/ExcelImportPlugin";
 import { JsonImportPlugin } from "./plugins/JsonImportPlugin";
 import { apiService } from "./ApiService";

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { eventService } from "./EventService";
 import { storageService } from "./StorageService";
 import { apiService } from "./ApiService";

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import * as signalR from "@microsoft/signalr";
 
 import { authService } from "./AuthService";

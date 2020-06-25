@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { storageService } from "./StorageService";
 import { REL_TYPE_OUTGOING } from "./Constants";
 

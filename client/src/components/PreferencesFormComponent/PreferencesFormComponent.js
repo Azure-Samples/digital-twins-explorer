@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from "react";
 import { FocusZone, FocusZoneTabbableElements, Toggle, IconButton } from "office-ui-fabric-react";
 

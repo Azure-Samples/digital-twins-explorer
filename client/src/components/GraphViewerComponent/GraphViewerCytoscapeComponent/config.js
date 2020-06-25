@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /* eslint-disable */
 
 // Mpn65 color scheme taken from https://github.com/google/palette.js

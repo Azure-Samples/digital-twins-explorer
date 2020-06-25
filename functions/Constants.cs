@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 namespace AdtExplorer.Functions
 {
   public static class Constants

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 class StorageService {
 
   getLocalStorageObject = name => JSON.parse(localStorage.getItem(name))

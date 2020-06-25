@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { readFile } from "../../utils/utilities";
 
 export class JsonImportPlugin {

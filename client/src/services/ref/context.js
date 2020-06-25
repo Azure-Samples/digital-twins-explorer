@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 module.exports = { "@context": {
     "@vocab": "http://azure.com/DigitalTwin/MetaModel/undefinedTerm/",
     "dtmm": "http://azure.com/DigitalTwin/MetaModel/",

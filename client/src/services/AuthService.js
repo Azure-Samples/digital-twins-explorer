@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import * as Msal from "msal";
 import { configService } from "./ConfigService";
 import { eventService } from "./EventService";

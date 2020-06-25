@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 const Messages = {
   error: {
     render: (error, componentStack, componentName) =>

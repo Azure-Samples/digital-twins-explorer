@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Stack } from "office-ui-fabric-react/lib/";

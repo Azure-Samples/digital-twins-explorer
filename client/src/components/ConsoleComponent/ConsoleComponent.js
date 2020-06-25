@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from "react";
 import Terminal from "react-console-emulator";
 import { v4 as uuidv4 } from "uuid";

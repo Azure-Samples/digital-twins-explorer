@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export function readFile(file) {
   // Always return a Promise
   return new Promise((resolve, reject) => {

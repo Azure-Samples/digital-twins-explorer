@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from "react";
 import { DefaultButton } from "office-ui-fabric-react";
 import ModalComponent from "../../ModalComponent/ModalComponent";

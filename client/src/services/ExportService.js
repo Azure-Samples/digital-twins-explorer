@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { apiService } from "./ApiService";
 import { BatchService } from "./BatchService";
 import { DataModel } from "./models/DataModel";

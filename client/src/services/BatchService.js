@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 const MAX_CONCURRENT_QUERIES = 6;
 
 export class BatchService {
