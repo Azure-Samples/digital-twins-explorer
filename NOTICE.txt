@@ -1,0 +1,2 @@
+This sample code uses the Mpn65 color palette from https://github.com/google/palette.js
+Licensed under the Apache License, Version 2.0
