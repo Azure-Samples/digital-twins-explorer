@@ -1,11 +1,10 @@
 const MAX_CONCURRENT_QUERIES = 6;
-const BATCH_REFRESH_SIZE = 3 * MAX_CONCURRENT_QUERIES;
 
 export class BatchService {
 
   constructor(config) {
     this.maxConcurrentQueries = config.maxConcurrentQueries || MAX_CONCURRENT_QUERIES;
-    this.refreshSize = config.refreshSize || BATCH_REFRESH_SIZE;
+    this.refreshSize = config.refreshSize || Math.round(config.items.length / 3);
     this._refresh = config.refresh;
     this._update = config.update;
     this._action = config.action;
