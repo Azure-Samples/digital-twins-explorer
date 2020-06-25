@@ -2,6 +2,8 @@
 
 This is a preview release of the ADT Explorer for the ADTv2 public preview service.
 
+Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+
 ## Requirements
 
 Node.js 10+
