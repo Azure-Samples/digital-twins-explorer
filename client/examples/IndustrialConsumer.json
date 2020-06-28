@@ -1,0 +1,14 @@
+{
+    "@id": "dtmi:example:grid:plants:industrialConsumer;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "extends": ["dtmi:example:grid:consumer:baseConsumer;1"],
+    "displayName": "Industrial Customer",
+    "contents": [
+        {
+            "@type": "Relationship",
+            "name": "hasGenerator",
+            "target": "dtmi:example:grid:plants:basePlant;1"
+        }
+    ]
+}

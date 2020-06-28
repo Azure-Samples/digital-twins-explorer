@@ -1,0 +1,14 @@
+{
+    "@id": "dtmi:example:grid:transmission:transformer;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "extends": ["dtmi:example:grid:transmission:baseReceiver;1"],
+    "displayName": "Transformer",
+    "contents": [
+        {
+            "@type": "Relationship",
+            "name": "feeds",
+            "target": "dtmi:example:grid:transmission:powerLine;1"
+        }
+    ]
+}

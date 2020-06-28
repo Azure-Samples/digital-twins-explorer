@@ -1,0 +1,13 @@
+{
+    "@id": "dtmi:example:grid:consumer:baseConsumer;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "displayName": "Base Consumer",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "PowerRequirement",
+            "schema": "double"
+        }
+    ]
+}

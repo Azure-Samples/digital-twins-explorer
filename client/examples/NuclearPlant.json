@@ -1,0 +1,7 @@
+{
+    "@id": "dtmi:example:grid:plants:nuclearPlant;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "extends": ["dtmi:example:grid:plants:basePlant;1"],
+    "displayName": "Nuclear Plant"
+}

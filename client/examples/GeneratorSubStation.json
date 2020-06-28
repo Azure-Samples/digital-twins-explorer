@@ -1,0 +1,19 @@
+{
+    "@id": "dtmi:example:grid:transmission:generatorSubStation;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "extends": ["dtmi:example:grid:transmission:baseReceiver;1"],
+    "displayName": "Generator SubStation",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "Capacity",
+            "schema": "double"
+        },
+        {
+            "@type": "Relationship",
+            "name": "feeds",
+            "target": "dtmi:example:grid:transmission:powerLine;1"
+        }
+    ]
+}

@@ -1,0 +1,79 @@
+{
+    "@id": "dtmi:example:grid:plants:basePlant;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "displayName": "Base Plant",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "Output",
+            "schema": "double"
+        },
+        {
+            "@type": "Relationship",
+            "name": "feeds",
+            "target": "dtmi:example:grid:transmission:powerLine;1"
+        },
+        {
+            "@type": "Property",
+            "name": "EmissionType",
+            "comment": "[GLOBALTYPE]",
+            "schema": {
+                "@type": "Enum",
+                "valueSchema": "string",
+                "enumValues": [
+                    {
+                        "name": "Renewable",
+                        "displayName": "Renewable",
+                        "enumValue": "Renewable"
+                    },
+                    {
+                        "name": "Traditional",
+                        "displayName": "Traditional",
+                        "enumValue": "Traditional"
+                    }
+                ]
+            }
+        },
+        {
+            "@type": "Property",
+            "name": "ManufacturerInfo",
+            "comment": "[GLOBALTYPE]",
+            "schema": {
+                "@type": "Object",
+                "comment": "[GLOBALTYPE]",
+                "fields": [
+                    {
+                        "name": "Name",
+                        "schema": "string"
+                    },
+                    {
+                        "name": "Address",
+                        "schema": {
+                            "@type": "Object",
+                            "comment": "[GLOBALTYPE]",
+                            "fields": [
+                                {
+                                    "name": "Street",
+                                    "schema": "string"
+                                },
+                                {
+                                    "name": "City",
+                                    "schema": "string"
+                                },
+                                {
+                                    "name": "Zip",
+                                    "schema": "string"
+                                },
+                                {
+                                    "name": "Country",
+                                    "schema": "string"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

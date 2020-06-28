@@ -1,0 +1,44 @@
+{
+    "@id": "dtmi:example:grid:transmission:powerLine;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "displayName": "Power Line",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "Capacity",
+            "schema": "double"
+        },
+        {
+            "@type": "Relationship",
+            "name": "feeds",
+            "target": "dtmi:example:grid:transmission:baseReceiver;1"
+        },
+        {
+            "@type":"Property",
+            "name": "GridType",
+            "schema": "dtmi:example:grid:gridTypeEnum;1"
+        }
+    ],
+    "schemas": [
+        {
+            "@type": "Enum",
+            "valueSchema": "string",
+            "@id": "dtmi:example:grid:gridTypeEnum;1",
+            "enumValues": [
+                {
+                    "name": "ExtraHighVoltage",
+                    "enumValue": "ExtraHighVoltage"
+                },
+                {
+                    "name": "HighVoltage",
+                    "enumValue": "HighVoltage"
+                },
+                {
+                    "name": "Distribution",
+                    "enumValue": "Distribution"
+                }
+            ]
+        }
+    ]
+}

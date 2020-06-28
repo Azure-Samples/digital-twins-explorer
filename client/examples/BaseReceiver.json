@@ -1,0 +1,6 @@
+{
+    "@id": "dtmi:example:grid:transmission:baseReceiver;1",
+    "@context": "dtmi:dtdl:context;2",
+    "@type": "Interface",
+    "displayName": "Base Receiver"
+}

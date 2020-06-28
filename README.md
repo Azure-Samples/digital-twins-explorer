@@ -1,8 +1,19 @@
 # ADT Explorer
 
-This is a preview release of the ADT Explorer for the ADTv2 public preview service.
+adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/en-us/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
+* Upload and explore models 
+* Upload and edit graphs of twins
+* Visualize the twins graph with a number of layout techniques
+* Edit properties of twins
+* Run queries against the twins graph 
 
-Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+![Image of adt-explorer](./media/adt-explorer.png)
+
+There is also an experimental set of features that allows you to send push notifications from Azure Digital Twins to the application for close-to-real time updates. 
+
+ADT explorer is written as a single-page JavaScript application. You can run it locally as a node.js application - see instructions below.
+
+ADT explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 ## Requirements
 
@@ -10,19 +21,141 @@ Node.js 10+
 
 ## Getting Started
 
-### Running locally
+### Running adt-explorer locally
 
-1. Ensure you provision your service environment and setup an Azure AD client as per the instructions in the [main repo](https://github.com/azure/azure-digital-twins), specifically:
-    * [Set up an Azure Digital Twins instance](https://github.com/Azure/azure-digital-twins/blob/private-preview/Documentation/how-to-set-up-instance.md)
-    * [Authenticate against Azure Digital Twins](https://github.com/Azure/azure-digital-twins/blob/private-preview/Documentation/how-to-authenticate.md): part 1 only (i.e. creating the app registration)
-      > When adding callback URLs, make sure to add `http://localhost:3000`. While it is possible to customize the port used by ADT Explorer, this is the default.
-1. From a command prompt in the `client/src` folder, run `npm install`.
+1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
+    * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance)
+    * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
+      > When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
+1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
     >  * Linux/Mac (Bash): `PORT=8080 npm run start`
     >  * Windows (cmd): `set PORT=8080 && npm run start`
     > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. localhost:7000 if that is the port you are using.
 1. Your browser should open and the app should appear.
+
+## Quick Start: Create an Example Graph
+
+To create an example graph with adt-explorer connected to a fresh instance of Azure Digital Twins, follow the steps below. THe result will be the graph in the screenshot above.
+
+Note: When you click the first command, adt-explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide:
+1. The Azure AD client ID configured earlier.
+1. The Azure AD tenant ID where the app is defined.
+1. The target Azure DT URL.
+
+![sign-in dialog](./media/sign-in-dialog.png)
+
+1. In the model panel at the left, click the `upload models` button (cloud icon with an arrow pointing into the cloud). 
+![model view panel](./media/model-upload.png)
+    * In the file selector box that appears, navigate to the client/examples folder in the repository
+    * Select all files with the `*.json` extension and hit ok
+1. adt-explorer will now upload these model files to your Azure Digital Twins instance
+1.  In the graph view panel (the large space in the middle), select the `import graph` button
+![graph view panel](./media/graph-panel-upload.png)
+1. In the file selector box, choose the `distributionGrid.xlsx` spreadsheet file. THis file contains a description of the desired graph.
+1. An import view opens, showing a preview of the graph that is going to be loaded.
+1. Hit the save button in the upper right corner
+![graph preview](./media/graph-preview.png)
+1. Adt-explorer will now create the requested twins and relationships in the service instance. A dialog will appear to show that it is finished.
+![graph import](./media/import-success.png)
+1. Click on the graph view tab
+1. Click the large query button in the upper right of the screen. This will cause adt-explorer to retrieve all twins and relationships from the service and draw the graph defined by them. 
+
+For more detailed instructions on adt-explorer features, please see the sections below.
+
+## Using adt-explorer
+
+### First run
+
+Initial authentication is triggered by:
+1. Clicking on the sign in button in the top right, or
+1. Clicking on an operation that requires calling the service.
+
+![sign-in icon](./media/sign-in.png) 
+
+Before continuing, you'll need to provide:
+1. The Azure AD client ID configured earlier.
+1. The Azure AD tenant ID where the app is defined.
+1. The target Azure DT URL.
+
+![sign-in dialog](./media/sign-in-dialog.png)
+
+To change these properties at any time, click on the sign in button in the top right.
+
+### Uploading Models
+
+Azure Digital Twins needs to be configured with models representing the entities that are important to your business. If you are using a fresh Azure Digital Twins instance, you should upload some models to the service first.
+
+To upload, browse and delete models, use the model view panel docked on the left side of the screen.
+
+![model view panel](./media/model-view.png)
+ 
+The panel will automatically show all available models in your environment on first connection; however, to trigger it explicitly, click on the *Download models* button.
+
+To upload a model, click on the *Upload a model* button and select one more JSON-formatted model files when prompted.
+
+For each model, you can:
+1. **Delete**: remove the definition from your ADT environment.
+1. **View**: see the raw JSON definition of the model.
+1. **Create a new twin**: create a new instance of the model as a twin in the ADT environment. No properties are set as part of this process (aside from name).
+
+The models shown in the example screenshot are available in the `examples` folder in this repository (`client/examples`). 
+
+### Creating Twins and Relationships
+
+You can create twins and relationships in adt-explorer. To create more than a few individual twins and relationships, you will probably want to use the **import** feature described below.
+
+* To create a twin instance, use the (+) button in any of the model items in the model list. A dialog will open, prompting you for the desired name of the new instance. The name must be unique.
+![create-twin](./media/create-twin.png)
+* To create a relationship: 
+  * You need to have at least two twins in your graph. An appropriate relationship must be defined in the model definition (in other words, the relationship you are trying to create must be allowed in the DTDL of the source twin). 
+  * Select the source twin first by clicking on it, then hold the shift key and click the target twin.
+  * Click the "Create Relationship" button in the graph viewer command bar
+![create-rel](./media/create-rel.png)
+  * Pick the desired relationship type (if any is available) from the popup menu in the relationship dialog
+![create-rel-diag](./media/create-rel-diag.png)
+
+### Querying
+
+Queries can be issued from the *Query Explorer* panel.
+
+To save a query, click on the Save icon next to the *Run Query* button. This query will then be saved locally and be available in the *Saved Queries* drop down to the left of the query text box. To delete a saved query, click on the *X* icon next to the name of the query when the *Saved Queries* drop down is open.
+
+For large graphs, it's suggested to query only a limited subset and then load the remainder as required. More specifically, you can double click on twins in the graph view to retrieve additional related nodes.
+
+To the right side of the *Query Explorer* toolbar, there are a number of controls to change the layout of the graph. Four different layout algorithms are available alongside options to center, fit to screen, and re-run layout.
+
+### Import/Export
+
+From the *Graph View*, import/export functionality is available.
+
+Export serializes the most recent query results to a JSON-based format, including models, twins, and relationships.
+
+Import deserializes from either a custom Excel-based format (see the `examples` folder) or the JSON-based format generated on export. Before import is executed, a preview of the graph is presented for validation.
+
+### Editing twins
+
+Selecting a node in the *Graph View* shows its properties in the *Property Explorer*. This includes default values for properties that have not yet been set.
+
+To edit writeable properties, update their values inline and click the Save button at the top of the view. The resulting patch operation on the API is then shown in a modal.
+
+Selecting two nodes allows for the creation of relationships. Multi-selection is enabled by holding down CTRL/CMD keys. Ensure twins are selected in the order of the relationship direction (i.e the first twin selected will be the source). Once two twins are selected, click on the `Create Relationship` button and select the type of relationship.
+
+Multi-select is also enabled for twin deletion.
+
+### Advanced Settings
+
+Clicking the settings cog in the top right corner allows the configuration of the following advanced features:
+1. Eager Loading: in the case the twins returned by a query have relationships to twins *not* returned by the query, this feature will load these missing twins before rendering the graph.
+1. Caching: this keeps a local cache of relationships and models in memory to improve query performance. These caches are cleared on any write operations on the relevant components (or on browser refresh).
+1. Console & Output windows: these are hidden by default. The console window enables the use of simple shell functions for workign with the graph. The output window shows a diagnostic trace of operations.
+1. Number of layers to expand: when double clicking on a node, this number indicates how many layers of relationships to fetch.
+1. Expansion direction: when double clicking on a node, this indicates which kinds of relationships to follow when expanding.
+
+## Experimental Features
+
+In addition to local operation, you can also run adt-explorer as a cloud application. In the cloud, you can use push notifications from Azure Digital Twins, sent via the Azure SignalR service, to update your adt-explorer in real time.
 
 ### Running in the cloud
 
@@ -42,69 +175,6 @@ When running locally, the Event Grid and SignalR services required for telemetry
 This requires setting the `REACT_APP_BASE_ADT_URL` environment variable to point to your Azure Functions host (e.g. `https://adtexplorer-<your suffix>.azurewebsites.net`). This can be set in the shell environment before starting `npm` or by creating a `.env` file in the `client` folder with `REACT_APP_BASE_ADT_URL=https://...`.
 
 Also, the local URL needs to be added to the allowed origins for the Azure Function and SignalR service. In the ARM template, the default `http://localhost:3000` path is added during deployment; however, if the site is run on a different port locally then both services will need to be updated through the Azure Portal.
-
-## Key features
-
-### First run
-
-Initial authentication is triggered by:
-1. Clicking on the sign in button in the top right, or
-1. Clicking on an operation that requires calling the service.
-
-Before continuing, you'll need to provide:
-1. The Azure AD client ID configured earlier.
-1. The Azure AD tenant ID where the app is defined.
-1. The target Azure DT URL.
-
-To change these properties at any time, click on the sign in button in the top right.
-
-### Querying
-
-Queries can be issued from the *Query Explorer* panel.
-
-To save a query, click on the Save icon next to the *Run Query* button. This query will then be saved locally and be available in the *Saved Queries* drop down to the left of the query text box. To delete a saved query, click on the *X* icon next to the name of the query when the *Saved Queries* drop down is open.
-
-For large graphs, it's suggested to query only a limited subset and then load the remainder as required. More specifically, you can double click on twins in the graph view to retrieve additional related nodes.
-
-To the right side of the *Query Explorer* toolbar, there are a number of controls to change the layout of the graph. Four different layout algorithms are available alongside options to center, fit to screen, and re-run layout.
-
-### Models
-
-Models can be viewed and managed from the *Model View* panel. The panel will automatically show all available models in your environment on first connection; however, to trigger it explicitly, click on the *Download models* button.
-
-To upload a model, click on the *Upload a model* button and select one more JSON-formatted model files when prompted.
-
-For each model, you can:
-1. Delete: remove the definition from your ADT environment.
-1. View: see the raw JSON definition of the model.
-1. Create a new twin: create a new instance of the model as a twin in the ADT environment. No properties are set as part of this process (aside from name).
-
-### Import/Export
-
-From the *Graph View*, import/export functionality is available.
-
-Export serializes the most recent query results to a JSON-based format, including models, twins, and relationships.
-
-Import deserializes from either a custom Excel-based format (see the `examples` folder) or the JSON-based format generated on export. Before import is executed, a preview of the graph is presented for validation.
-
-### Editing twins
-
-Selecting a node in the *Graph View* shows its properties in the *Property Explorer*. This includes default values for properties that have not yet been set.
-
-To edit writeable properties, update thier values inline and click the Save button at the top of the view. The resulting patch operation on the API is then shown in a modal.
-
-Selecting two nodes allows for the creation of relationships. Multi-selection is enabled by holding down CTRL/CMD keys. Ensure twins are selected in the order of the relationship direction (i.e the first twin selected will be the source). Once two twins are selected, click on the `Create Relationship` button and select the type of relationship.
-
-Multi-select is also enabled for twin deletion.
-
-### Advanced Settings
-
-Clicking the settings cog in the top right corner allows the configuration of the following advanced features:
-1. Eager Loading: in the case the twins returned by a query have relationships to twins *not* returned by the query, this feature will load these missing twins before rendering the graph.
-1. Caching: this keeps a local cache of relationships and models in memory to improve query performance. These caches are cleared on any write operations on the relevant components (or on browser refresh).
-1. Console & Output windows: these are hidden by default. The console window enables the use of simple shell functions for workign with the graph. The output window shows a diagnostic trace of operations.
-1. Number of layers to expand: when double clicking on a node, this number indicates how many layers of relationships to fetch.
-1. Expansion direction: when double clicking on a node, this indicates which kinds of relationships to follow when expanding.
 
 ## Extensibility points
 
