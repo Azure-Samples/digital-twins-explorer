@@ -26,7 +26,10 @@ Node.js 10+
 1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
     * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance)
     * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
-      > When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
+      > A few important aspects for your app registrations:
+      > * Make sure you add app registrations to the Web platform section of the app registration, not the desktop/mobile section.
+      > * When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
+      > * Check the **Access Tokens** toggle in the **Implicit Grants** section a few paragraphs below the **Platform Configuration** section on the page. If this toggle is not checked, you will not get authorization tokens.  
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
