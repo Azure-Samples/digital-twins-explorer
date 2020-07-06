@@ -47,7 +47,7 @@ Note: When you click the first command, adt-explorer will open a dialog that pro
 1. The Azure AD tenant ID where the app is defined.
 1. The target Azure DT URL.
 
-<img src="./media/sign-in-dialog.png" width="200" height="400" />
+<img src="./media/sign-in-dialog.png" width="200"/>
 
 ![sign-in dialog](./media/sign-in-dialog.png)
 
