@@ -53,7 +53,7 @@ In the model panel at the left, click the `upload models` button (cloud icon wit
 
 <img src="./media/model-upload.png" alt="model view panel" width="250"/>
 
-    * In the file selector box that appears, navigate to the client/examples folder in the repository
+    * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
     * Select all files with the `*.json` extension and hit ok
 
 Adt-explorer will now upload these model files to your Azure Digital Twins instance
@@ -157,7 +157,7 @@ From the *Graph View*, import/export functionality is available.
 
 Export serializes the most recent query results to a JSON-based format, including models, twins, and relationships.
 
-Import deserializes from either a custom Excel-based format (see the `examples` folder) or the JSON-based format generated on export. Before import is executed, a preview of the graph is presented for validation.
+Import deserializes from either a custom Excel-based format (see the [examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder for example files) or the JSON-based format generated on export. Before import is executed, a preview of the graph is presented for validation.
 
 ### Editing twins
 
