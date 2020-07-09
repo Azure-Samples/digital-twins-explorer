@@ -11,7 +11,7 @@ urlFragment: adt-explorer
 
 # ADT Explorer
 
-adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/en-us/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
+adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
 * Upload and explore models 
 * Upload and edit graphs of twins
 * Visualize the twins graph with a number of layout techniques
@@ -35,8 +35,8 @@ Node.js 10+
 ### Running adt-explorer locally
 
 1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
-    * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance)
-    * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
+    * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance)
+    * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
       > A few important aspects for your app registrations:
       > * Make sure you add app registrations to the Web platform section of the app registration, not the desktop/mobile section.
       > * When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
