@@ -1,3 +1,14 @@
+---
+page_type: sample
+languages:
+- csharp
+products:
+- azure-digital-twins
+name: ADT explorer
+description: A code sample for visualizing and managing an Azure Digital Twins instance
+urlFragment: adt-explorer
+---
+
 # ADT Explorer
 
 adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/en-us/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
