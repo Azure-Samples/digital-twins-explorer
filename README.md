@@ -53,8 +53,8 @@ In the model panel at the left, click the `upload models` button (cloud icon wit
 
 <img src="./media/model-upload.png" alt="model view panel" width="250"/>
 
-    * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
-    * Select all files with the `*.json` extension and hit ok
+  * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
+  * Select all files with the `*.json` extension and hit ok
 
 Adt-explorer will now upload these model files to your Azure Digital Twins instance
 
@@ -159,6 +159,23 @@ Export serializes the most recent query results to a JSON-based format, includin
 
 Import deserializes from either a custom Excel-based format (see the [examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder for example files) or the JSON-based format generated on export. Before import is executed, a preview of the graph is presented for validation.
 
+The excel import format is based on the following columns:
+* ModelId: The complete dtmi for the model that should be instantiated.
+* ID: The unique ID for the twin to be created
+* Relationship: A twin id with an outgoing relationship to the new twin
+* Relationship name: The name for the outgoing relationship from the twin in the previous column
+* Init data: A JSON string that contains Property settings for the twins to be created
+
+A few notes for relationships in the excel file. The following row
+
+`dtmi:example:test;1, twin01, twin02, relatesTo, {"Capacity":5}`  
+
+creates a twin instance of type `dtmi:example:test;1` with the id `twin01` and a `Capacity` property set to 5. It will also create a `relatesTo` relationship from a twin instance with the id twin02 to twin01.
+
+In this example, the model `dtmi:example:test;1` actually must define a property named `Capacity` of a numeric data type, and the model type of `twin02` must have a defined relationship `relatesTo`.
+  
+It is also possible to create multiple relationships to a twin that is being created. To just create a relationship (not a twin instance) simply leave the modelId column empty. 
+
 ### Editing twins
 
 Selecting a node in the *Graph View* shows its properties in the *Property Explorer*. This includes default values for properties that have not yet been set.
@@ -177,6 +194,11 @@ Clicking the settings cog in the top right corner allows the configuration of th
 1. Console & Output windows: these are hidden by default. The console window enables the use of simple shell functions for workign with the graph. The output window shows a diagnostic trace of operations.
 1. Number of layers to expand: when double clicking on a node, this number indicates how many layers of relationships to fetch.
 1. Expansion direction: when double clicking on a node, this indicates which kinds of relationships to follow when expanding.
+
+## Known Limitations
+
+* adt-explorer does not currently handle complex properties or components defined in twins well. You can create or visualize twins using these features, but you may not be able to view or edit their properties
+* The display of patches in the property inspector is not always correct if you perform multiple patches in a sequence. The changes should be correctly applied to th service twin, though
 
 ## Experimental Features
 
