@@ -6,10 +6,10 @@ products:
 - azure-digital-twins
 name: ADT explorer
 description: A code sample for visualizing and managing an Azure Digital Twins instance
-urlFragment: adt-explorer
+urlFragment: digital-twins-explorer
 ---
 
-# ADT Explorer
+# Azure Digital Twins (ADT) explorer
 
 adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
 * Upload and explore models 
