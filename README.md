@@ -1,7 +1,7 @@
 ---
 page_type: sample
 languages:
-- csharp
+- JavaScript / TypeScript
 products:
 - azure-digital-twins
 name: ADT explorer
