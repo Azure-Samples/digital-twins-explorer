@@ -61,9 +61,9 @@ Node.js 10+
 1. From a command prompt in the root folder, run `docker build -t adt-explorer .`. This will build the Docker image for the ADT explorer.
 1. From the same command prompt, run `docker run -it -p3000:3000 adt-explorer`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 adt-explorer`
-    > Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside docker this information might not be accurate, as other port might have been exposed. Be sure to use
-    the port you chose before.
-    > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. `localhost:7000` if that is the port you are using.
+    >  * Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside Docker this information might not be accurate, as other port might have been exposed. Be sure to use
+    >  the port you chose before.
+    >  * Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. `localhost:7000` if that is the port you are using.
 1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the apropriate port, if you changed it) and the app should appear.
 
 ## Quick Start: Create an Example Graph
