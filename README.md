@@ -49,6 +49,23 @@ Node.js 10+
     > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. localhost:7000 if that is the port you are using.
 1. Your browser should open and the app should appear.
 
+### Running adt-explorer with Docker
+
+1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
+    * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance)
+    * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
+      > A few important aspects for your app registrations:
+      > * Make sure you add app registrations to the Web platform section of the app registration, not the desktop/mobile section.
+      > * When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
+      > * Check the **Access Tokens** toggle in the **Implicit Grants** section a few paragraphs below the **Platform Configuration** section on the page. If this toggle is not checked, you will not get authorization tokens.  
+1. From a command prompt in the root folder, run `docker build -t adt-explorer .`. This will build the Docker image for the ADT explorer.
+1. From the same command prompt, run `docker run -it -p3000:3000 adt-explorer`.
+    > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 adt-explorer`
+    > Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside docker this information might not be accurate, as other port might have been exposed. Be sure to use
+    the port you chose before.
+    > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. `localhost:7000` if that is the port you are using.
+1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the apropriate port, if you changed it) and the app should appear.
+
 ## Quick Start: Create an Example Graph
 
 To create an example graph with adt-explorer connected to a fresh instance of Azure Digital Twins, follow the steps below. The result will be the graph in the screenshot above.
