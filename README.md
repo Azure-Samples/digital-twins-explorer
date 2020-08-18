@@ -4,7 +4,7 @@ languages:
 - JavaScript / TypeScript
 products:
 - azure-digital-twins
-name: ADT explorer
+name: Azure Digital Twins (ADT) explorer
 description: A code sample for visualizing and managing an Azure Digital Twins instance
 urlFragment: digital-twins-explorer
 ---
