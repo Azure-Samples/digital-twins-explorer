@@ -18,7 +18,7 @@ adt-explorer is a sample application for the [Azure Digital Twins service](https
 * Edit properties of twins
 * Run queries against the twins graph 
 
-![Image of adt-explorer](media/adt-explorer.png)
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/adt-explorer.png" alt="Image of adt-explorer"/>
 
 There is also an experimental set of features that allows you to send push notifications from Azure Digital Twins to the application for close-to-real time updates. 
 
@@ -57,11 +57,11 @@ Note: When you click the first command, adt-explorer will open a dialog that pro
 1. The Azure AD tenant ID where the app is defined.
 1. The target Azure DT URL.
 
-<img src="media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 In the model panel at the left, click the `upload models` button (cloud icon with an arrow pointing into the cloud). 
 
-<img src="media/model-upload.png" alt="model view panel" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/model-upload.png" alt="model view panel" width="250"/>
 
   * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
   * Select all files with the `*.json` extension and hit ok
@@ -70,7 +70,7 @@ Adt-explorer will now upload these model files to your Azure Digital Twins insta
 
 In the graph view panel (the large space in the middle), select the `import graph` button.
 
-<img src="media/graph-panel-upload.png" alt="graph view panel header" width="500"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/graph-panel-upload.png" alt="graph view panel header" width="500"/>
 
 In the file selector box, choose the `distributionGrid.xlsx` spreadsheet file. This file contains a description of the desired graph.
 
@@ -78,11 +78,11 @@ An import view opens, showing a preview of the graph that is going to be loaded.
 
 Hit the save button in the upper right corner
 
-<img src="media/graph-preview.png" alt="graph preview" width="500"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/graph-preview.png" alt="graph preview" width="500"/>
 
 Adt-explorer will now create the requested twins and relationships in the service instance. A dialog will appear to show that it is finished.
 
-<img src="media/import-success.png" alt="graph import success dialog" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/import-success.png" alt="graph import success dialog" width="250"/>
 
 Click on the graph view tab
 
@@ -98,7 +98,7 @@ Initial authentication is triggered by:
 1. Clicking on the sign in button in the top right, or
 1. Clicking on an operation that requires calling the service.
 
-<img src="media/sign-in.png" alt="sign-in icon" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in.png" alt="sign-in icon" width="250"/>
 
 
 Before continuing, you'll need to provide:
@@ -107,7 +107,7 @@ Before continuing, you'll need to provide:
 1. The target Azure DT URL.
 
 
-<img src="media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 
 To change these properties at any time, click on the sign in button in the top right.
@@ -118,7 +118,7 @@ Azure Digital Twins needs to be configured with models representing the entities
 
 To upload, browse and delete models, use the model view panel docked on the left side of the screen.
 
-<img src="media/model-view.png" alt="model view panel" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/model-view.png" alt="model view panel" width="250"/>
  
 The panel will automatically show all available models in your environment on first connection; however, to trigger it explicitly, click on the *Download models* button.
 
@@ -137,19 +137,19 @@ You can create twins and relationships in adt-explorer. To create more than a fe
 
 * To create a twin instance, use the (+) button in any of the model items in the model list. A dialog will open, prompting you for the desired name of the new instance. The name must be unique.
 
-<img src="media/create-twin.png" alt="create twin" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-twin.png" alt="create twin" width="250"/>
 
 * To create a relationship: 
   * You need to have at least two twins in your graph. An appropriate relationship must be defined in the model definition (in other words, the relationship you are trying to create must be allowed in the DTDL of the source twin). 
   * Select the source twin first by clicking on it, then hold the shift key and click the target twin.
   * Click the "Create Relationship" button in the graph viewer command bar
 
-<img src="media/create-rel.png" alt="create relationship" width="400"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-rel.png" alt="create relationship" width="400"/>
 
 
   * Pick the desired relationship type (if any is available) from the popup menu in the relationship dialog
 
-<img src="media/create-rel-diag.png" alt="create relationship dialog" width="250"/>
+<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-rel-diag.png" alt="create relationship dialog" width="250"/>
 
 ### Querying
 
