@@ -1,7 +1,8 @@
 ---
 page_type: sample
 languages:
-- JavaScript / TypeScript
+- javascript
+- typescript
 products:
 - azure-digital-twins
 name: Azure Digital Twins (ADT) explorer
