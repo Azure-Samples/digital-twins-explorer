@@ -42,6 +42,13 @@ class ApiService {
     this.clientOptions = null;
   }
 
+  async addhttp(url) {
+    if (!/^(?:f|ht)tps?:\/\//.test(url)) {
+        url = "http://" + url;
+    }
+    return url;
+  }
+
   async initialize() {
     const accessToken = await authService.login();
     if (!accessToken) {
@@ -58,7 +65,7 @@ class ApiService {
     this.client = new AzureDigitalTwinsAPI(tokenCredentials, clientConfig);
 
     const { appAdtUrl } = await configService.getConfig();
-    this.clientOptions = { customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } };
+    this.clientOptions = { customHeaders: { "x-adt-host": new URL(await this.addhttp(appAdtUrl)).hostname } };
   }
 
   async queryTwinsPaged(query, callback) {
