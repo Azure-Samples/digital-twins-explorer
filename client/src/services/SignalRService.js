@@ -9,13 +9,20 @@ import { print } from "./LoggingService";
 
 class SignalRService {
 
+  async addhttp(url) {
+    if (!/^(?:f|ht)tps?:\/\//.test(url)) {
+        url = "http://" + url;
+    }
+    return url;
+  }
+
   async initialize() {
     if (!this.connection) {
       try {
         const accessToken = await authService.login();
         const { appAdtUrl } = await configService.getConfig();
 
-        let signalRUrl = `/api/signalr/?x-adt-host=${new URL(appAdtUrl).hostname}`;
+        let signalRUrl = `/api/signalr/?x-adt-host=${new URL(await this.addhttp(appAdtUrl)).hostname}`;
         if (process.env.NODE_ENV === "development" && process.env.REACT_APP_BASE_ADT_URL) {
           signalRUrl = process.env.REACT_APP_BASE_ADT_URL + signalRUrl;
         }
