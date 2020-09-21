@@ -220,7 +220,7 @@ In addition to local operation, you can also run adt-explorer as a cloud applica
 1. Deploy the ARM template called `template.json` located under the `deployment` folder into your Azure subscription.
 1. Package the client app using `npm run build`. You may need to set `NODE_OPTIONS=--max_old_space_size=4096` if you receive memory-related errors.
 1. From the new `build` file, upload each file to the `web` container in the new storage account created by the ARM template.
-1. Package the functions app using `dotnet public -c Release -o ./publish`.
+1. Package the functions app using `dotnet publish -c Release -o ./publish`.
 1. Zip the contents of the `./publish` folder. E.g. from within the publish folder, run `zip -r AdtExplorerFunctions.zip *`.
 1. Publish the functions app using the CLI: `az functionapp deployment source config-zip -g <resource_group> -n <app_name> --src <zip_file_path>`.
 1. [Optional] For each Azure Digital Twins environment used with the tool *where live telemetry through SignalR is required*, deploy the `template-eventgrid.json` template in your Azure subscription.
