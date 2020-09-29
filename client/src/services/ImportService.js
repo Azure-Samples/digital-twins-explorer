@@ -42,7 +42,7 @@ class ImportService {
 
   async saveData(data) {
     const results = { twins: [], relationships: [] };
-
+    await apiService.initialize();
     const twinsBs = new BatchService({
       items: data.digitalTwinsGraph.digitalTwins,
       action: (item, resolve, reject) => {
