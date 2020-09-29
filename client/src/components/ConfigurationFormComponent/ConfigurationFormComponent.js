@@ -37,10 +37,32 @@ export class ConfigurationFormComponent extends Component {
       appTenantId: this.state.appTenantId,
       appAdtUrl: this.state.appAdtUrl
     };
-    if (config.appClientId && config.appTenantId && config.appAdtUrl) {
+
+    if (this.validateConfig(config)) {
       eventService.publishConfigure({ type: "end", config });
       this.resetModalState();
     }
+
+  }
+
+  validateConfig = config => {
+    if (!config.appClientId || !config.appTenantId || !config.appAdtUrl) {
+      eventService.publishError("*** All fields are required.");
+      return false;
+    }
+
+    if (!config.appAdtUrl.startsWith("https")) {
+      eventService.publishError("*** ADT URL must start with ‘https’.");
+      return false;
+    }
+
+    const regexp = /^(https):\/\/[\w-]+.api.[\w]+.digitaltwins.azure.net/gm;
+    if (!regexp.test(config.appAdtUrl)) {
+      eventService.publishError("*** ADT URL must match the format 'https://<name>.api.<dc>.digitaltwins.azure.net'.");
+      return false;
+    }
+
+    return false;
   }
 
   closeConfigurationSettings = e => {
