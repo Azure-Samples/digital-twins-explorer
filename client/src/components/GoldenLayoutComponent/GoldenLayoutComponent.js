@@ -1,6 +1,4 @@
-// This component is based on the bug fix suggested by
-// pmunin here: 
-// https://github.com/golden-layout/golden-layout/issues/392
+// This component is based on the bug fix suggested by pmunin here: https://github.com/golden-layout/golden-layout/issues/392
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import GoldenLayout from "golden-layout";
@@ -157,7 +155,7 @@ export class GoldenLayoutComponent extends Component {
 
 }
 
-//Patching internal GoldenLayout.__lm.utils.ReactComponentHandler:
+// Patching internal GoldenLayout.__lm.utils.ReactComponentHandler:
 
 const ReactComponentHandler = GoldenLayout.__lm.utils.ReactComponentHandler;
 
