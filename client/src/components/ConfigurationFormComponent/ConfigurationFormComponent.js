@@ -62,7 +62,7 @@ export class ConfigurationFormComponent extends Component {
       return false;
     }
 
-    return false;
+    return true;
   }
 
   closeConfigurationSettings = e => {
