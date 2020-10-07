@@ -86,10 +86,6 @@ class ApiService {
     const httpClient = new CustomHttpClient({ customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } });
     this.client = new DigitalTwinsClient(baseUri, customTokenCredentials, { httpClient });
 
-<<<<<<< HEAD
-    const { appAdtUrl } = await configService.getConfig();
-    this.clientOptions = { customHeaders: { "x-adt-host": new URL(await this.addhttp(appAdtUrl)).hostname } };
-=======
     // Workaround pending SDK fix
     const t1 = this.client.client.digitalTwins.listRelationshipsNext;
     this.client.client.digitalTwins.listRelationshipsNext = (a, b, c) =>
@@ -98,7 +94,6 @@ class ApiService {
     const t2 = this.client.client.digitalTwins.listIncomingRelationshipsNext;
     this.client.client.digitalTwins.listIncomingRelationshipsNext = (a, b, c) =>
       t2.call(this.client.client.digitalTwins, b === "" ? b : a, b === "" ? a : b, c);
->>>>>>> b66c95b... Adding Digital Twins JavaScipt SDK to API service and removing existing AutoRest resources.
   }
 
   async queryTwinsPaged(query, callback) {
