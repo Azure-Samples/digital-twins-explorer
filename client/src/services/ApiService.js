@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { TokenCredentials } from "@azure/ms-rest-js";
-import { AzureDigitalTwinsAPI } from "./lib/azureDigitalTwinsAPI";
+import { DigitalTwinsClient } from "@azure/digital-twins";
+import { DefaultHttpClient } from "@azure/core-http";
 import { authService } from "./AuthService";
+import { BatchService } from "./BatchService";
 import { configService } from "./ConfigService";
+import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
 import { print } from "./LoggingService";
 import { settingsService } from "./SettingsService";
-import { BatchService } from "./BatchService";
-import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "./Constants";
 
 const getAllTwinsQuery = "SELECT * FROM digitaltwins";
 
@@ -35,11 +35,31 @@ const getTwinsFromQueryResponse = response => {
   return twins;
 };
 
+class CustomHttpClient {
+
+  constructor(options) {
+    this.client = new DefaultHttpClient();
+    this.options = options;
+  }
+
+  sendRequest(httpRequest) {
+    if (this.options && this.options.customHeaders) {
+      for (const key in this.options.customHeaders) {
+        if (Object.prototype.hasOwnProperty.call(this.options.customHeaders, key)) {
+          httpRequest.headers.set(key, this.options.customHeaders[key]);
+        }
+      }
+    }
+
+    return this.client.sendRequest(httpRequest);
+  }
+
+}
+
 class ApiService {
 
   constructor() {
     this.client = null;
-    this.clientOptions = null;
   }
 
   async addhttp(url) {
@@ -50,38 +70,46 @@ class ApiService {
   }
 
   async initialize() {
-    const accessToken = await authService.login();
-    if (!accessToken) {
-      throw new Error("Failed to acquire access token");
-    }
+    const { appAdtUrl } = await configService.getConfig();
 
-    const tokenCredentials = new TokenCredentials(accessToken);
-
-    const clientConfig = {
-      baseUri: `${window.location.origin}/api/proxy`
+    const customTokenCredentials = {
+      async getToken() {
+        const token = await authService.login();
+        if (!token) {
+          throw new Error("Failed to acquire access token");
+        }
+        return { token };
+      }
     };
 
-    // Add token and server url to service instance
-    this.client = new AzureDigitalTwinsAPI(tokenCredentials, clientConfig);
+    const baseUri = `${window.location.origin}/api/proxy`;
+    const httpClient = new CustomHttpClient({ customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } });
+    this.client = new DigitalTwinsClient(baseUri, customTokenCredentials, { httpClient });
 
+<<<<<<< HEAD
     const { appAdtUrl } = await configService.getConfig();
     this.clientOptions = { customHeaders: { "x-adt-host": new URL(await this.addhttp(appAdtUrl)).hostname } };
+=======
+    // Workaround pending SDK fix
+    const t1 = this.client.client.digitalTwins.listRelationshipsNext;
+    this.client.client.digitalTwins.listRelationshipsNext = (a, b, c) =>
+      t1.call(this.client.client.digitalTwins, b === "" ? b : a, b === "" ? a : b, c);
+
+    const t2 = this.client.client.digitalTwins.listIncomingRelationshipsNext;
+    this.client.client.digitalTwins.listIncomingRelationshipsNext = (a, b, c) =>
+      t2.call(this.client.client.digitalTwins, b === "" ? b : a, b === "" ? a : b, c);
+>>>>>>> b66c95b... Adding Digital Twins JavaScipt SDK to API service and removing existing AutoRest resources.
   }
 
   async queryTwinsPaged(query, callback) {
     await this.initialize();
 
-    let page = 1;
-    let continuationToken = null;
-    do {
-      const response = await this.client.query.queryTwins({ query, continuationToken }, this.clientOptions);
-      print(`Ran query for twins, page ${page}:`, "info");
-      print(JSON.stringify(response.items, null, 2), "info");
-      await callback(getTwinsFromQueryResponse(response.items));
-
-      continuationToken = response.continuationToken;
-      page++;
-    } while (continuationToken);
+    let count = 1;
+    for await (const page of this.client.queryTwins(query).byPage()) {
+      print(`Ran query for twins, page ${count++}:`, "info");
+      print(JSON.stringify(page, null, 2), "info");
+      await callback(getTwinsFromQueryResponse(page.items));
+    }
   }
 
   async queryTwins(query) {
@@ -98,20 +126,20 @@ class ApiService {
   async getTwinById(twinId) {
     await this.initialize();
 
-    const response = await this.client.digitalTwins.getById(twinId, this.clientOptions);
+    const response = await this.client.getDigitalTwin(twinId);
     return response.body;
   }
 
   async addTwin(twinId, payload) {
     await this.initialize();
 
-    return await this.client.digitalTwins.add(twinId, payload, this.clientOptions);
+    return await this.client.upsertDigitalTwin(twinId, payload);
   }
 
   async updateTwin(twinId, patch) {
     await this.initialize();
 
-    return await this.client.digitalTwins.update(twinId, patch, this.clientOptions);
+    return await this.client.updateDigitalTwin(twinId, patch);
   }
 
   async queryRelationshipsPaged(twinId, callback, type = REL_TYPE_OUTGOING) {
@@ -121,20 +149,16 @@ class ApiService {
     for (let i = 0; i < operations.length; i++) {
       const op = operations[i];
       const isFinalOp = i === operations.length - 1;
+      const baseOperationName = `list${op === REL_TYPE_INCOMING ? "Incoming" : ""}Relationships`;
 
-      let page = 1;
-      let nextLink = null;
-      do {
-        const baseOperationName = `list${op === REL_TYPE_INCOMING ? "Incoming" : ""}Relationships`;
-        const response = nextLink
-          ? await this.client.digitalTwins[`${baseOperationName}Next`](`${this.client.baseUri}${nextLink}`, this.clientOptions)
-          : await this.client.digitalTwins[baseOperationName](twinId, this.clientOptions);
-        print(`Ran query for relationships for twin ${twinId}, page ${page}:`, "info");
-        print(JSON.stringify(response, null, 2), "info");
+      let count = 1;
+      for await (const page of this.client[baseOperationName](twinId).byPage()) {
+        print(`Ran query for relationships for twin ${twinId}, page ${count++}:`, "info");
+        print(JSON.stringify(page, null, 2), "info");
 
         // The response type for the incoming relationships doesn't match the outgoing call so we'll remap it
         if (op === REL_TYPE_INCOMING) {
-          response.forEach(x => {
+          page.value.forEach(x => {
             [ "sourceId", "relationshipId", "relationshipName", "relationshipLink" ]
               .filter(y => !!x[y])
               .forEach(y => {
@@ -146,16 +170,13 @@ class ApiService {
         }
 
         // Indicate to the caller that we're not done in the case where we are calling multiple operations
-        const callbackResponse = [ ...response ];
-        if (response.nextLink || !isFinalOp) {
+        const callbackResponse = [ ...page.value ];
+        if (page.nextLink || !isFinalOp) {
           callbackResponse.nextLink = true;
         }
 
         await callback(callbackResponse);
-
-        nextLink = response.nextLink;
-        page++;
-      } while (nextLink);
+      }
     }
   }
 
@@ -169,31 +190,18 @@ class ApiService {
   async addRelationship(sourceId, targetId, relationshipType, relationshipId) {
     await this.initialize();
 
-    return await this.client.digitalTwins.addRelationship(sourceId, relationshipId,
-      { relationship: { $relationshipName: relationshipType, $targetId: targetId }, ...this.clientOptions });
-  }
-
-  async queryModelsPaged(callback) {
-    await this.initialize();
-
-    let page = 1;
-    let nextLink = null;
-    do {
-      print(`Running query for models: page ${page}`, "info");
-
-      const response = nextLink
-        ? await this.client.digitalTwinModels.listNext(`${this.client.baseUri}${nextLink}`, this.clientOptions)
-        : await this.client.digitalTwinModels.list({ includeModelDefinition: true, ...this.clientOptions });
-      await callback(response);
-
-      nextLink = response.nextLink;
-      page++;
-    } while (nextLink);
+    return await this.client.updateRelationship(sourceId, relationshipId,
+      { relationship: { $relationshipName: relationshipType, $targetId: targetId } });
   }
 
   async queryModels() {
+    await this.initialize();
+
     const list = [];
-    await this.queryModelsPaged(items => items.forEach(x => list.push(x)));
+    const models = this.client.listModels([], true);
+    for await (const model of models) {
+      list.push(model);
+    }
 
     return list;
   }
@@ -201,20 +209,20 @@ class ApiService {
   async getModelById(modelId) {
     await this.initialize();
 
-    return this.client.digitalTwinModels.getById(modelId, { includeModelDefinition: true, ...this.clientOptions });
+    return await this.client.getModel(modelId, true);
   }
 
   async addModels(models) {
     await this.initialize();
 
-    return await this.client.digitalTwinModels.add({ models, ...this.clientOptions });
+    return await this.client.createModels(models);
   }
 
   async deleteRelationship(twinId, relationshipId) {
     await this.initialize();
 
     print(`Deleting relationship ${relationshipId} for twin ${twinId}`, "warning");
-    await this.client.digitalTwins.deleteRelationship(twinId, relationshipId, this.clientOptions);
+    await this.client.deleteRelationship(twinId, relationshipId);
   }
 
   async deleteTwin(twinId, skipRelationships = false) {
@@ -223,7 +231,7 @@ class ApiService {
     }
 
     print(`Deleting twin ${twinId}`, "warning");
-    await this.client.digitalTwins.deleteMethod(twinId, this.clientOptions);
+    await this.client.deleteDigitalTwin(twinId);
   }
 
   async deleteTwinRelationships(twinId, skipIncoming = false) {
@@ -268,8 +276,52 @@ class ApiService {
 
   async deleteModel(id) {
     await this.initialize();
-    await this.client.digitalTwinModels.deleteMethod(id, this.clientOptions);
+    await this.client.deleteModel(id);
     print(`*** Delete complete for model with ID: ${id}`, "warning");
+  }
+
+  async getRelationship(sourceTwinId, relationshipId) {
+    print(`Get relationship with id ${relationshipId} for source twin ${sourceTwinId}`, "info");
+    await this.initialize();
+    return await this.client.getRelationship(sourceTwinId, relationshipId);
+  }
+
+  async getEventRoutes() {
+    print(`Get event routes`, "info");
+    await this.initialize();
+
+    const list = [];
+    const eventRoutes = this.client.listEventRoutes();
+    for await (const eventRoute of eventRoutes) {
+      list.push(eventRoute);
+    }
+    return list;
+  }
+
+  async getEventRoute(routeId) {
+    print(`Get event route with id ${routeId}`, "info");
+    await this.initialize();
+    return await this.client.getEventRoute(routeId);
+  }
+
+  async addEventRoute(routeId, endpointId, filter) {
+    print(`Adding event route with id ${routeId}`, "info");
+    await this.initialize();
+    const eventRoute = { id: routeId, endpointId, filter };
+    return await this.client.upsertEventRoute(routeId, { options: eventRoute });
+  }
+
+  async deleteEventRoute(routeId) {
+    print(`Deleting event route with id ${routeId}`, "warning");
+    await this.initialize();
+    await this.client.deleteEventRoute(routeId);
+    print(`*** Delete complete for event route with ID: ${routeId}`, "warning");
+  }
+
+  async decommissionModel(modelId) {
+    print(`Decommission model with ID: ${modelId}`, "info");
+    await this.initialize();
+    await this.client.decomissionModel(modelId);
   }
 
 }
