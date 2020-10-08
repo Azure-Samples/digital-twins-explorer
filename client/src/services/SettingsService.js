@@ -5,6 +5,7 @@ import { storageService } from "./StorageService";
 import { REL_TYPE_OUTGOING } from "./Constants";
 
 const StorageKeyName = "settings";
+const EnvStorageKeyName = "environments";
 
 class SettingsService {
 
@@ -57,6 +58,18 @@ class SettingsService {
     this.settings.relExpansionLevel = relExpansionLevel;
     this.save();
   }
+
+  get environments() {
+    return storageService.getLocalStorageObject(EnvStorageKeyName);
+  }
+
+  set environments(envs) {
+    storageService.setLocalStorageObject(EnvStorageKeyName, envs);
+  }
+
+  getNodeImage = modelId => localStorage.getItem(modelId);
+
+  setNodeImage = (modelId, dataString) => localStorage.setItem(modelId, dataString);
 
   save() {
     storageService.setLocalStorageObject(StorageKeyName, this.settings);
