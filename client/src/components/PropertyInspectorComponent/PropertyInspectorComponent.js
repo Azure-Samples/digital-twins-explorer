@@ -28,29 +28,15 @@ const applyDefaultValues = (properties, selection) => {
     return selection;
   }
 
+  const modelService = new ModelService();
   for (const p of properties) {
     if (selection[p.name]) {
       continue;
     }
 
-    switch (p.schema) {
-      case "dtmi:dtdl:instance:Schema:double;2":
-      case "dtmi:dtdl:instance:Schema:integer;2":
-      case "dtmi:dtdl:instance:Schema:long;2":
-      case "dtmi:dtdl:instance:Schema:float;2":
-        selection[p.name] = 0;
-        break;
-      case "dtmi:dtdl:instance:Schema:string;2":
-        selection[p.name] = " ";
-        break;
-      case "dtmi:dtdl:instance:Schema:boolean;2":
-        selection[p.name] = false;
-        break;
-      default:
-        break;
-    }
+    const value = modelService.getPropertyDefaultValue(p.schema);
+    selection[p.name] = value;
   }
-
   return selection;
 };
 
@@ -67,6 +53,7 @@ export class PropertyInspectorComponent extends Component {
     };
     this.editorRef = React.createRef();
     this.properties = null;
+    this.writeableProperties = null;
     this.original = null;
     this.updated = null;
   }
@@ -109,11 +96,16 @@ export class PropertyInspectorComponent extends Component {
         print(`*** Error fetching twin properties: ${exc}`, "error");
       }
 
-      this.properties = properties;
-      this.original = this.updated = selection ? await applyDefaultValues(properties, deepClone(selection)) : null;
+      this.properties = properties ? properties.filter(property => property.fromChild !== true) : null;
+      this.writeableProperties = properties ? properties.filter(property => property.writeable) : null;
+      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
       this.setState({ changed: false, selection, patch: null });
       if (selection) {
         this.editor.set(this.original);
+        const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
+        if (rootMetaIndex >= 0) {
+          this.editor.node.childs[rootMetaIndex].expand(true);
+        }
       }
     });
   }
@@ -132,7 +124,7 @@ export class PropertyInspectorComponent extends Component {
     }
 
     if (node && (NonPatchableFields.indexOf(node.path[0]) > -1
-      || this.properties.some(x => x.name === node.field && x.writeable === false))) {
+      || !this.writeableProperties.some(x => x.name === node.path.join("-")))) {
       return { field: false, value: false };
     }
 
