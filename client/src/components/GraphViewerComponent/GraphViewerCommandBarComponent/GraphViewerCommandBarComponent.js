@@ -7,6 +7,7 @@ import { CommandBar, TextField, Icon } from "office-ui-fabric-react";
 import { GraphViewerRelationshipCreateComponent } from "../GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "../GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "../GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
+import { GraphViewerRelationshipDeleteComponent } from "../GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
 import { eventService } from "../../../services/EventService";
 import { settingsService } from "../../../services/SettingsService";
 import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "../../../services/Constants";
@@ -21,6 +22,7 @@ export class GraphViewerCommandBarComponent extends Component {
     this.view = React.createRef();
     this.create = React.createRef();
     this.delete = React.createRef();
+    this.deleteRel = React.createRef();
     this.importModelRef = React.createRef();
     this.settings = React.createRef();
     this.state = {
@@ -30,6 +32,15 @@ export class GraphViewerCommandBarComponent extends Component {
   }
 
   farItems = [
+    {
+      key: "hideTwins",
+      text: "Hide Selected Twins",
+      ariaLabel: "hide selected twins",
+      iconProps: { iconName: "Hide" },
+      onClick: () => this.onTwinsHide(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
     {
       key: "deleteTwin",
       text: "Delete Selected Twins",
@@ -41,8 +52,8 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "getRelationship",
-      text: "Get Relationship",
-      ariaLabel: "get relationship",
+      text: "Get Relationships",
+      ariaLabel: "get relationships",
       iconProps: { iconName: "Relationship" },
       onClick: () => this.view.current.open(),
       iconOnly: true,
@@ -54,6 +65,15 @@ export class GraphViewerCommandBarComponent extends Component {
       ariaLabel: "add relationship",
       iconProps: { iconName: "AddLink" },
       onClick: () => this.create.current.open(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
+    {
+      key: "deleteRelationship",
+      text: "Delete Relationship",
+      ariaLabel: "delete relationship",
+      iconProps: { iconName: "RemoveLink" },
+      onClick: () => this.deleteRel.current.open(),
       iconOnly: true,
       className: this.buttonClass
     },
@@ -156,6 +176,14 @@ export class GraphViewerCommandBarComponent extends Component {
     </div>
   )
 
+  onTwinsHide = () => {
+    const { onTwinsHide } = this.props;
+
+    if (onTwinsHide) {
+      onTwinsHide();
+    }
+  }
+
   onSelectedRelTypeChange = type => {
     settingsService.relTypeLoading = type;
     this.setState({ relTypeLoading: type });
@@ -177,10 +205,12 @@ export class GraphViewerCommandBarComponent extends Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes } = this.props;
+    const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes, selectedEdge } = this.props;
+    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes || selectedNodes.length < 1;
     this.farItems.find(i => i.key === "deleteTwin").disabled = !selectedNode;
     this.farItems.find(i => i.key === "getRelationship").disabled = !selectedNodes || selectedNodes.length !== 1;
     this.farItems.find(i => i.key === "addRelationship").disabled = !selectedNodes || selectedNodes.length !== 2;
+    this.farItems.find(i => i.key === "deleteRelationship").disabled = !selectedEdge;
     this.farItems.find(i => i.key === "exportGraph").disabled = this.farItems.find(i => i.key === "relayout").disabled = !query;
     this.farItems.find(i => i.key === "relayout").subMenuProps.items = this.props.layouts.map(x => ({
       key: x,
@@ -208,6 +238,7 @@ export class GraphViewerCommandBarComponent extends Component {
         <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
         <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
           onDelete={onTwinDelete} onGetCurrentNodes={onGetCurrentNodes} />
+        <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
       </>
     );
   }

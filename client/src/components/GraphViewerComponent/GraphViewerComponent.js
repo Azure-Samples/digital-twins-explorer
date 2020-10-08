@@ -26,6 +26,7 @@ export class GraphViewerComponent extends React.Component {
       isLoading: false,
       selectedNode: null,
       selectedNodes: null,
+      selectedEdge: null,
       layout: "Klay"
     };
     this.cyRef = React.createRef();
@@ -54,6 +55,7 @@ export class GraphViewerComponent extends React.Component {
     eventService.subscribeClearData(() => {
       this.clearData();
     });
+    eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
   }
 
   clearData() {
@@ -185,12 +187,20 @@ export class GraphViewerComponent extends React.Component {
     }
   }
 
+  onEdgeClicked = e => {
+    this.setState({ selectedEdge: e });
+  }
+
   onNodeClicked = async e => {
     this.setState({ selectedNode: e.selectedNode, selectedNodes: e.selectedNodes });
-    if (e.selectedNode) {
+    if (e.selectedNodes && e.selectedNodes.length > 1) {
+      eventService.publishSelection();
+    } else if (e.selectedNode) {
       try {
         const data = await apiService.getTwinById(e.selectedNode.id);
-        if (data) {
+        // Get latest
+        const { selectedNode } = this.state;
+        if (data && selectedNode.id === e.selectedNode.id) {
           eventService.publishSelection(data);
         }
       } catch (exc) {
@@ -215,7 +225,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   onControlClicked = () => {
-    this.setState({ selectedNode: null, selectedNodes: null });
+    this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
     eventService.publishSelection();
   }
 
@@ -227,6 +237,13 @@ export class GraphViewerComponent extends React.Component {
       this.cyRef.current.clearTwins();
     }
     eventService.publishSelection();
+  }
+
+  onTwinsHide = () => {
+    const { selectedNodes } = this.state;
+    if (selectedNodes.length > 0) {
+      this.cyRef.current.hideSelectedTwins();
+    }
   }
 
   onRelationshipCreate = async relationship => {
@@ -250,15 +267,16 @@ export class GraphViewerComponent extends React.Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, isLoading, query, progress, layout } = this.state;
+    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout } = this.state;
     return (
       <div className="gc-grid">
         <div className="gc-toolbar">
           <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
-            selectedNode={selectedNode} selectedNodes={selectedNodes} query={query}
+            selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
             layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout}
             onRelationshipCreate={this.onRelationshipCreate}
             onTwinDelete={this.onTwinDelete}
+            onTwinsHide={this.onTwinsHide}
             onLayoutClicked={() => this.cyRef.current.doLayout()}
             onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
             onCenterClicked={() => this.cyRef.current.center()}
@@ -267,6 +285,7 @@ export class GraphViewerComponent extends React.Component {
         </div>
         <div className="gc-wrap">
           <GraphViewerCytoscapeComponent ref={this.cyRef}
+            onEdgeClicked={this.onEdgeClicked}
             onNodeClicked={this.onNodeClicked}
             onNodeDoubleClicked={this.onNodeDoubleClicked}
             onControlClicked={this.onControlClicked} />
