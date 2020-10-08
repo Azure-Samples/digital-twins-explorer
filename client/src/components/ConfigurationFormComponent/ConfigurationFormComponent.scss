@@ -11,6 +11,40 @@
     margin-top: 0;
   }
 
+  .select-settings {
+    position: relative;
+
+    .fieldGroup-83 {
+      &:hover {
+        border-color: $inputOutlineColor;
+      }
+    }
+
+    .configuration-input {
+      width: calc(100% - 27px);
+      &:focus::after {
+        display: none;
+      }
+    }
+
+    .ms-Dropdown-container {
+      position: absolute;
+      left: 0px;
+      top: 31px;
+      width: 100%;
+
+      div[class^="dropdown-"]:focus::after {
+        border-width: 1px;
+      }
+
+      .ms-Dropdown:hover {
+        .ms-Dropdown-title {
+          border-color: $inputOutlineColor;
+        }
+      }
+    }
+  }
+
   .configuration-input {
     font-size: 12px;
     font-weight: 200;
