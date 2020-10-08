@@ -8,7 +8,7 @@ import context from "./ref/context";
 
 const REL_TARGET_ANY = "*";
 const getPropertyName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:name;2");
-const getPropertyWriteable = vertex => vertex.getAttributeValue("dtmi:dtdl:property:writeable;2");
+const getPropertyWriteable = vertex => vertex.getAttributeValue("http://azure.com/DigitalTwin/MetaModel/undefinedTerm/writable");
 
 const inferTarget = vertex => {
   const targetEdge = vertex.getOutgoing("dtmi:dtdl:property:target;2").first();
@@ -40,6 +40,18 @@ const inferSchema = vertex => {
         name: getPropertyName(edge.toVertex),
         value: edge.toVertex.getAttributeValue("dtmi:dtdl:property:enumValue;2")
       })) ]
+    };
+  }
+
+  if (schemaEdge.toVertex.isType("dtmi:dtdl:class:Map;2")) {
+    return {
+      type: "Map",
+      fields: [ ...schemaEdge.toVertex.getOutgoing("dtmi:dtdl:property:fields;2")
+        .map(edge => ({
+          name: getPropertyName(edge.toVertex),
+          schema: inferSchema(edge.toVertex)
+        }))
+        .filter(edge => !!edge.schema) ]
     };
   }
 
@@ -75,13 +87,29 @@ export class ModelService {
   async getProperties(sourceModelId) {
     await this.initialize();
     const sourceModel = this._getModel(sourceModelId);
-    return sourceModel.properties;
+    const properties = [];
+    this.getChildComponentProperties(sourceModel, "", properties, false);
+    return properties;
+  }
+
+  getChildComponentProperties(component, basePropertyName, properties, fromChild) {
+    const baseName = basePropertyName ? `${basePropertyName}-` : "";
+    component.properties.forEach(componentProperty => {
+      properties.push({
+        name: `${baseName}${componentProperty.name}`,
+        schema: componentProperty.schema,
+        writeable: componentProperty.writeable ?? true,
+        fromChild
+      });
+    });
+    component.components.forEach(c => {
+      this.getChildComponentProperties(c, `${baseName}${c.name}`, properties, true);
+    });
   }
 
   async getTelemetries(sourceModelId) {
     await this.initialize();
-    const sourceModel = this._getModel(sourceModelId);
-    return sourceModel.telemetries;
+    return this._getModel(sourceModelId).telemetries;
   }
 
   async getBases(modelId) {
@@ -110,12 +138,65 @@ export class ModelService {
     }
   }
 
-  createPayload(modelId) {
-    return { $metadata: { $model: modelId } };
+  async createPayload(modelId) {
+    const model = await apiService.getModelById(modelId);
+    const payload = {
+      $metadata: {
+        $model: model.model["@id"]
+      }
+    };
+    const components = model.model.contents.filter(content => content["@type"] === "Component");
+    for (const component of components) {
+      const componentModel = await apiService.getModelById(component.schema);
+      const componentPayload = {
+        $metadata: {
+        }
+      };
+      const properties = componentModel.model.contents.filter(content => content["@type"] === "Property");
+      properties.forEach(property => {
+        componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
+      });
+      payload[component.name] = componentPayload;
+    }
+    return payload;
+  }
+
+  getPropertyDefaultValue(schema) {
+    if (typeof schema === "object") {
+      const schemaType = schema.type ?? schema["@type"];
+      const enumValues = schema.values ?? schema.enumValues;
+      switch (schemaType) {
+        case "Enum":
+          return enumValues.length > 0 ? enumValues[0].value ?? enumValues[0].enumValue : this.getPropertyDefaultValue(schema.valueSchema);
+        case "Map":
+        default:
+          return {};
+      }
+    }
+
+    switch (schema) {
+      case "dtmi:dtdl:instance:Schema:double;2":
+      case "dtmi:dtdl:instance:Schema:integer;2":
+      case "dtmi:dtdl:instance:Schema:long;2":
+      case "dtmi:dtdl:instance:Schema:float;2":
+      case "double":
+      case "integer":
+      case "long":
+      case "float":
+        return 0;
+      case "dtmi:dtdl:instance:Schema:string;2":
+      case "string":
+        return " ";
+      case "dtmi:dtdl:instance:Schema:boolean;2":
+      case "boolean":
+        return false;
+      default:
+        return "";
+    }
   }
 
   _getModel(modelId) {
-    const contents = { properties: [], relationships: [], telemetries: [], bases: [] };
+    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [] };
     const model = this.modelGraph.getVertex(modelId);
     if (model) {
       this._mapModel(model, contents);
@@ -151,6 +232,13 @@ export class ModelService {
             name: getPropertyName(x.toVertex),
             target: inferTarget(x.toVertex)
           });
+        }
+
+        if (x.toVertex.isType("dtmi:dtdl:class:Component;2")) {
+          const component = this._getModel(inferSchema(x.toVertex));
+          component.name = getPropertyName(x.toVertex);
+          component.schema = inferSchema(x.toVertex);
+          safeAdd(contents.components, component);
         }
       });
 

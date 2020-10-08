@@ -55,9 +55,8 @@ export class ModelViewerCreateComponent extends Component {
     this.setState({ isLoading: true });
     try {
       print(`*** Creating a twin instance`, "info");
-      const model = await apiService.getModelById(item.key);
-
-      const payload = new ModelService().createPayload(model.model["@id"]);
+      const modelService = new ModelService();
+      const payload = await modelService.createPayload(item.key);
       print("Generated model payload:", "info");
       print(JSON.stringify(payload, null, 2), "info");
 

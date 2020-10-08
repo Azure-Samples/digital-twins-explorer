@@ -15,6 +15,7 @@ import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { authService } from "../../services/AuthService";
+import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
 
@@ -31,6 +32,7 @@ export class ModelViewerComponent extends Component {
 
     this.originalItems = [];
     this.uploadModelRef = React.createRef();
+    this.uploadModelImagesRef = React.createRef();
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
     this.deleteRef = React.createRef();
@@ -105,6 +107,61 @@ export class ModelViewerComponent extends Component {
     this.uploadModelRef.current.value = "";
   }
 
+  handleUploadOfModelImages = async evt => {
+    const files = evt.target.files;
+    this.setState({ isLoading: true });
+    print("*** Uploading model images", "info");
+    try {
+      // Get updated list of models
+      const models = await apiService.queryModels();
+      for (const file of files) {
+        print(`- checking image: ${file.name}`);
+        const fileNameWithoutExtension = file.name.split(".")
+          .slice(0, -1)
+          .join(".")
+          .toLowerCase();
+        const matchedModels = models.filter(model =>
+          model.id.toLowerCase().split(":")
+            .pop() === fileNameWithoutExtension);
+        if (matchedModels.length > 0) {
+          const id = matchedModels[0].id;
+          print(`*** Uploading model image for ${id}`, "info");
+          await new Promise(resolve => {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+              settingsService.setNodeImage(id, fileReader.result);
+              eventService.publishModelIconUpdate(id);
+              print(`*** Model image uploaded for ${id}`, "info");
+              resolve();
+            };
+            fileReader.readAsDataURL(file);
+          });
+        }
+      }
+    } catch (exc) {
+      print(`*** Error fetching models: ${exc}`, "error");
+      eventService.publishError(`*** Error fetching models: ${exc}`);
+    }
+
+    this.setState({ isLoading: false });
+    this.uploadModelImagesRef.current.value = "";
+  }
+
+  onSetModelImage = (evt, item, ref) => {
+    const imageFile = evt.target.files[0];
+    const fileReader = new FileReader();
+
+    fileReader.addEventListener("load", () => {
+      settingsService.setNodeImage(item.key, fileReader.result);
+      eventService.publishModelIconUpdate(item.key);
+      ref.current.value = "";
+    });
+
+    if (imageFile) {
+      fileReader.readAsDataURL(imageFile);
+    }
+  }
+
   async retrieveModels() {
     this.setState({ isLoading: true });
 
@@ -144,11 +201,16 @@ export class ModelViewerComponent extends Component {
       <>
         <div className="mv-grid">
           <div className="mv-toolbar">
-            <ModelViewerCommandBarComponent className="mv-commandbar" buttonClass="mv-toolbarButtons"
+            <ModelViewerCommandBarComponent
+              className="mv-commandbar"
+              buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
-              onUploadModelClicked={() => this.uploadModelRef.current.click()} />
+              onUploadModelClicked={() => this.uploadModelRef.current.click()}
+              onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
+            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
+              ref={this.uploadModelImagesRef} onChange={this.handleUploadOfModelImages} />
           </div>
           <div>
             <TextField className="mv-filter" onChange={this.onFilterChanged} styles={this.getStyles}
@@ -158,7 +220,8 @@ export class ModelViewerComponent extends Component {
             <SelectionZone selection={new Selection({ selectionMode: SelectionMode.single })}>
               {items.map((item, index) => (
                 <ModelViewerItem key={item.key} item={item} itemIndex={index}
-                  onView={() => this.onView(item)} onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
+                  onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
+                  onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
               ))}
             </SelectionZone>
           </div>
