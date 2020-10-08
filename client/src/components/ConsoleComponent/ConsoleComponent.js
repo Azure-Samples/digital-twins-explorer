@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
+import { REL_TYPE_INCOMING } from "../../services/Constants";
 
 import "./ConsoleComponent.scss";
 
@@ -74,7 +75,8 @@ export class ConsoleComponent extends Component {
   addTwin = async (arg1, arg2) => {
     if (arg1 && arg2) {
       try {
-        const payload = new ModelService().createPayload(arg1);
+        const modelService = new ModelService();
+        const payload = await modelService.createPayload(arg1);
         const result = await apiService.addTwin(arg2, payload);
         eventService.publishCreateTwin({ $dtId: arg2, $metadata: { $model: arg1 } });
         this.pushToStdout(JSON.stringify(result, null, 2));
@@ -100,10 +102,23 @@ export class ConsoleComponent extends Component {
     }
   }
 
-  getRelationships = async arg1 => {
+  deleteAllTwins = async args => {
+    if (args) {
+      try {
+        await apiService.deleteAllTwins(args);
+        this.pushToStdout(`*** Deleted twins with ids: ${args}`);
+      } catch (exc) {
+        this.pushToStdout(`*** Error deleting twins: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  getRelationships = async (arg1, type) => {
     if (arg1) {
       try {
-        const edgeList = await apiService.queryRelationships(arg1);
+        const edgeList = await apiService.queryRelationships(arg1, type);
         if (edgeList !== null) {
           if (edgeList.length <= 0) {
             this.pushToStdout(`*** No relationships found.`);
@@ -119,6 +134,10 @@ export class ConsoleComponent extends Component {
     } else {
       this.pushToStdout("*** Not enough params");
     }
+  }
+
+  getIncomingRelationships = async arg1 => {
+    await this.getRelationships(arg1, REL_TYPE_INCOMING);
   }
 
   addRelationship = async (arg1, arg2, arg3) => {
@@ -163,6 +182,15 @@ export class ConsoleComponent extends Component {
     }
   }
 
+  getModels = async () => {
+    try {
+      const result = await apiService.queryModels();
+      this.pushToStdout(JSON.stringify(result, null, 2));
+    } catch (exc) {
+      this.pushToStdout(`*** Error retrieving models from ADT: ${exc}`);
+    }
+  }
+
   addModel = async arg1 => {
     if (arg1) {
       try {
@@ -179,7 +207,7 @@ export class ConsoleComponent extends Component {
     }
   }
 
-  delModel = async arg1 => {
+  deleteModel = async arg1 => {
     if (arg1) {
       try {
         await apiService.deleteModel(arg1);
@@ -187,6 +215,129 @@ export class ConsoleComponent extends Component {
         this.pushToStdout(`*** Deleted model with ID: ${arg1}`);
       } catch (exc) {
         this.pushToStdout(`*** Error deleting model: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  deleteAllModels = async () => {
+    try {
+      await new ModelService().deleteAll();
+      eventService.publishClearData();
+      this.pushToStdout(`*** All models deleted.`);
+    } catch (exc) {
+      this.pushToStdout(`*** Error deleting all models: ${exc}`);
+    }
+  }
+
+  query = async args => {
+    if (args) {
+      try {
+        const query = `${Array.from(args).join(" ")}`;
+        const result = await apiService.queryTwins(query);
+        this.pushToStdout(JSON.stringify(result, null, 2));
+      } catch (exc) {
+        this.pushToStdout(`*** Error retrieving data from ADT: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  observeProperties = async (arg1, arg2) => {
+    if (arg1 && arg2) {
+      try {
+        const twin = await apiService.getTwinById(arg1);
+        if (twin[arg2]) {
+          this.pushToStdout(`*** Observed property ${arg2} for TwinId '${arg1}': ${twin[arg2]}`);
+        } else {
+          this.pushToStdout(`*** Property ${arg2} not found for TwinId '${arg1}'`);
+        }
+      } catch (exc) {
+        this.pushToStdout(`*** Error observing properties: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  getRelationship = async (arg1, arg2) => {
+    if (arg1 && arg2) {
+      try {
+        const relationship = await apiService.getRelationship(arg1, arg2);
+        if (relationship) {
+          this.pushToStdout(`${JSON.stringify(relationship, null, 2)}`);
+        } else {
+          this.pushToStdout(`*** Relationship ${arg2} not found for TwinId '${arg1}'`);
+        }
+      } catch (exc) {
+        this.pushToStdout(`*** Error getting the relationship: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  getEventRoutes = async () => {
+    try {
+      const eventRoutes = await apiService.getEventRoutes();
+      this.pushToStdout(`${JSON.stringify(eventRoutes, null, 2)}`);
+    } catch (exc) {
+      this.pushToStdout(`*** Error getting the event routes: ${exc}`);
+    }
+  }
+
+  getEventRoute = async arg1 => {
+    if (arg1) {
+      try {
+        const eventRoute = await apiService.getEventRoute(arg1);
+        if (eventRoute) {
+          this.pushToStdout(`${JSON.stringify(eventRoute, null, 2)}`);
+        } else {
+          this.pushToStdout(`*** Event route with id ${arg1} not found.`);
+        }
+      } catch (exc) {
+        this.pushToStdout(`*** Error getting the event route: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  addEventRoute = async (arg1, arg2, arg3) => {
+    if (arg1 && arg2 && arg3) {
+      try {
+        const eventRoute = await apiService.addEventRoute(arg1, arg2, arg3);
+        this.pushToStdout(`${JSON.stringify(eventRoute, null, 2)}`);
+      } catch (exc) {
+        this.pushToStdout(`*** Error creating the event route: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  deleteEventRoute = async arg1 => {
+    if (arg1) {
+      try {
+        await apiService.deleteEventRoute(arg1);
+        this.pushToStdout(`*** Deleted event route with ID: ${arg1}`);
+      } catch (exc) {
+        this.pushToStdout(`*** Error deleting the event route: ${exc}`);
+      }
+    } else {
+      this.pushToStdout("*** Not enough params");
+    }
+  }
+
+  decommissionModel = async arg1 => {
+    if (arg1) {
+      try {
+        await apiService.decommissionModel(arg1);
+        this.pushToStdout(`*** Decommission Model with ID: ${arg1}`);
+      } catch (exc) {
+        this.pushToStdout(`*** Error decommissioning model: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -230,11 +381,32 @@ export class ConsoleComponent extends Component {
         this.deleteTwin(arg1);
       }
     },
-    getrel: {
+    delalltwins: {
+      description: "delete all digital twins",
+      usage: "delalltwins <twinId:string>",
+      fn: (...args) => {
+        this.deleteAllTwins(args);
+      }
+    },
+    getrelationships: {
       description: "get relationships",
-      usage: "getrel <twinId:string>",
+      usage: "getrelationships <twinId:string>",
       fn: arg1 => {
         this.getRelationships(arg1);
+      }
+    },
+    getrelationship: {
+      description: "get a specific relationship by id",
+      usage: "getRelationship <sourceTwinId:string> <relationshipId:string>",
+      fn: (arg1, arg2) => {
+        this.getRelationship(arg1, arg2);
+      }
+    },
+    getincomrel: {
+      description: "get incoming relationship",
+      usage: "getrel <twinId:string>",
+      fn: arg1 => {
+        this.getIncomingRelationships(arg1);
       }
     },
     addrel: {
@@ -258,6 +430,13 @@ export class ConsoleComponent extends Component {
         this.getModel(arg1);
       }
     },
+    getmodels: {
+      description: "get models info",
+      usage: "getmodels <modelId:string>",
+      fn: arg1 => {
+        this.getModels(arg1);
+      }
+    },
     addmodel: {
       description: "add model (ensure JSON has no spaces and is not escaped)",
       usage: "addmodel <modelJSON:string>",
@@ -269,7 +448,63 @@ export class ConsoleComponent extends Component {
       description: "delete model",
       usage: "delmodel <modelId:string>",
       fn: arg1 => {
-        this.delModel(arg1);
+        this.deleteModel(arg1);
+      }
+    },
+    delallmodels: {
+      description: "Deletes all models in your instance",
+      usage: "delallmodels",
+      fn: () => {
+        this.deleteAllModels();
+      }
+    },
+    query: {
+      description: "query twins",
+      usage: "query <string>",
+      fn: (...args) => {
+        this.query(args);
+      }
+    },
+    observeproperties: {
+      description: "observes the selected properties on the selected twins",
+      usage: "observeproperties <twinId:string> <propertyName:string>",
+      fn: (arg1, arg2) => {
+        this.observeProperties(arg1, arg2);
+      }
+    },
+    geteventroutes: {
+      description: "get all the event routes",
+      usage: "geteventroutes",
+      fn: () => {
+        this.getEventRoutes();
+      }
+    },
+    geteventroute: {
+      description: "get a specific route by id",
+      usage: "geteventroute <routeId:string>",
+      fn: arg1 => {
+        this.getEventRoute(arg1);
+      }
+    },
+    addeventroute: {
+      description: "creates a new event route",
+      usage: "addeventroute <routeId:string> <endpointId:string> <filter:bool>",
+      fn: (arg1, arg2, arg3) => {
+        this.addEventRoute(arg1, arg2, arg3);
+      }
+    },
+    deleventroute: {
+      description: "deletes an event route by the id",
+      usage: "deleventroute <routeId:string>",
+      fn: arg1 => {
+        this.deleteEventRoute(arg1);
+      }
+    },
+    decommissionmodel: {
+      description: "decommission model",
+      usage: "decommissionmodel <modelId:string>",
+      fn: arg1 => {
+        this.decommissionModel(arg1);
       }
     }
   }
