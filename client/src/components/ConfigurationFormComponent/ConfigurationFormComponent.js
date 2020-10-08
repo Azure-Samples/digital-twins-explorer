@@ -45,7 +45,9 @@ export class ConfigurationFormComponent extends Component {
       appTenantId: this.state.appTenantId,
       appAdtUrl: this.state.appAdtUrl
     };
-    if (config.appClientId && config.appTenantId && config.appAdtUrl) {
+
+    if (this.validateConfig(config)) {
+      this.saveEnvironment(config);
       eventService.publishConfigure({ type: "end", config });
       this.resetModalState();
     }
