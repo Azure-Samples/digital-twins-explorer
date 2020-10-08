@@ -35,10 +35,18 @@
       padding: 3vh;
       border-radius: 5px;
 
-      pre {
+      .modal-scroll {
         overflow-y: auto;
-        margin-bottom: 20px;
         max-height: 60vh;
+        margin-bottom: 20px;
+      }
+
+      pre {
+        margin-bottom: 20px;
+      }
+
+      .btn-group {
+        display: flex;
       }
     }
   }

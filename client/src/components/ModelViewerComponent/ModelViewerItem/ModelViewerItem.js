@@ -33,26 +33,35 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete }) => (
-  <div className={classNames.item} data-is-focusable data-selection-index={itemIndex}>
-    <div className="mv_listItem" data-is-focusable data-selection-toggle data-selection-invoke>
-      <Stack horizontal>
+export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage }) => {
+  const uploadModelImageRef = React.createRef();
+
+  return (
+    <div className={classNames.item} data-is-focusable data-selection-index={itemIndex}>
+      <div className="mv_listItem" data-is-focusable data-selection-toggle data-selection-invoke>
         <Stack horizontal={false}>
-          <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
+          <Stack horizontal>
+            <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
+            <div>
+              <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
+                title="Delete Model" ariaLabel="Delete Model"
+                className="mv-loadButtons" onClick={onDelete} />
+              <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
+                title="Upload Model Image" ariaLabel="Upload Model Image"
+                className="mv-loadButtons" onClick={() => uploadModelImageRef.current.click()} />
+              <IconButton iconProps={{ iconName: "Info" }} id={item.key}
+                title="View Model" ariaLabel="View Model"
+                className="mv-loadButtons" onClick={onView} />
+              <IconButton iconProps={{ iconName: "AddTo" }} id={item.key}
+                title="Create a Twin" ariaLabel="Create a Twin"
+                className="mv-loadButtons" onClick={onCreate} />
+              <input id={item.key} type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
+                ref={uploadModelImageRef} onChange={evt => onSetModelImage(evt, item, uploadModelImageRef)} />
+            </div>
+          </Stack>
           <div className="mv_listItemKey" data-selection-invoke>{item.key}</div>
         </Stack>
-        <div>
-          <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
-            title="Delete Model" ariaLabel="Delete Model"
-            className="mv-loadButtons" onClick={onDelete} />
-          <IconButton iconProps={{ iconName: "Info" }} id={item.key}
-            title="View Model" ariaLabel="View Model"
-            className="mv-loadButtons" onClick={onView} />
-          <IconButton iconProps={{ iconName: "AddTo" }} id={item.key}
-            title="Create a Twin" ariaLabel="Create a Twin"
-            className="mv-loadButtons" onClick={onCreate} />
-        </div>
-      </Stack>
+      </div>
     </div>
-  </div>
-);
+  );
+};

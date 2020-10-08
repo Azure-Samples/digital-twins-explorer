@@ -32,7 +32,10 @@ export const graphStyles = [ // the stylesheet for the graph
       "font-family": "Segoe UI, sans-serif",
       "font-weight": 600,
       "text-wrap": "ellipsis",
-      "text-max-width": "60px"
+      "text-max-width": "60px",
+      "background-fit": "contain",
+      "background-repeat": "no-repeat",
+      "background-clip": "none"
     }
   },
   {
@@ -63,6 +66,36 @@ export const graphStyles = [ // the stylesheet for the graph
       "text-wrap": "ellipsis",
       "text-max-width": "60px",
       "text-margin-y": "-7px"
+    }
+  },
+  {
+    selector: "edge:selected",
+    style: {
+      "border-color": "#900",
+      "line-color": "#900",
+      "target-arrow-color": "#900",
+      "width": 3
+    }
+  },
+  {
+    selector: "edge.highlighted",
+    style: {
+      "border-color": "#e9e6e6",
+      "line-color": "#e9e6e6",
+      "target-arrow-color": "#e9e6e6",
+      "width": 2
+    }
+  },
+  {
+    selector: ".hide",
+    style: {
+      "display": "none"
+    }
+  },
+  {
+    selector: ".opaque",
+    style: {
+      "opacity": "0.4"
     }
   }
 ]

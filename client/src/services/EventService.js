@@ -178,6 +178,14 @@ class EventService {
     this._on("loading", callback);
   }
 
+  publishModelIconUpdate(modelId) {
+    this._emit("modeliconupdate", modelId);
+  }
+
+  subscribeModelIconUpdate(callback) {
+    this._on("modeliconupdate", callback);
+  }
+
   _emit = (name, payload) => this._action({ type: "emit", name, payload })
 
   _off = (name, payload) => this._action({ type: "off", name, payload })

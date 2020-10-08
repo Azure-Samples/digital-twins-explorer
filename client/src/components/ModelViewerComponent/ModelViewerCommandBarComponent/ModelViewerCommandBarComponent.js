@@ -15,6 +15,14 @@ export class ModelViewerCommandBarComponent extends Component {
 
   farItems = [
     {
+      key: "uploadModelImages",
+      text: "Upload Model Images",
+      iconProps: { iconName: "ImageSearch" },
+      onClick: () => this.props.onUploadModelImagesClicked(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
+    {
       key: "downloadModels",
       text: "Download Models",
       iconProps: { iconName: "CloudDownload" },
