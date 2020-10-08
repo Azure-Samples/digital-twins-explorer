@@ -62,13 +62,6 @@ class ApiService {
     this.client = null;
   }
 
-  async addhttp(url) {
-    if (!/^(?:f|ht)tps?:\/\//.test(url)) {
-        url = "http://" + url;
-    }
-    return url;
-  }
-
   async initialize() {
     const { appAdtUrl } = await configService.getConfig();
 
