@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@azure/ms-rest-azure-js": "^2.0.1",
-    "@azure/ms-rest-js": "^2.0.5",
+    "@azure/digital-twins": "^1.0.0-preview.1",
+    "@azure/identity": "^1.1.0",
     "@microsoft/signalr": "^3.1.4",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
