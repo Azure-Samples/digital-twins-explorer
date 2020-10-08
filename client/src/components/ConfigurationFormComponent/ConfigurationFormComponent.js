@@ -51,8 +51,6 @@ export class ConfigurationFormComponent extends Component {
     }
   }
 
-<<<<<<< HEAD
-=======
   saveEnvironment = config => {
     const { environmentOptions } = this.state;
     const { appAdtUrl } = config;
@@ -91,7 +89,6 @@ export class ConfigurationFormComponent extends Component {
     return true;
   }
 
->>>>>>> 183ea7e... Updating configuration validation and multi-instance support
   closeConfigurationSettings = e => {
     e.preventDefault();
     eventService.publishConfigure({ type: "end" });
