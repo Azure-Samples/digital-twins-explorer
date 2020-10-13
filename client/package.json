@@ -31,11 +31,15 @@
     "react-error-boundary": "^2.0.1",
     "react-excel-renderer": "^1.1.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^3.4.3",
     "typescript": "^3.7.5",
     "uuid": "^7.0.1"
   },
+  "resolutions": {
+    "serialize-javascript": "4.0.0"
+  },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
