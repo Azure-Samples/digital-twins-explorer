@@ -39,8 +39,25 @@ module.exports = { "@context": {
       "@type": "@vocab",
       "@container": "@list"
     },
+    "dtmm:aka": { "@type": "@vocab" },
+    "dtmm:datatypeProperty": { "@type": "@vocab" },
     "dtmm:dictionaryKey": { "@type": "@vocab" },
     "dtmm:doppelganger": { "@type": "@vocab" },
+    "dtmm:dtmiSegment": { "@type": "@vocab" },
+    "dtmm:excludeType": { "@type": "@vocab" },
+    "dtmm:importProperties": {
+      "@type": "@vocab",
+      "@container": "@list"
+    },
+    "dtmm:properties": {
+      "@type": "@vocab",
+      "@container": "@list"
+    },
+    "dtmm:replaceWith": { "@type": "@vocab" },
+    "dtmm:uniqueProperties": {
+      "@type": "@vocab",
+      "@container": "@list"
+    },
 
     "Array": { "@id": "dtmi:dtdl:class:Array;2" },
     "Boolean": { "@id": "dtmi:dtdl:class:Boolean;2" },
@@ -266,7 +283,7 @@ module.exports = { "@context": {
       "@id": "dtmi:dtdl:property:valueSchema;2",
       "@type": "@vocab"
     },
-    "writeable": { "@id": "dtmi:dtdl:property:writeable;2" },
+    "writable": { "@id": "dtmi:dtdl:property:writable;2" },
 
     "asynchronous": { "@id": "dtmi:dtdl:instance:CommandType:asynchronous;2" },
     "synchronous": { "@id": "dtmi:dtdl:instance:CommandType:synchronous;2" },
