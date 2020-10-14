@@ -20,7 +20,8 @@ export class GraphViewerRelationshipCreateComponent extends Component {
     this.state = {
       isLoading: false,
       relationshipItems: [],
-      relationshipId: null
+      relationshipId: null,
+      hasRequiredRelError: false
     };
   }
 
@@ -52,28 +53,30 @@ export class GraphViewerRelationshipCreateComponent extends Component {
   }
 
   onSelectedRelChange = (e, i) => {
-    this.setState({ relationshipId: i.key });
+    this.setState({ relationshipId: i.key, hasRequiredRelError: false });
   }
 
   save = async () => {
     const { onCreate } = this.props;
     const { relationshipId, relationshipItems } = this.state;
-    const { sourceId, targetId } = this.getNodes();
-
-    this.setState({ isLoading: true });
-    try {
-      const id = uuidv4();
-      const rel = relationshipItems[relationshipId];
-      await apiService.addRelationship(sourceId, targetId, rel, id);
-      if (onCreate) {
-        onCreate({ $sourceId: sourceId, $relationshipId: id, $relationshipName: rel, $targetId: targetId });
+    if (relationshipId === null) {
+      this.setState({ hasRequiredRelError: true });
+    } else {
+      const { sourceId, targetId } = this.getNodes();
+      this.setState({ isLoading: true });
+      try {
+        const id = uuidv4();
+        const rel = relationshipItems[relationshipId];
+        await apiService.addRelationship(sourceId, targetId, rel, id);
+        if (onCreate) {
+          onCreate({ $sourceId: sourceId, $relationshipId: id, $relationshipName: rel, $targetId: targetId });
+        }
+      } catch (exc) {
+        print(`*** Error creating relationship: ${exc}`, "error");
+        eventService.publishError(`*** Error creating relationship: ${exc}`);
       }
-    } catch (exc) {
-      print(`*** Error creating relationship: ${exc}`, "error");
-      eventService.publishError(`*** Error creating relationship: ${exc}`);
+      this.setState({ isLoading: false, showModal: false });
     }
-
-    this.setState({ isLoading: false, showModal: false });
   }
 
   cancel = () => {
@@ -114,7 +117,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
   }
 
   render() {
-    const { relationshipItems, relationshipId, isLoading, showModal } = this.state;
+    const { relationshipItems, relationshipId, isLoading, showModal, hasRequiredRelError } = this.state;
     const { sourceId, targetId } = this.getNodes();
 
     return (
@@ -134,6 +137,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
           styles={{
             dropdown: { width: 208 }
           }}
+          errorMessage={hasRequiredRelError ? "Please select a relationship" : null}
           onChange={this.onSelectedRelChange} />
         <div className="btn-group">
           <DefaultButton className="modal-button save-button" onClick={this.save}>Save</DefaultButton>

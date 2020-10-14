@@ -153,7 +153,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         const { backgroundColor, backgroundImage } = mtypes[t];
         cy.elements(`node[modelId="${t}"]`).style({
           "background-color": backgroundColor,
-          "background-image": backgroundImage
+          "background-image": backgroundImage,
+          "background-fit": "cover",
+          "background-clip": "node"
         });
       }
     });

@@ -53,7 +53,7 @@ export class PropertyInspectorComponent extends Component {
     };
     this.editorRef = React.createRef();
     this.properties = null;
-    this.writeableProperties = null;
+    this.writableProperties = null;
     this.original = null;
     this.updated = null;
   }
@@ -97,7 +97,7 @@ export class PropertyInspectorComponent extends Component {
       }
 
       this.properties = properties ? properties.filter(property => property.fromChild !== true) : null;
-      this.writeableProperties = properties ? properties.filter(property => property.writeable) : null;
+      this.writableProperties = properties ? properties.filter(property => property.writable) : null;
       this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
       this.setState({ changed: false, selection, patch: null });
       if (selection) {
@@ -124,7 +124,7 @@ export class PropertyInspectorComponent extends Component {
     }
 
     if (node && (NonPatchableFields.indexOf(node.path[0]) > -1
-      || !this.writeableProperties.some(x => x.name === node.path.join("-")))) {
+      || !this.writableProperties.some(x => x.name === node.path.join("-")))) {
       return { field: false, value: false };
     }
 

@@ -8,7 +8,7 @@ import context from "./ref/context";
 
 const REL_TARGET_ANY = "*";
 const getPropertyName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:name;2");
-const getPropertyWriteable = vertex => vertex.getAttributeValue("http://azure.com/DigitalTwin/MetaModel/undefinedTerm/writable");
+const getPropertyWritable = vertex => vertex.getAttributeValue("http://azure.com/DigitalTwin/MetaModel/undefinedTerm/writable");
 
 const inferTarget = vertex => {
   const targetEdge = vertex.getOutgoing("dtmi:dtdl:property:target;2").first();
@@ -98,7 +98,7 @@ export class ModelService {
       properties.push({
         name: `${baseName}${componentProperty.name}`,
         schema: componentProperty.schema,
-        writeable: componentProperty.writeable ?? true,
+        writable: componentProperty.writable ?? true,
         fromChild
       });
     });
@@ -216,7 +216,7 @@ export class ModelService {
           safeAdd(contents.properties, {
             name: getPropertyName(x.toVertex),
             schema: inferSchema(x.toVertex),
-            writeable: getPropertyWriteable(x.toVertex)
+            writable: getPropertyWritable(x.toVertex)
           });
         }
 
