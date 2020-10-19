@@ -22,18 +22,6 @@ class EventService {
     this._on("query", callback);
   }
 
-  publishLogin() {
-    this._emit("login");
-  }
-
-  subscribeLogin(callback) {
-    this._on("login", callback);
-  }
-
-  unsubscribeLogin(callback) {
-    this._off("login", callback);
-  }
-
   publishLog(data, type) {
     this._emit("log", { data, type });
   }

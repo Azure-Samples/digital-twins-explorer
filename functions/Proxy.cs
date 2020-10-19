@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using ProxyKit;
 using AdtExplorer.Functions.Utilities;
+using Azure.Identity;
+using Azure.Core;
 
 namespace AdtExplorer.Functions
 {
@@ -17,6 +19,8 @@ namespace AdtExplorer.Functions
   {
     private readonly IRequestProcessor _requestProcessor;
     private readonly ILogger<Proxy> _log;
+    private static readonly DefaultAzureCredential _credential = new DefaultAzureCredential();
+    private static AccessToken token;
 
     public Proxy(IRequestProcessor requestProcessor, ILogger<Proxy> log)
     {
@@ -28,6 +32,12 @@ namespace AdtExplorer.Functions
     public async Task<HttpResponseMessage> Run(
       [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "POST", "PUT", "PATCH", "DELETE", Route = "proxy/{*wildcard}")] HttpRequest req)
     {
+      if (token.ExpiresOn < DateTime.UtcNow)
+      {
+        token = await GetAccessToken();
+      }
+      req.Headers["authorization"] = $"Bearer {token.Token}";
+
       var rpr = await _requestProcessor.ProcessAsync(req);
       if (!rpr.IsSuccess)
       {
@@ -51,6 +61,11 @@ namespace AdtExplorer.Functions
       res.Headers.Remove("transfer-encoding");
 
       return res;
+    }
+
+    private ValueTask<AccessToken> GetAccessToken() 
+    {
+       return  _credential.GetTokenAsync(new TokenRequestContext(new string[] {"https://digitaltwins.azure.net/.default"}));
     }
   }
 }
