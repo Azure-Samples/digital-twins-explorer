@@ -132,7 +132,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.batch(() => {
       const types = {};
       const mtypes = {};
+      const rtypes = {};
       const el = cy.nodes("*");
+      const rels = cy.edges("*");
 
       // Color by type attribute
       for (let i = 0; i < el.length; i++) {
@@ -157,6 +159,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           "background-fit": "cover",
           "background-clip": "node"
         });
+      }
+
+      // Color relationships by label
+      for (let i = 0; i < rels.length; i++) {
+        rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
+      }
+      for (const r of Object.keys(rtypes)) {
+        cy.elements(`edge[label="${r}"]`).style("line-color", rtypes[r]);
       }
     });
 
