@@ -15,8 +15,6 @@ export class ConfigurationFormComponent extends Component {
     super(props);
     this.state = {
       showModal: false,
-      appClientId: "",
-      appTenantId: "",
       appAdtUrl: "",
       environmentOptions: []
     };
@@ -34,18 +32,15 @@ export class ConfigurationFormComponent extends Component {
 
   loadConfigurationSettings = evt => {
     if (evt.type === "start") {
-      this.setState({ showModal: true, ...evt.config });
+      this.setState({ showModal: true, appAdtUrl: evt.appAdtUrl });
     }
   }
 
   saveConfigurationsSettings = e => {
     e.preventDefault();
     const config = {
-      appClientId: this.state.appClientId,
-      appTenantId: this.state.appTenantId,
       appAdtUrl: this.state.appAdtUrl
     };
-
     if (this.validateConfig(config)) {
       this.saveEnvironment(config);
       eventService.publishConfigure({ type: "end", config });
@@ -72,7 +67,7 @@ export class ConfigurationFormComponent extends Component {
   }
 
   validateConfig = config => {
-    if (!config.appClientId || !config.appTenantId || !config.appAdtUrl) {
+    if (!config.appAdtUrl) {
       eventService.publishError("*** All fields are required.");
       return false;
     }
@@ -100,13 +95,11 @@ export class ConfigurationFormComponent extends Component {
   resetModalState = () => {
     this.setState({
       showModal: false,
-      appClientId: "",
-      appTenantId: "",
       appAdtUrl: ""
     });
   }
 
-  onSelectedEnvironmentChange = (e, i) => {
+  onSelectedEnvironmentChange = i => {
     if (this.environments) {
       const environment = this.environments.find(env => env.name === i.key);
       if (environment) {
@@ -119,7 +112,8 @@ export class ConfigurationFormComponent extends Component {
     this.setState({ appAdtUrl: e.target.value });
   }
 
-  onRemoveEnvironmentClick = item => {
+  onRemoveEnvironmentClick = (evt, item) => {
+    evt.stopPropagation();
     const { environmentOptions, appAdtUrl } = this.state;
     const filteredOptions = environmentOptions.filter(option => option !== item);
     this.environments = this.environments.filter(env => env.name !== item);
@@ -131,22 +125,18 @@ export class ConfigurationFormComponent extends Component {
   }
 
   onRenderOption = item => (
-    <div className="dropdown-option">
+    <div className="dropdown-option" onClick={() => this.onSelectedEnvironmentChange(item)}>
       <span>{item.text}</span>
       <Icon
         className="close-icon"
         iconName="ChromeClose"
         aria-hidden="true"
-        onClick={() => this.onRemoveEnvironmentClick(item.key)}
-        aria-label={`Remove ${item} environment`}
+        onClick={e => this.onRemoveEnvironmentClick(e, item.key)}
+        aria-label={`Remove ${item.text} environment`}
         role="button"
         title="Remove environment"
         tabIndex="0" />
     </div>)
-
-  onAppClientIdChange = evt => this.setState({ appClientId: evt.target.value })
-
-  onAppTenantIdChange = evt => this.setState({ appTenantId: evt.target.value })
 
   onAppAdtUrlChange = evt => this.setState({ appAdtUrl: evt.target.value })
 
@@ -157,7 +147,7 @@ export class ConfigurationFormComponent extends Component {
   })
 
   render() {
-    const { appClientId, appTenantId, appAdtUrl, showModal, environmentOptions } = this.state;
+    const { appAdtUrl, showModal, environmentOptions } = this.state;
 
     return (
       <ModalComponent
@@ -165,27 +155,22 @@ export class ConfigurationFormComponent extends Component {
         className="configuration-settings">
         <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#appClientIdField">
           <form onSubmit={this.saveConfigurationsSettings}>
-            <h2 className="heading-2">Sign In</h2>
+            <h2 className="heading-2">Azure Digital Twins URL</h2>
             <div className="select-settings">
               <Dropdown
                 placeholder="Selected Environment"
-                options={environmentOptions.map(env => ({ key: env, text: env }))}
+                options={environmentOptions.filter(env => env !== appAdtUrl).map(env => ({ key: env, text: env }))}
                 onRenderOption={this.onRenderOption}
                 styles={{
                   dropdown: { width: "100%" }
-                }}
-                onChange={this.onSelectedEnvironmentChange} />
+                }} />
               <TextField required id="appAdtUrlField" label="ADT URL" className="configuration-input"
                 styles={this.getStyles} value={appAdtUrl} onChange={this.onAppAdtUrlChange} />
             </div>
-            <TextField required id="appClientIdField" label="Client ID" className="configuration-input"
-              styles={this.getStyles} value={appClientId} onChange={this.onAppClientIdChange} />
-            <TextField required id="appTenantIdField" label="Tenant ID" className="configuration-input"
-              styles={this.getStyles} value={appTenantId} onChange={this.onAppTenantIdChange} />
             <p>Configuration data is saved in local storage.</p>
             <div className="btn-group">
               <PrimaryButton type="submit" className="modal-button save-button" onClick={this.saveConfigurationsSettings}>
-                Connect
+                Save
               </PrimaryButton>
               <DefaultButton className="modal-button cancel-button" onClick={this.closeConfigurationSettings}>Cancel</DefaultButton>
             </div>

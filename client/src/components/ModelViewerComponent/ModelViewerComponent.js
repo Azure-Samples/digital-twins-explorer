@@ -14,7 +14,6 @@ import { print } from "../../services/LoggingService";
 import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
-import { authService } from "../../services/AuthService";
 import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
@@ -48,20 +47,14 @@ export class ModelViewerComponent extends Component {
     });
     eventService.subscribeCreateModel(() => this.retrieveModels());
 
-    if (authService.isLoggedIn) {
-      await this.retrieveModels();
-    } else {
-      eventService.subscribeLogin(async () => {
-        if (!this.state.isLoading && this.state.items.length === 0) {
-          await this.retrieveModels();
-        }
-      });
-      eventService.subscribeConfigure(evt => {
-        if (evt.type === "end" && evt.config) {
-          this.setState({ items: [], isLoading: false });
-        }
-      });
-    }
+    await this.retrieveModels();
+
+    eventService.subscribeConfigure(evt => {
+      if (evt.type === "end" && evt.config) {
+        this.retrieveModels();
+      }
+    });
+
     eventService.subscribeClearData(() => {
       this.setState({ items: [], isLoading: false });
     });

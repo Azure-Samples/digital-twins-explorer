@@ -95,6 +95,7 @@ module.exports = {
       "react/prop-types": 0,
       "react/require-optimization": 0,
       "react/sort-comp": 0,
+      "require-atomic-updates": 0,
       "require-unicode-regexp": 0,
       "sort-keys": 0,
       "sort-imports": 0,
