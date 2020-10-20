@@ -124,7 +124,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   getBackgroundImage(modelId) {
-    return settingsService.getNodeImage(modelId);
+    return settingsService.getModelImage(modelId);
   }
 
   doLayout() {

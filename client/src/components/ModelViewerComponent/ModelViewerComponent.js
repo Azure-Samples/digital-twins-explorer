@@ -8,6 +8,7 @@ import { ModelViewerCommandBarComponent } from "./ModelViewerCommandBarComponent
 import { ModelViewerViewComponent } from "./ModelViewerViewComponent/ModelViewerViewComponent";
 import { ModelViewerCreateComponent } from "./ModelViewerCreateComponent/ModelViewerCreateComponent";
 import { ModelViewerDeleteComponent } from "./ModelViewerDeleteComponent/ModelViewerDeleteComponent";
+import { ModelViewerUpdateModelImageComponent } from "./ModelViewerUpdateModelImageComponent/ModelViewerUpdateModelImageComponent";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { readFile, sortArray } from "../../utils/utilities";
 import { print } from "../../services/LoggingService";
@@ -35,6 +36,8 @@ export class ModelViewerComponent extends Component {
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
     this.deleteRef = React.createRef();
+    this.updateModelImageRef = React.createRef();
+    this.inputFileRef = null;
   }
 
   async componentDidMount() {
@@ -58,6 +61,27 @@ export class ModelViewerComponent extends Component {
     eventService.subscribeClearData(() => {
       this.setState({ items: [], isLoading: false });
     });
+  }
+
+  async retrieveModels() {
+    this.setState({ isLoading: true });
+
+    let list = [];
+    try {
+      list = await apiService.queryModels();
+    } catch (exc) {
+      print(`*** Error fetching models: ${exc}`, "error");
+      eventService.publishError(`*** Error fetching models: ${exc}`);
+    }
+
+    const items = list.map(m => ({
+      displayName: (m.displayName && m.displayName.en) || m.id,
+      key: m.id
+    }));
+    sortArray(items, "displayName", "key");
+
+    this.originalItems = items.slice(0, items.length);
+    this.setState({ items, isLoading: false });
   }
 
   onFilterChanged = (_, text) => {
@@ -122,7 +146,7 @@ export class ModelViewerComponent extends Component {
           await new Promise(resolve => {
             const fileReader = new FileReader();
             fileReader.onload = () => {
-              settingsService.setNodeImage(id, fileReader.result);
+              settingsService.setModelImage(id, fileReader.result);
               eventService.publishModelIconUpdate(id);
               print(`*** Model image uploaded for ${id}`, "info");
               resolve();
@@ -145,9 +169,10 @@ export class ModelViewerComponent extends Component {
     const fileReader = new FileReader();
 
     fileReader.addEventListener("load", () => {
-      settingsService.setNodeImage(item.key, fileReader.result);
+      settingsService.setModelImage(item.key, fileReader.result);
       eventService.publishModelIconUpdate(item.key);
       ref.current.value = "";
+      this.setState({ isLoading: false });
     });
 
     if (imageFile) {
@@ -155,25 +180,22 @@ export class ModelViewerComponent extends Component {
     }
   }
 
-  async retrieveModels() {
+  onUpdateModelImage = (item, inputFileRef) => {
+    this.updateModelImageRef.current.open(item);
+    this.inputFileRef = inputFileRef.current;
+  }
+
+  onDeleteModelImage = modelId => {
     this.setState({ isLoading: true });
+    print(`*** Removing model image for ${modelId}`, "info");
+    settingsService.deleteModelImage(modelId);
+    eventService.publishModelIconUpdate(modelId);
+    this.setState({ isLoading: false });
+  }
 
-    let list = [];
-    try {
-      list = await apiService.queryModels();
-    } catch (exc) {
-      print(`*** Error fetching models: ${exc}`, "error");
-      eventService.publishError(`*** Error fetching models: ${exc}`);
-    }
-
-    const items = list.map(m => ({
-      displayName: (m.displayName && m.displayName.en) || m.id,
-      key: m.id
-    }));
-    sortArray(items, "displayName", "key");
-
-    this.originalItems = items.slice(0, items.length);
-    this.setState({ items, isLoading: false });
+  onReplaceModelImage = modelId => {
+    print(`*** Replacing model image for ${modelId}`, "info");
+    this.inputFileRef.click();
   }
 
   onView = item => this.viewRef.current.open(item)
@@ -211,11 +233,16 @@ export class ModelViewerComponent extends Component {
           </div>
           <div data-is-scrollable="true" className="mv-modelListWrapper">
             <SelectionZone selection={new Selection({ selectionMode: SelectionMode.single })}>
-              {items.map((item, index) => (
-                <ModelViewerItem key={item.key} item={item} itemIndex={index}
-                  onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
-                  onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
-              ))}
+              {items.map((item, index) => {
+                const modelImage = settingsService.getModelImage(item.key);
+                return (
+                  <ModelViewerItem key={item.key} item={item} itemIndex={index}
+                    modelImage={modelImage}
+                    onUpdateModelImage={this.onUpdateModelImage}
+                    onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
+                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
+                );
+              })}
             </SelectionZone>
           </div>
           {isLoading && <LoaderComponent />}
@@ -223,6 +250,10 @@ export class ModelViewerComponent extends Component {
         <ModelViewerViewComponent ref={this.viewRef} />
         <ModelViewerCreateComponent ref={this.createRef} />
         <ModelViewerDeleteComponent ref={this.deleteRef} onDelete={this.updateModelList} />
+        <ModelViewerUpdateModelImageComponent
+          ref={this.updateModelImageRef}
+          onDelete={this.onDeleteModelImage}
+          onReplace={this.onReplaceModelImage} />
       </>
     );
   }
