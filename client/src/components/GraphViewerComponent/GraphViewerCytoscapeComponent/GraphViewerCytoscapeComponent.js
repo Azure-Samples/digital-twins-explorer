@@ -174,7 +174,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   updateModelIcon(modelId) {
     const cy = this.graphControl;
     cy.elements(`node[modelId="${modelId}"]`).style({
-      "background-image": this.getBackgroundImage(modelId)
+      "background-image": `url(${this.getBackgroundImage(modelId)})`
     });
   }
 
