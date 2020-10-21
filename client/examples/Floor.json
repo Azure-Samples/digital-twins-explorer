@@ -1,0 +1,25 @@
+{
+  "@id": "dtmi:example:Floor;1",
+  "@type": "Interface",
+  "displayName": "Floor",
+  "@context": "dtmi:dtdl:context;2",
+  "contents": [
+    {
+      "@type": "Relationship",
+      "name": "contains",
+      "displayName": "contains",
+      "properties": [
+        {
+          "name": "ownershipUser",
+          "@type":"Property",
+          "schema": "string"
+        },
+        {
+          "name": "ownershipDepartment",
+          "@type":"Property",
+          "schema": "string"
+        }
+      ]
+    }
+  ]
+}
