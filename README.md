@@ -11,7 +11,7 @@ urlFragment: digital-twins-explorer
 ---
 
 # Azure Digital Twins (ADT) explorer
-
+ 
 adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
 * Upload and explore models 
 * Upload and edit graphs of twins
