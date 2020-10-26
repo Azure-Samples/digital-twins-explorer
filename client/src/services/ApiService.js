@@ -3,7 +3,6 @@
 
 import { DigitalTwinsClient } from "@azure/digital-twins";
 import { DefaultHttpClient } from "@azure/core-http";
-import { authService } from "./AuthService";
 import { BatchService } from "./BatchService";
 import { configService } from "./ConfigService";
 import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
@@ -65,19 +64,13 @@ class ApiService {
   async initialize() {
     const { appAdtUrl } = await configService.getConfig();
 
-    const customTokenCredentials = {
-      async getToken() {
-        const token = await authService.login();
-        if (!token) {
-          throw new Error("Failed to acquire access token");
-        }
-        return { token };
-      }
+    const nullTokenCredentials = {
+      getToken: () => null
     };
 
     const baseUri = `${window.location.origin}/api/proxy`;
     const httpClient = new CustomHttpClient({ customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } });
-    this.client = new DigitalTwinsClient(baseUri, customTokenCredentials, { httpClient });
+    this.client = new DigitalTwinsClient(baseUri, nullTokenCredentials, { httpClient });
 
     // Workaround pending SDK fix
     const t1 = this.client.client.digitalTwins.listRelationshipsNext;

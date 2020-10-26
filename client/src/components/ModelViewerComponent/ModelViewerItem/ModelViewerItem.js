@@ -33,8 +33,16 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage }) => {
+export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage, onUpdateModelImage, modelImage }) => {
   const uploadModelImageRef = React.createRef();
+
+  const onHandleModelImage = () => {
+    if (modelImage) {
+      onUpdateModelImage(item.key, uploadModelImageRef);
+    } else {
+      uploadModelImageRef.current.click();
+    }
+  };
 
   return (
     <div className={classNames.item} data-is-focusable data-selection-index={itemIndex}>
@@ -48,7 +56,7 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
                 className="mv-loadButtons" onClick={onDelete} />
               <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
                 title="Upload Model Image" ariaLabel="Upload Model Image"
-                className="mv-loadButtons" onClick={() => uploadModelImageRef.current.click()} />
+                className="mv-loadButtons" onClick={onHandleModelImage} />
               <IconButton iconProps={{ iconName: "Info" }} id={item.key}
                 title="View Model" ariaLabel="View Model"
                 className="mv-loadButtons" onClick={onView} />

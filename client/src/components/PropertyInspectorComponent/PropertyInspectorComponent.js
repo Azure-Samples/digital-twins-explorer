@@ -14,7 +14,6 @@ import { print } from "../../services/LoggingService";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { signalRService } from "../../services/SignalRService";
-import { authService } from "../../services/AuthService";
 import { ModelService } from "../../services/ModelService";
 
 import "jsoneditor-react/es/editor.min.css";
@@ -64,15 +63,7 @@ export class PropertyInspectorComponent extends Component {
 
   componentDidMount() {
     this.subscribeSelection();
-    if (authService.isLoggedIn) {
-      this.subscribeTelemetry();
-    } else {
-      const callback = () => {
-        this.subscribeTelemetry();
-        eventService.unsubscribeLogin(callback);
-      };
-      eventService.subscribeLogin(callback);
-    }
+    this.subscribeTelemetry();
   }
 
   subscribeTelemetry = () => {

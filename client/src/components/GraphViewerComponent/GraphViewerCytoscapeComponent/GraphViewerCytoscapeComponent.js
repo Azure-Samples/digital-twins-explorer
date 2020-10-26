@@ -124,7 +124,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   getBackgroundImage(modelId) {
-    return settingsService.getNodeImage(modelId);
+    return settingsService.getModelImage(modelId);
   }
 
   doLayout() {
@@ -153,7 +153,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         const { backgroundColor, backgroundImage } = mtypes[t];
         cy.elements(`node[modelId="${t}"]`).style({
           "background-color": backgroundColor,
-          "background-image": backgroundImage,
+          "background-image": `url(${backgroundImage})`,
           "background-fit": "cover",
           "background-clip": "node"
         });
@@ -174,7 +174,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   updateModelIcon(modelId) {
     const cy = this.graphControl;
     cy.elements(`node[modelId="${modelId}"]`).style({
-      "background-image": this.getBackgroundImage(modelId)
+      "background-image": `url(${this.getBackgroundImage(modelId)})`
     });
   }
 

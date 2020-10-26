@@ -4,11 +4,19 @@
 import { eventService } from "./EventService";
 import { storageService } from "./StorageService";
 import { apiService } from "./ApiService";
-import { authService } from "./AuthService";
 
 const StorageKeyName = "configuration";
 
 class ConfigService {
+
+  constructor() {
+    eventService.subscribeConfigure(evt => {
+      if (evt.type === "end" && evt.config) {
+        storageService.setLocalStorageObject(StorageKeyName, evt.config);
+        apiService.clearCache();
+      }
+    });
+  }
 
   getConfig(force) {
     const config = storageService.getLocalStorageObject(StorageKeyName);
@@ -23,7 +31,6 @@ class ConfigService {
           if (evt.config) {
             storageService.setLocalStorageObject(StorageKeyName, evt.config);
             apiService.clearCache();
-            authService.reset();
             resolve(evt.config);
           } else {
             const e = new Error("Configuration aborted");

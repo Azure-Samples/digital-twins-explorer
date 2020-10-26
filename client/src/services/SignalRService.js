@@ -3,8 +3,8 @@
 
 import * as signalR from "@microsoft/signalr";
 
-import { authService } from "./AuthService";
 import { configService } from "./ConfigService";
+import { eventService } from "./EventService";
 import { print } from "./LoggingService";
 
 class SignalRService {
@@ -12,8 +12,11 @@ class SignalRService {
   async initialize() {
     if (!this.connection) {
       try {
-        const accessToken = await authService.login();
         const { appAdtUrl } = await configService.getConfig();
+
+        if (!appAdtUrl) {
+          return;
+        }
 
         let signalRUrl = `/api/signalr/?x-adt-host=${new URL(appAdtUrl).hostname}`;
         if (process.env.NODE_ENV === "development" && process.env.REACT_APP_BASE_ADT_URL) {
@@ -21,9 +24,7 @@ class SignalRService {
         }
 
         this.connection = new signalR.HubConnectionBuilder()
-          .withUrl(signalRUrl, {
-            accessTokenFactory: () => accessToken
-          })
+          .withUrl(signalRUrl)
           .build();
 
         await this.connection.start();
@@ -34,11 +35,16 @@ class SignalRService {
   }
 
   async subscribe(action, callback) {
-    if (this.connection) {
-      this.connection.on(action, callback);
-    } else {
-      await this.initialize();
-      this.connection.on(action, callback);
+    try {
+      if (this.connection) {
+        this.connection.on(action, callback);
+      } else {
+        await this.initialize();
+        this.connection.on(action, callback);
+      }
+    } catch (e) {
+      print(`*** Error with SignalR : ${e}`, "error");
+      eventService.publishError(`*** Error with SignalR: ${e}`);
     }
   }
 
