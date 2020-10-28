@@ -38,9 +38,9 @@
     }
   },
   "variables": {
-    "appInsightsName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
-    "functionAppName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
-    "signalrName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]",
+    "appInsightsName": "[concat('adtexplorer', parameters('uniqueSuffix'))]",
+    "functionAppName": "[concat('adtexplorer', parameters('uniqueSuffix'))]",
+    "signalrName": "[concat('adtexplorer', parameters('uniqueSuffix'))]",
     "siteContainerName": "web",
     "storageAccountName": "[concat('adtexplorerstore', parameters('uniqueSuffix'))]",
     "storageAccountSiteSas": {

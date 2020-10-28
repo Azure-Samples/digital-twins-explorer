@@ -20,7 +20,7 @@
     "eventGridFunctionUrl": "[concat('https://', variables('functionAppName'), '.azurewebsites.net/runtime/webhooks/eventgrid?functionName=eventgrid&code=')]",
     "eventGridSubscriptionName": "[concat('webhook-', parameters('uniqueSuffix'))]",
     "eventGridTopicName": "[parameters('digitalTwinsInstance')]",
-    "functionAppName": "[concat('adtexplorer-', parameters('uniqueSuffix'))]"
+    "functionAppName": "[concat('adtexplorer', parameters('uniqueSuffix'))]"
   },
   "resources": [
     {
