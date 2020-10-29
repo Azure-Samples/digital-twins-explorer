@@ -35,12 +35,9 @@ Node.js 10+
 
 ### Running adt-explorer locally
 
-1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to article:
+1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
     * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-scripted)
-      > A few important aspects for your app registrations:
-      > * Make sure you add app registrations to the Web platform section of the app registration, not the desktop/mobile section.
-      > * When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run adt-explorer with a different port (see below), but this is the default.
-      > * Check the **Access Tokens** toggle in the **Implicit Grants** section a few paragraphs below the **Platform Configuration** section on the page. If this toggle is not checked, you will not get authorization tokens.  
+1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer. it will pick up the credentials.   
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
@@ -55,10 +52,8 @@ See below for instructions on how to run adt-explorer using docker.
 
 To create an example graph with adt-explorer connected to a fresh instance of Azure Digital Twins, follow the steps below. The result will be the graph in the screenshot above.
 
-Note: When you click the first command, adt-explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide:
-1. The Azure AD client ID configured earlier.
-1. The Azure AD tenant ID where the app is defined.
-1. The target Azure DT URL.
+Note: When you click the first command, adt-explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide the URL of your Azure Digital Twins instance, prefixed with "https://". 
+You can find the service URL in the portal overview page for your Azure Digital Twins instance. 
 
 <img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
@@ -104,16 +99,12 @@ Initial authentication is triggered by:
 <img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in.png" alt="sign-in icon" width="250"/>
 
 
-Before continuing, you'll need to provide:
-1. The Azure AD client ID configured earlier.
-1. The Azure AD tenant ID where the app is defined.
-1. The target Azure DT URL.
-
+To continue, you will need to provide the URL of the Azure Digital Twins instance you want to access.
 
 <img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 
-To change these properties at any time, click on the sign in button in the top right.
+To change the instance URL to connect to another instance of ADT, click on the sign in button in the top right.
 
 ### Uploading Models
 
