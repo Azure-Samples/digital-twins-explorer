@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { DigitalTwinsClient } from "@azure/digital-twins";
+import { DigitalTwinsClient } from "@azure/digital-twins-core";
 import { DefaultHttpClient } from "@azure/core-http";
 import { BatchService } from "./BatchService";
 import { configService } from "./ConfigService";
@@ -71,25 +71,16 @@ class ApiService {
     const baseUri = `${window.location.origin}/api/proxy`;
     const httpClient = new CustomHttpClient({ customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } });
     this.client = new DigitalTwinsClient(baseUri, nullTokenCredentials, { httpClient });
-
-    // Workaround pending SDK fix
-    const t1 = this.client.client.digitalTwins.listRelationshipsNext;
-    this.client.client.digitalTwins.listRelationshipsNext = (a, b, c) =>
-      t1.call(this.client.client.digitalTwins, b === "" ? b : a, b === "" ? a : b, c);
-
-    const t2 = this.client.client.digitalTwins.listIncomingRelationshipsNext;
-    this.client.client.digitalTwins.listIncomingRelationshipsNext = (a, b, c) =>
-      t2.call(this.client.client.digitalTwins, b === "" ? b : a, b === "" ? a : b, c);
   }
 
   async queryTwinsPaged(query, callback) {
     await this.initialize();
-
+    
     let count = 1;
     for await (const page of this.client.queryTwins(query).byPage()) {
       print(`Ran query for twins, page ${count++}:`, "info");
       print(JSON.stringify(page, null, 2), "info");
-      await callback(getTwinsFromQueryResponse(page.items));
+      await callback(getTwinsFromQueryResponse(page.value));
     }
   }
 
