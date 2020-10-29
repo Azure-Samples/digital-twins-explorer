@@ -32,8 +32,8 @@ export class GraphViewerRelationshipDeleteComponent extends Component {
       await apiService.deleteRelationship(source, id);
       eventService.publishDeleteRelationship({ $sourceId: source, $relationshipId: id });
     } catch (exc) {
-      print(`*** Error deleting relationship: ${exc}`, "error");
-      eventService.publishError(`*** Error deleting relationship: ${exc}`);
+      exc.customMessage = "Error deleting relationship";
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false });

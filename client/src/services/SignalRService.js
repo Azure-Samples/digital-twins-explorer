@@ -42,9 +42,9 @@ class SignalRService {
         await this.initialize();
         this.connection.on(action, callback);
       }
-    } catch (e) {
-      print(`*** Error with SignalR : ${e}`, "error");
-      eventService.publishError(`*** Error with SignalR: ${e}`);
+    } catch (exc) {
+      exc.customMessage = "";
+      eventService.publishError(exc);
     }
   }
 

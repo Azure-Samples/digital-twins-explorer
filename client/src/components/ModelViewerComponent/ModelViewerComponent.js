@@ -70,8 +70,8 @@ export class ModelViewerComponent extends Component {
     try {
       list = await apiService.queryModels();
     } catch (exc) {
-      print(`*** Error fetching models: ${exc}`, "error");
-      eventService.publishError(`*** Error fetching models: ${exc}`);
+      exc.customMessage = "Error fetching models";
+      eventService.publishError(exc);
     }
 
     const items = list.map(m => ({
@@ -104,8 +104,8 @@ export class ModelViewerComponent extends Component {
         list.push(dtdl);
       }
     } catch (exc) {
-      print(`*** Parsing error: ${exc}`, "error");
-      eventService.publishError(`*** Parsing error: ${exc}`);
+      exc.customMessage = "Parsing error";
+      eventService.publishError(exc);
     }
 
     if (list.length > 0) {
@@ -114,8 +114,8 @@ export class ModelViewerComponent extends Component {
         print("*** Upload result:", "info");
         print(JSON.stringify(res, null, 2), "info");
       } catch (exc) {
-        print(`*** Upload error: ${exc}`, "error");
-        eventService.publishError(`*** Upload error: ${exc}`);
+        exc.customMessage = "Upload error";
+        eventService.publishError(exc);
       }
     }
 
@@ -156,8 +156,8 @@ export class ModelViewerComponent extends Component {
         }
       }
     } catch (exc) {
-      print(`*** Error fetching models: ${exc}`, "error");
-      eventService.publishError(`*** Error fetching models: ${exc}`);
+      exc.customMessage = "Error fetching models";
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false });

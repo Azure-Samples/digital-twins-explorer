@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
-import { print } from "../../../services/LoggingService";
 
 import "../GraphViewerComponentShared.scss";
 import { eventService } from "../../../services/EventService";
@@ -72,8 +71,8 @@ export class GraphViewerRelationshipCreateComponent extends Component {
           onCreate({ $sourceId: sourceId, $relationshipId: id, $relationshipName: rel, $targetId: targetId });
         }
       } catch (exc) {
-        print(`*** Error creating relationship: ${exc}`, "error");
-        eventService.publishError(`*** Error creating relationship: ${exc}`);
+        exc.customMessage = "Error creating relationship";
+        eventService.publishError(exc);
       }
       this.setState({ isLoading: false, showModal: false });
     }
@@ -98,10 +97,10 @@ export class GraphViewerRelationshipCreateComponent extends Component {
     try {
       const relationshipItems = await new ModelService().getRelationships(sourceModelId, targetModelId);
       this.setState({ relationshipItems });
-    } catch (exp) {
+    } catch (exc) {
       this.setState({ relationshipItems: [] });
-      print(`Error in retrieving model. Requested ${sourceModelId}. Exception: ${exp}`, "error");
-      eventService.publishError(`Error in retrieving model. Requested ${sourceModelId}. Exception: ${exp}`);
+      exc.customMessage = `Error in retrieving model. Requested ${sourceModelId}`;
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false });

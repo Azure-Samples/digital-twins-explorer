@@ -88,10 +88,10 @@ export class GraphViewerComponent extends React.Component {
     try {
       const allTwins = await this.getTwinsData(query);
       await this.getRelationshipsData(allTwins, 30, false, true, REL_TYPE_OUTGOING);
-    } catch (e) {
-      if (e.errorCode !== "user_cancelled") {
-        print(`*** Error fetching data for graph: ${e}`, "error");
-        eventService.publishError(`*** Error fetching data for graph: ${e}`);
+    } catch (exc) {
+      if (exc.errorCode !== "user_cancelled") {
+        exc.customMessage = "Error fetching data for graph";
+        eventService.publishError(exc);
       }
     }
 
@@ -217,8 +217,8 @@ export class GraphViewerComponent extends React.Component {
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
     } catch (exc) {
-      print(`*** Error fetching data for graph: ${exc}`, "error");
-      eventService.publishError(`*** Error fetching data for graph: ${exc}`);
+      exc.customMessage = "Error fetching data for graph";
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false, progress: 0 });

@@ -181,8 +181,8 @@ export class PropertyInspectorComponent extends Component {
       print(`*** Patching twin ${this.original.$dtId}`, "info");
       await apiService.updateTwin(this.original.$dtId, res);
     } catch (exc) {
-      print(`*** Error in patching twin: ${exc}`, "error");
-      eventService.publishError(`*** Error in patching twin: ${exc}`);
+      exc.customMessage = "Error in patching twin";
+      eventService.publishError(exc);
     }
     this.setState({ isLoading: false });
   }

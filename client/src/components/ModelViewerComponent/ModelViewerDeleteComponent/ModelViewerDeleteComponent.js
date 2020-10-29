@@ -6,7 +6,6 @@ import { DefaultButton } from "office-ui-fabric-react";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
-import { print } from "../../../services/LoggingService";
 import { eventService } from "../../../services/EventService";
 
 import "./ModelViewerDeleteComponent.scss";
@@ -41,8 +40,8 @@ export class ModelViewerDeleteComponent extends Component {
       await apiService.deleteModel(item.key);
       this.props.onDelete(item.key);
     } catch (exc) {
-      print(`*** Error with deleting instance: ${exc}`, "error");
-      eventService.publishError(`*** Error in instance creation: ${exc}`);
+      exc.customMessage = "Error with deleting instance";
+      eventService.publishError(exc);
     }
 
     this.setState({ showModal: false });

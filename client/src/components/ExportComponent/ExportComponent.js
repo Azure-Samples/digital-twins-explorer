@@ -7,7 +7,6 @@ import { Link } from "office-ui-fabric-react";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { exportService } from "../../services/ExportService";
 import { eventService } from "../../services/EventService";
-import { print } from "../../services/LoggingService";
 
 import "./ExportComponent.scss";
 
@@ -26,9 +25,9 @@ export class ExportComponent extends Component {
     try {
       const { query } = this.props;
       data = await exportService.save(query);
-    } catch (e) {
-      print(`*** Error in exporting graph: ${e}`, "error");
-      eventService.publishError(`*** Error in exporting graph: ${e}`);
+    } catch (exc) {
+      exc.customMessage = "Error in exporting graph";
+      eventService.publishError(exc);
     }
 
     if (data) {

@@ -28,8 +28,8 @@ export default class DeleteAllTwinsComponent extends Component {
       await apiService.deleteAllTwins(ids);
       eventService.publishClearData();
     } catch (exc) {
-      print(`*** Error deleting twins: ${exc}`, "error");
-      eventService.publishError(`*** Error deleting twins: ${exc}`);
+      exc.customMessage = "Error deleting twins";
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false });
