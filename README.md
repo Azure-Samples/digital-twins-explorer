@@ -19,7 +19,7 @@ adt-explorer is a sample application for the [Azure Digital Twins service](https
 * Edit properties of twins
 * Run queries against the twins graph 
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/adt-explorer.png" alt="Image of adt-explorer"/>
+<img src="./media/adt-explorer.png" alt="Image of adt-explorer"/>
 
 There is also an experimental set of features that allows you to send push notifications from Azure Digital Twins to the application for close-to-real time updates. 
 
@@ -37,7 +37,7 @@ Node.js 10+
 
 1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
     * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-scripted)
-1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer. it will pick up the credentials.   
+1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
@@ -55,11 +55,11 @@ To create an example graph with adt-explorer connected to a fresh instance of Az
 Note: When you click the first command, adt-explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide the URL of your Azure Digital Twins instance, prefixed with "https://". 
 You can find the service URL in the portal overview page for your Azure Digital Twins instance. 
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
+<img src="./media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 In the model panel at the left, click the `upload models` button (cloud icon with an arrow pointing into the cloud). 
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/model-upload.png" alt="model view panel" width="250"/>
+<img src="./media/model-upload.png" alt="model view panel" width="250"/>
 
   * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
   * Select all files with the `*.json` extension and hit ok
@@ -68,7 +68,7 @@ Adt-explorer will now upload these model files to your Azure Digital Twins insta
 
 In the graph view panel (the large space in the middle), select the `import graph` button.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/graph-panel-upload.png" alt="graph view panel header" width="500"/>
+<img src="./media/graph-panel-upload.png" alt="graph view panel header" width="500"/>
 
 In the file selector box, choose the `distributionGrid.xlsx` spreadsheet file. This file contains a description of the desired graph.
 
@@ -76,11 +76,11 @@ An import view opens, showing a preview of the graph that is going to be loaded.
 
 Hit the save button in the upper right corner
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/graph-preview.png" alt="graph preview" width="500"/>
+<img src="./media/graph-preview.png" alt="graph preview" width="500"/>
 
 Adt-explorer will now create the requested twins and relationships in the service instance. A dialog will appear to show that it is finished.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/import-success.png" alt="graph import success dialog" width="250"/>
+<img src="./media/import-success.png" alt="graph import success dialog" width="250"/>
 
 Click on the graph view tab
 
@@ -93,15 +93,15 @@ For more detailed instructions on adt-explorer features, please see the sections
 ### First run
 
 Initial authentication is triggered by:
-1. Clicking on the sign in button in the top right, or
+1. Clicking on the ADT URL button in the top right, or
 1. Clicking on an operation that requires calling the service.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in.png" alt="sign-in icon" width="250"/>
+<img src="./media/adt-url.png" alt="sign-in icon" width="250"/>
 
 
 To continue, you will need to provide the URL of the Azure Digital Twins instance you want to access.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
+<img src="./media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 
 To change the instance URL to connect to another instance of ADT, click on the sign in button in the top right.
@@ -112,7 +112,7 @@ Azure Digital Twins needs to be configured with models representing the entities
 
 To upload, browse and delete models, use the model view panel docked on the left side of the screen.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/model-view.png" alt="model view panel" width="250"/>
+<img src="./media/model-view.png" alt="model view panel" width="250"/>
  
 The panel will automatically show all available models in your environment on first connection; however, to trigger it explicitly, click on the *Download models* button.
 
@@ -131,19 +131,19 @@ You can create twins and relationships in adt-explorer. To create more than a fe
 
 * To create a twin instance, use the (+) button in any of the model items in the model list. A dialog will open, prompting you for the desired name of the new instance. The name must be unique.
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-twin.png" alt="create twin" width="250"/>
+<img src="./media/create-twin.png" alt="create twin" width="250"/>
 
 * To create a relationship: 
   * You need to have at least two twins in your graph. An appropriate relationship must be defined in the model definition (in other words, the relationship you are trying to create must be allowed in the DTDL of the source twin). 
   * Select the source twin first by clicking on it, then hold the shift key and click the target twin.
   * Click the "Create Relationship" button in the graph viewer command bar
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-rel.png" alt="create relationship" width="400"/>
+<img src="./media/create-rel.png" alt="create relationship" width="400"/>
 
 
   * Pick the desired relationship type (if any is available) from the popup menu in the relationship dialog
 
-<img src="https://github.com/Azure-Samples/digital-twins-explorer/raw/master/media/create-rel-diag.png" alt="create relationship dialog" width="250"/>
+<img src="./media/create-rel-diag.png" alt="create relationship dialog" width="250"/>
 
 ### Querying
 
@@ -234,7 +234,18 @@ In addition to local operation, you can also run adt-explorer as a cloud applica
 1. Zip the contents of the `./publish` folder. E.g. from within the publish folder, run `zip -r AdtExplorerFunctions.zip *`.
 1. Publish the functions app using the CLI: `az functionapp deployment source config-zip -g <resource_group> -n <app_name> --src <zip_file_path>`.
 1. [Optional] For each Azure Digital Twins environment used with the tool *where live telemetry through SignalR is required*, deploy the `template-eventgrid.json` template in your Azure subscription.
-1. Update your Azure AD client to add a new callback URL for the application (i.e. `https://adtexplorer-<your suffix>.azurewebsites.net/`).
+1. Setup a system assigned identity to allow Functions proxy to access Azure Digital Twins Service.
+    1. In Azure, open the **Function App** resource from your resource group.
+    1. Click **Identity** from the left hand blade.
+    1. Under the **System assigned** tab Turn the **Status** toggle to on.
+    1. From your resource group, select the **Azure Digital Twins** resource.
+    1. Click **Access Control (IAM)** from the left blade.
+    1. Click **+ Add** then **Add role assignment**.
+    1. Select **Azure Digital Twins Data Owner** as the Role.
+    1. Assign accesss to **System assigned managed identity - Functions App**.
+    1. Select your **Functions App** from the list.
+    1. Click **Save**.
+
 
 ### Advanced
 

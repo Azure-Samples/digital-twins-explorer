@@ -27,7 +27,7 @@ export class ErrorMessageComponent extends Component {
       if (exc && exc.name === "RestError" && !exc.code) {
         message = CUSTOM_AUTH_ERROR_MESSAGE;
       } else {
-        message = exc.customMessage ? `${exc.customMessage}: ${exc}` : exc;
+        message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
 
       print(message, "error");
