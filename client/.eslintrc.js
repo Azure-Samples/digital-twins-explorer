@@ -41,7 +41,7 @@ module.exports = {
       "func-style": 0,
       "implicit-arrow-linebreak": 0,
       "max-classes-per-file": 0,
-      "max-len": ["error", 140],
+      "max-len": ["error", 200],
       "max-lines": 0,
       "max-lines-per-function": ["error", 100],
       "max-params": 0,

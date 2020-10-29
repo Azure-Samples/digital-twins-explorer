@@ -8,7 +8,6 @@ import { ConfigurationFormComponent } from "../ConfigurationFormComponent/Config
 import { PreferencesFormComponent } from "../PreferencesFormComponent/PreferencesFormComponent";
 import { configService } from "../../services/ConfigService";
 import { eventService } from "../../services/EventService";
-import { print } from "../../services/LoggingService";
 import DeleteAllTwinsComponent from "./DeleteAllTwinsComponent/DeleteAllTwinsComponent";
 
 import "./AppCommandBar.scss";
@@ -56,10 +55,10 @@ export class AppCommandBar extends Component {
     try {
       const { appAdtUrl } = await configService.getConfig();
       await eventService.publishConfigure({ type: "start", appAdtUrl });
-    } catch (e) {
-      if (e.errorCode !== "user_cancelled") {
-        print(`*** Error on saving settings: ${e}`, "error");
-        eventService.publishError(`*** Error on saving settings: ${e}`);
+    } catch (exc) {
+      if (exc.errorCode !== "user_cancelled") {
+        exc.customMessage = "Error on saving settings";
+        eventService.publishError(exc);
       }
     }
   }

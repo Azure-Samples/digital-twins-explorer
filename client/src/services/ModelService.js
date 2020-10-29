@@ -145,18 +145,20 @@ export class ModelService {
         $model: model.model["@id"]
       }
     };
-    const components = model.model.contents.filter(content => content["@type"] === "Component");
-    for (const component of components) {
-      const componentModel = await apiService.getModelById(component.schema);
-      const componentPayload = {
-        $metadata: {
-        }
-      };
-      const properties = componentModel.model.contents.filter(content => content["@type"] === "Property");
-      properties.forEach(property => {
-        componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
-      });
-      payload[component.name] = componentPayload;
+    if (model.model.contents) {
+      const components = model.model.contents.filter(content => content["@type"] === "Component");
+      for (const component of components) {
+        const componentModel = await apiService.getModelById(component.schema);
+        const componentPayload = {
+          $metadata: {
+          }
+        };
+        const properties = componentModel.model.contents.filter(content => content["@type"] === "Property");
+        properties.forEach(property => {
+          componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
+        });
+        payload[component.name] = componentPayload;
+      }
     }
     return payload;
   }

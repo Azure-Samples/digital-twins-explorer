@@ -41,6 +41,10 @@
   background-color: $backgroundColor2;
 }
 
+.mv_buttonGroup {
+  display: flex;
+}
+
 .mv_listItem {
   margin-bottom: 7px;
   padding: 7px 0 7px 8px;
@@ -76,6 +80,7 @@
   text-overflow: ellipsis;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .mv_listItemKey {

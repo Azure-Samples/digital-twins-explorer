@@ -8,7 +8,6 @@ import { ImportCommandBar } from "./ImportCommandBar/ImportCommandBar";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import ImportStatsComponent from "./ImportStatsComponent/ImportStatsComponent";
 import { importService } from "../../services/ImportService";
-import { print } from "../../services/LoggingService";
 import { eventService } from "../../services/EventService";
 
 import "./ImportComponent.scss";
@@ -33,9 +32,9 @@ export class ImportComponent extends Component {
     this.setState({ isLoading: true });
     try {
       this.data = await importService.tryLoad(file);
-    } catch (e) {
-      print(`*** Error in creating graph from spreadsheet: ${e}`, "error");
-      eventService.publishError(`*** Error in creating graph from spreadsheet: ${e}`);
+    } catch (exc) {
+      exc.customMessage = "Error in creating graph from spreadsheet";
+      eventService.publishError(exc);
     }
 
     if (this.data) {
@@ -53,9 +52,9 @@ export class ImportComponent extends Component {
     try {
       await importService.save(this.data);
       this.setState({ isComplete: true, showImportModal: true });
-    } catch (e) {
-      print(`*** Error in importing graph: ${e}`, "error");
-      eventService.publishError(`*** Error in importing graph: ${e}`);
+    } catch (exc) {
+      exc.customMessage = "Error in importing graph";
+      eventService.publishError(exc);
     }
 
     this.setState({ isLoading: false });

@@ -4,7 +4,11 @@
 @import "../../theme/theme.scss";
 
 .message-container {
-  width: 300px;
+  width: 750px;
+
+  &.wide {
+    width: 750px;
+  }
 
   h2 {
     color: $textColorLight1;

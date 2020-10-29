@@ -51,7 +51,7 @@ export class ModelViewerViewComponent extends Component {
         <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#close-model-btn">
           <form onSubmit={this.close}>
             <h2 className="heading-2">Model Information</h2>
-            <div className="pre-wrapper">
+            <div className="pre-wrapper modal-scroll">
               {model && <pre dangerouslySetInnerHTML={this.getMarkup(model)} />}
             </div>
             <div className="btn-group">

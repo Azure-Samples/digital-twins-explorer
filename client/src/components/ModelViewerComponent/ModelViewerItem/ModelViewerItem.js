@@ -50,7 +50,7 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
         <Stack horizontal={false}>
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
-            <div>
+            <div className="mv_buttonGroup">
               <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
                 title="Delete Model" ariaLabel="Delete Model"
                 className="mv-loadButtons" onClick={onDelete} />
