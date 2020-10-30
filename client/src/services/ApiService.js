@@ -36,19 +36,19 @@ const getTwinsFromQueryResponse = response => {
 
 class CustomHttpClient {
 
-  constructor(options) {
+  constructor() {
     this.client = new DefaultHttpClient();
-    this.options = options;
   }
 
   sendRequest(httpRequest) {
-    if (this.options && this.options.customHeaders) {
-      for (const key in this.options.customHeaders) {
-        if (Object.prototype.hasOwnProperty.call(this.options.customHeaders, key)) {
-          httpRequest.headers.set(key, this.options.customHeaders[key]);
-        }
-      }
-    }
+    const url = new URL(httpRequest.url);
+    httpRequest.headers.set("x-adt-host", url.hostname);
+
+    const baseUrl = new URL(window.location.origin);
+    url.host = baseUrl.host;
+    url.pathname = `/api/proxy${url.pathname}`;
+    url.protocol = baseUrl.protocol;
+    httpRequest.url = url.toString();
 
     return this.client.sendRequest(httpRequest);
   }
@@ -68,9 +68,8 @@ class ApiService {
       getToken: () => null
     };
 
-    const baseUri = `${window.location.origin}/api/proxy`;
-    const httpClient = new CustomHttpClient({ customHeaders: { "x-adt-host": new URL(appAdtUrl).hostname } });
-    this.client = new DigitalTwinsClient(baseUri, nullTokenCredentials, { httpClient });
+    const httpClient = new CustomHttpClient();
+    this.client = new DigitalTwinsClient(appAdtUrl, nullTokenCredentials, { httpClient });
   }
 
   async queryTwinsPaged(query, callback) {
