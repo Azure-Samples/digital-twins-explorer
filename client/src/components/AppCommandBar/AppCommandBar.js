@@ -4,11 +4,10 @@
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react/lib/";
 
-import { authService } from "../../services/AuthService";
 import { ConfigurationFormComponent } from "../ConfigurationFormComponent/ConfigurationFormComponent";
 import { PreferencesFormComponent } from "../PreferencesFormComponent/PreferencesFormComponent";
+import { configService } from "../../services/ConfigService";
 import { eventService } from "../../services/EventService";
-import { print } from "../../services/LoggingService";
 import DeleteAllTwinsComponent from "./DeleteAllTwinsComponent/DeleteAllTwinsComponent";
 
 import "./AppCommandBar.scss";
@@ -31,12 +30,12 @@ export class AppCommandBar extends Component {
         },
         {
           key: "signIn",
-          text: "Sign In",
-          ariaLabel: "sign in",
+          text: "ADT URL",
+          ariaLabel: "adt url",
           iconOnly: true,
           iconProps: { iconName: "Signin" },
           split: true,
-          onClick: () => this.login(),
+          onClick: () => this.updateAdtUrlSettings(),
           className: "app-toolbarButtons"
         },
         {
@@ -47,37 +46,20 @@ export class AppCommandBar extends Component {
           iconProps: { iconName: "Settings" },
           onClick: () => this.togglePreferencesModal(),
           className: "app-toolbarButtons settings-button"
-        },
-        {
-          key: "signOut",
-          text: "Sign Out",
-          ariaLabel: "sign out",
-          iconOnly: true,
-          iconProps: { iconName: "SignOut" },
-          onClick: () => this.logout(),
-          className: "app-toolbarButtons"
         }
       ]
     };
   }
 
-  login = async () => {
+  updateAdtUrlSettings = async () => {
     try {
-      await authService.login(true);
-    } catch (e) {
-      if (e.errorCode !== "user_cancelled") {
-        print(`*** Error on login: ${e}`, "error");
-        eventService.publishError(`*** Error on login: ${e}`);
+      const { appAdtUrl } = await configService.getConfig();
+      await eventService.publishConfigure({ type: "start", appAdtUrl });
+    } catch (exc) {
+      if (exc.errorCode !== "user_cancelled") {
+        exc.customMessage = "Error on saving settings";
+        eventService.publishError(exc);
       }
-    }
-  }
-
-  logout = () => {
-    try {
-      authService.logout();
-    } catch (e) {
-      print(`*** Error on logout: ${e}`, "error");
-      eventService.publishError(`*** Error on logout: ${e}`);
     }
   }
 

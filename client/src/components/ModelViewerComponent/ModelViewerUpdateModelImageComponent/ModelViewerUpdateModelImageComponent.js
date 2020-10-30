@@ -5,12 +5,10 @@ import React, { Component } from "react";
 import { DefaultButton } from "office-ui-fabric-react";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
-import { apiService } from "../../../services/ApiService";
-import { eventService } from "../../../services/EventService";
 
-import "./ModelViewerDeleteComponent.scss";
+import "./ModelViewerUpdateModelImageComponent.scss";
 
-export class ModelViewerDeleteComponent extends Component {
+export class ModelViewerUpdateModelImageComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -34,16 +32,15 @@ export class ModelViewerDeleteComponent extends Component {
     ]
   })
 
-  delete = async () => {
+  update = () => {
     const { item } = this.state;
-    try {
-      await apiService.deleteModel(item.key);
-      this.props.onDelete(item.key);
-    } catch (exc) {
-      exc.customMessage = "Error with deleting instance";
-      eventService.publishError(exc);
-    }
+    this.props.onReplace(item);
+    this.setState({ showModal: false });
+  }
 
+  delete = () => {
+    const { item } = this.state;
+    this.props.onDelete(item);
     this.setState({ showModal: false });
   }
 
@@ -51,8 +48,9 @@ export class ModelViewerDeleteComponent extends Component {
     const { showModal } = this.state;
     return (
       <ModalComponent isVisible={showModal} className="mv-delete">
-        <h2 className="heading-2">Are you sure?</h2>
+        <h2 className="heading-2">Model Image</h2>
         <div className="btn-group">
+          <DefaultButton className="modal-button confirm-button" onClick={this.update}>Replace</DefaultButton>
           <DefaultButton className="modal-button confirm-button" onClick={this.delete}>Delete</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
         </div>

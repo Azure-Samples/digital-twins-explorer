@@ -124,7 +124,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   getBackgroundImage(modelId) {
-    return settingsService.getNodeImage(modelId);
+    return settingsService.getModelImage(modelId);
   }
 
   doLayout() {
@@ -132,7 +132,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.batch(() => {
       const types = {};
       const mtypes = {};
+      const rtypes = {};
       const el = cy.nodes("*");
+      const rels = cy.edges("*");
 
       // Color by type attribute
       for (let i = 0; i < el.length; i++) {
@@ -153,8 +155,18 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         const { backgroundColor, backgroundImage } = mtypes[t];
         cy.elements(`node[modelId="${t}"]`).style({
           "background-color": backgroundColor,
-          "background-image": backgroundImage
+          "background-image": `url(${backgroundImage})`,
+          "background-fit": "cover",
+          "background-clip": "node"
         });
+      }
+
+      // Color relationships by label
+      for (let i = 0; i < rels.length; i++) {
+        rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
+      }
+      for (const r of Object.keys(rtypes)) {
+        cy.elements(`edge[label="${r}"]`).style("line-color", rtypes[r]);
       }
     });
 
@@ -172,7 +184,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   updateModelIcon(modelId) {
     const cy = this.graphControl;
     cy.elements(`node[modelId="${modelId}"]`).style({
-      "background-image": this.getBackgroundImage(modelId)
+      "background-image": `url(${this.getBackgroundImage(modelId)})`
     });
   }
 
@@ -223,12 +235,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const cy = this.graphControl;
     cy.edges().toggleClass("highlighted", false);
     if (this.selectedNodes && this.selectedNodes.length > 0) {
+      cy.edges().toggleClass("opaque", true);
       let relatedNodesIds = [];
       this.selectedNodes.forEach(selectedNodeItem => {
         const selectedNode = cy.nodes().filter(n => n.id() === selectedNodeItem.id);
         const connectedEdges = selectedNode.connectedEdges();
         connectedEdges.forEach(edge => {
           cy.$id(edge.data().id).toggleClass("highlighted", true);
+          cy.$id(edge.data().id).toggleClass("opaque", false);
         });
         const selectedNodeRelatedNodesIds = connectedEdges.map(edge =>
           selectedNode.id() === edge.data().source ? edge.data().target : edge.data().source);
@@ -246,6 +260,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       cy.nodes().forEach(cyNode => {
         cy.$id(cyNode.id()).toggleClass("opaque", false);
       });
+      cy.edges().toggleClass("opaque", false);
     }
   }
 

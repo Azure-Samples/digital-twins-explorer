@@ -67,9 +67,11 @@ class SettingsService {
     storageService.setLocalStorageObject(EnvStorageKeyName, envs);
   }
 
-  getNodeImage = modelId => localStorage.getItem(modelId);
+  getModelImage = modelId => storageService.getLocalStoragePrimitive(modelId)
 
-  setNodeImage = (modelId, dataString) => localStorage.setItem(modelId, dataString);
+  setModelImage = (modelId, dataString) => storageService.setLocalStorageObject(modelId, dataString);
+
+  deleteModelImage = modelId => storageService.removeLocalStorageObject(modelId);
 
   save() {
     storageService.setLocalStorageObject(StorageKeyName, this.settings);

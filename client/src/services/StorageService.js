@@ -3,6 +3,8 @@
 
 class StorageService {
 
+  getLocalStoragePrimitive = name => localStorage.getItem(name)
+
   getLocalStorageObject = name => JSON.parse(localStorage.getItem(name))
 
   setLocalStorageObject = (name, dataObj) => localStorage.setItem(name, JSON.stringify(dataObj))

@@ -33,8 +33,16 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage }) => {
+export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage, onUpdateModelImage, modelImage }) => {
   const uploadModelImageRef = React.createRef();
+
+  const onHandleModelImage = () => {
+    if (modelImage) {
+      onUpdateModelImage(item.key, uploadModelImageRef);
+    } else {
+      uploadModelImageRef.current.click();
+    }
+  };
 
   return (
     <div className={classNames.item} data-is-focusable data-selection-index={itemIndex}>
@@ -42,13 +50,13 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
         <Stack horizontal={false}>
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
-            <div>
+            <div className="mv_buttonGroup">
               <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
                 title="Delete Model" ariaLabel="Delete Model"
                 className="mv-loadButtons" onClick={onDelete} />
               <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
                 title="Upload Model Image" ariaLabel="Upload Model Image"
-                className="mv-loadButtons" onClick={() => uploadModelImageRef.current.click()} />
+                className="mv-loadButtons" onClick={onHandleModelImage} />
               <IconButton iconProps={{ iconName: "Info" }} id={item.key}
                 title="View Model" ariaLabel="View Model"
                 className="mv-loadButtons" onClick={onView} />

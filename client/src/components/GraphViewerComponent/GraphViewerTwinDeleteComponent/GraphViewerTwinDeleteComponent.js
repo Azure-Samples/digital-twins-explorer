@@ -26,8 +26,8 @@ export class GraphViewerTwinDeleteComponent extends Component {
     try {
       await apiService.deleteTwin(id);
     } catch (exc) {
-      print(`*** Error deleting twin: ${exc}`, "error");
-      eventService.publishError(`*** Error deleting twin: ${exc}`);
+      exc.customMessage = "Error deleting twin";
+      eventService.publishError(exc);
     }
   }
 
