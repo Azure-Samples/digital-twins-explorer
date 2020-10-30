@@ -44,7 +44,7 @@ class CustomHttpClient {
     const url = new URL(httpRequest.url);
     httpRequest.headers.set("x-adt-host", url.hostname);
 
-    const baseUrl = new URL(`${window.location.origin}`);
+    const baseUrl = new URL(window.location.origin);
     url.host = baseUrl.host;
     url.pathname = `/api/proxy${url.pathname}`;
     url.protocol = baseUrl.protocol;
