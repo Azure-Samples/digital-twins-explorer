@@ -11,7 +11,7 @@ urlFragment: digital-twins-explorer
 ---
 
 # Azure Digital Twins (ADT) explorer
-
+ 
 ## Note to Existing Users: Change in Authentication
 
 **As of 10/30, we have changed authentication in adt-explorer.** Adt-explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running adt-explorer (does not have to be the same command prompt).
