@@ -77,7 +77,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   async getData(query) {
-    const { isLoading } = this.state;
+    const { isLoading, selectedNode } = this.state;
     if (!query || isLoading) {
       return;
     }
@@ -88,6 +88,14 @@ export class GraphViewerComponent extends React.Component {
     try {
       const allTwins = await this.getTwinsData(query);
       await this.getRelationshipsData(allTwins, 30, false, true, REL_TYPE_OUTGOING);
+      if (selectedNode) {
+        const selected = allTwins.find(t => t.$dtId === selectedNode.id);
+        if (selected) {
+          eventService.publishSelection(selected);
+        } else {
+          eventService.publishSelection();
+        }
+      }
     } catch (exc) {
       if (exc.errorCode !== "user_cancelled") {
         exc.customMessage = "Error fetching data for graph";
