@@ -40,7 +40,7 @@ namespace AdtExplorer.Functions
       await SetupEndpointAsync(rpr.Context.InstanceName);
       await SetupRouteAsync(rpr.Context);
 
-      var hubName = rpr.Context.InstanceName;
+      var hubName = EndpointService.EncodeInstanceNameForSignalR(rpr.Context.InstanceName);
       var connectionInfo = binder.Bind<SignalRConnectionInfo>(
         new SignalRConnectionInfoAttribute
         {

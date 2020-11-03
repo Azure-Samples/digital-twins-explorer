@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdtExplorer.Functions.Utilities;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
@@ -49,7 +50,7 @@ namespace AdtExplorer.Functions
       var messages = binder.Bind<IAsyncCollector<SignalRMessage>>(
         new SignalRAttribute
         {
-          HubName = dtName
+          HubName = EndpointService.EncodeInstanceNameForSignalR(dtName)
         });
 
       await messages.AddAsync(new SignalRMessage
