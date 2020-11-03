@@ -38,6 +38,13 @@ namespace AdtExplorer.Functions.Utilities
       _log = log;
     }
 
+    public static string EncodeInstanceNameForSignalR(string instanceName)
+    {
+      // ADT supports '-' in names but not '_'
+      // SignalR supports '_' in hub names but not '-'
+      return instanceName.Replace("-", "_");
+    }
+
     public async Task CreateEndpointAsync(string instanceName)
     {
       var creds = GetAzureCredentials();
