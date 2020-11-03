@@ -32,20 +32,20 @@ namespace AdtExplorer.Functions
     public async Task<HttpResponseMessage> Run(
       [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "POST", "PUT", "PATCH", "DELETE", Route = "proxy/{*wildcard}")] HttpRequest req)
     {
-      if (token.ExpiresOn < DateTime.UtcNow)
-      {
-        token = await GetAccessToken();
-      }
-      req.Headers["authorization"] = $"Bearer {token.Token}";
-
-      var rpr = await _requestProcessor.ProcessAsync(req);
+      var rpr = _requestProcessor.Process(req);
       if (!rpr.IsSuccess)
       {
         return HttpUtilities.BadRequest(rpr.Message);
       }
 
-      var ctx = req.HttpContext.ForwardTo(new UpstreamHost("https", new HostString(rpr.Context.Host)));
+      if (token.ExpiresOn < DateTime.UtcNow)
+      {
+        token = await GetAccessToken();
+      }
 
+      req.Headers["authorization"] = $"Bearer {token.Token}";
+
+      var ctx = req.HttpContext.ForwardTo(new UpstreamHost("https", new HostString(rpr.Context.Host)));
       var uri = new UriBuilder(ctx.UpstreamRequest.RequestUri);
       uri.Path = uri.Path.Replace("api/proxy/", string.Empty);
       ctx.UpstreamRequest.RequestUri = uri.Uri;
@@ -65,7 +65,7 @@ namespace AdtExplorer.Functions
 
     private ValueTask<AccessToken> GetAccessToken() 
     {
-       return  _credential.GetTokenAsync(new TokenRequestContext(new string[] {"https://digitaltwins.azure.net/.default"}));
+       return _credential.GetTokenAsync(new TokenRequestContext(new string[] {"https://digitaltwins.azure.net/.default"}));
     }
   }
 }

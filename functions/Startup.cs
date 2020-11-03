@@ -26,8 +26,6 @@ namespace AdtExplorer.Functions
 
       builder.Services.AddOptions<EndpointOptions>()
         .Configure<IConfiguration>((settings, configuration) => configuration.GetSection("EndpointOptions").Bind(settings));
-      builder.Services.AddOptions<SecurityOptions>()
-        .Configure<IConfiguration>((settings, configuration) => configuration.GetSection("SecurityOptions").Bind(settings));
 
       builder.Services.AddSingleton<IEndpointService, EndpointService>();
       builder.Services.AddSingleton<IRequestProcessor, RequestProcessor>();

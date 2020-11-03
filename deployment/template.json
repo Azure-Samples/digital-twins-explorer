@@ -99,10 +99,6 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]"
             },
             {
-              "name": "EndpointOptions:EndpointName",
-              "value": "[variables('functionAppName')]"
-            },
-            {
               "name": "FUNCTIONS_EXTENSION_VERSION",
               "value": "~3"
             },
@@ -121,14 +117,6 @@
             {
               "name": "SITE_CONTAINER_SAS",
               "value": "[listServiceSas(variables('storageAccountName'), '2018-02-01', variables('storageAccountSiteSas')).serviceSasToken]"
-            },
-            {
-              "name": "SecurityOptions:AllowedTenant",
-              "value": "*"
-            },
-            {
-              "name": "SecurityOptions:AllowedHosts",
-              "value": "*"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
