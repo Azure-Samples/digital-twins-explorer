@@ -4,9 +4,16 @@
 import React, { Component } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Stack } from "office-ui-fabric-react/lib/";
+import cytoscape from "cytoscape";
+import fcose from "cytoscape-fcose";
+import cola from "cytoscape-cola";
+import dagre from "cytoscape-dagre";
+import klay from "cytoscape-klay";
+import dblclick from "cytoscape-dblclick";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
+import { ModelGraphViewerComponent } from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
 import { ModelViewerComponent } from "./components/ModelViewerComponent/ModelViewerComponent";
 import { PropertyInspectorComponent } from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
@@ -21,6 +28,12 @@ import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 import Messages from "./messages/messages";
 import { eventService } from "./services/EventService";
 import logo from "./assets/logo192.png";
+
+cytoscape.use(klay);
+cytoscape.use(dagre);
+cytoscape.use(cola);
+cytoscape.use(fcose);
+cytoscape.use(dblclick);
 
 class App extends Component {
 
@@ -78,6 +91,18 @@ class App extends Component {
                     type: "react-component",
                     isClosable: false,
                     component: "graph",
+                    props: {
+                      className: "graph-component"
+                    },
+                    setting: {
+                      showCloseIcon: false
+                    }
+                  },
+                  {
+                    title: "MODEL VIEW",
+                    type: "react-component",
+                    isClosable: false,
+                    component: "modelGraphViewer",
                     props: {
                       className: "graph-component"
                     },
@@ -227,6 +252,7 @@ class App extends Component {
               onTabCreated={this.onGoldenLayoutTabCreated}
               registerComponents={gLayout => {
                 gLayout.registerComponent("graph", GraphViewerComponent);
+                gLayout.registerComponent("modelGraphViewer", ModelGraphViewerComponent);
                 gLayout.registerComponent("modelViewer", ModelViewerComponent);
                 gLayout.registerComponent("propInspector", PropertyInspectorComponent);
                 gLayout.registerComponent("outputComponent", OutputComponent);

@@ -181,6 +181,42 @@ export class ModelService {
     }
   }
 
+  async getAllModels() {
+    await this.initialize();
+    const models = this.modelGraph.getVertices(x => x.isType("dtmi:dtdl:class:Interface;2")).items();
+    return models.map(model => {
+      const contents = {
+        id: model.id,
+        displayName: model.getAttributeValue("dtmi:dtdl:property:displayName;2"),
+        properties: [],
+        relationships: [],
+        telemetries: [],
+        bases: [],
+        components: []
+      };
+      this._mapModel(model, contents);
+      return contents;
+    });
+  }
+
+  _addReferencedModels(vertice, sortedModels, checkedList) {
+    if (checkedList.some(id => id === vertice.id)) {
+      return;
+    }
+    checkedList.push(vertice.id);
+    vertice.getOutgoing("dtmi:dtdl:property:extends;2")
+      .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
+      .items()
+      .forEach(x => this._addReferencedModels(x.toVertex, sortedModels, checkedList));
+    vertice.getOutgoing("dtmi:dtdl:property:contents;2")
+      .filter(x => x.toVertex.isType("dtmi:dtdl:class:Component;2"))
+      .items()
+      .map(x => x.toVertex.getOutgoing("dtmi:dtdl:property:schema;2").first())
+      .filter(x => x)
+      .forEach(x => this._addReferencedModels(x.toVertex, sortedModels, checkedList));
+    sortedModels.push(vertice.id);
+  }
+
   _getModel(modelId) {
     const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [] };
     const model = this.modelGraph.getVertex(modelId);

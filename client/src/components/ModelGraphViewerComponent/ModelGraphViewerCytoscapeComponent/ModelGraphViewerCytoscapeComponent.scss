@@ -1,0 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../../theme/theme.scss";
+
+.graph-control {
+  height: 100%;
+  background-color: $backgroundColor3;
+  grid-row: 2;
+}

@@ -4,48 +4,46 @@
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 
-import { graphStyles } from "./config";
+import { graphStyles, modelWithImageStyle } from "./config";
 import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions } from "../../../config/CytoscapeConfig";
-import { getUniqueRelationshipId } from "../../../utils/utilities";
-
-import "./GraphViewerCytoscapeComponent.scss";
 import { settingsService } from "../../../services/SettingsService";
 
-export const GraphViewerCytoscapeLayouts = {
+import "./ModelGraphViewerCytoscapeComponent.scss";
+
+export const ModelGraphViewerCytoscapeLayouts = {
   "Cola": colaOptions,
   "Dagre": dagreOptions,
   "fCoSE": fcoseOptions,
   "Klay": klayOptions
 };
 
-export class GraphViewerCytoscapeComponent extends React.Component {
+export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = { };
     this.graphControl = null;
     this.selectedNodes = [];
-    this.layout = "Klay";
+    this.layout = "Cola";
   }
 
-  addTwins(twins) {
-    const mapped = twins
-      .filter(x => this.graphControl.$id(x.$dtId).length === 0)
+  addNodes(nodes) {
+    const mapped = nodes
+      .filter(x => this.graphControl.$id(x.id).length === 0)
       .map(x => ({
         data: {
-          id: x.$dtId,
-          label: x.$dtId,
-          modelId: x.$metadata.$model,
-          category: "Twin"
+          id: x.id,
+          label: x.label,
+          category: "Model"
         }
       }));
 
     this.graphControl.add(mapped);
   }
 
-  removeTwins(twins) {
-    if (twins) {
-      twins.forEach(x => {
+  removeNodes(nodes) {
+    if (nodes) {
+      nodes.forEach(x => {
         const i = this.selectedNodes.findIndex(y => y.id === x);
         if (i >= 0) {
           this.selectedNodes.splice(i, 1);
@@ -56,86 +54,31 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  hideSelectedTwins() {
-    this.clearSelection();
-    const cy = this.graphControl;
+  hideSelectedNodes() {
     this.selectedNodes.forEach(x => {
-      cy.$id(x.id).toggleClass("hide", true);
-    });
-    cy.$(":selected").unselect();
-    this.selectedNodes = [];
-  }
-
-  hideOtherTwins() {
-    this.clearSelection();
-    const cy = this.graphControl;
-    cy.nodes().forEach(node => {
-      if (this.selectedNodes.filter(n => n.id === node.id()).length === 0) {
-        cy.$id(node.id()).toggleClass("hide", true);
-      }
+      this.graphControl.$id(x.id).toggleClass("hide");
     });
   }
 
-  hideNonChildren() {
-    this.clearSelection();
-    const cy = this.graphControl;
-    const relatedNodesIds = this.getSelectedNodesChildrenIds();
-    cy.nodes().forEach(cyNode => {
-      if (relatedNodesIds.indexOf(cyNode.id()) === -1) {
-        cy.$id(cyNode.id()).toggleClass("hide", true);
-      }
-    });
-  }
-
-  getSelectedNodesChildrenIds() {
-    const cy = this.graphControl;
-    const relatedNodesIds = [];
-    const searchForChildren = nodeIds => {
-      nodeIds.forEach(nodeId => {
-        const selectedNode = cy.nodes().filter(n => n.id() === nodeId);
-        const connectedEdges = selectedNode.connectedEdges();
-        const selectedNodeRelatedNodesIds
-          = connectedEdges.filter(edge => selectedNode.id() === edge.data().source).map(edge => edge.data().target);
-        relatedNodesIds.push(selectedNode.id());
-        searchForChildren(selectedNodeRelatedNodesIds);
-      });
-    };
-    searchForChildren(this.selectedNodes.map(n => n.id));
-    return relatedNodesIds;
-  }
-
-  hideWithChildren() {
-    this.clearSelection();
-    const cy = this.graphControl;
-    const relatedNodesIds = this.getSelectedNodesChildrenIds();
-    cy.nodes().forEach(cyNode => {
-      if (relatedNodesIds.indexOf(cyNode.id()) !== -1) {
-        cy.$id(cyNode.id()).toggleClass("hide", true);
-        cy.$id(cyNode.id()).unselect();
-      }
-    });
-    cy.$(":selected").unselect();
-    this.selectedNode = [];
-  }
-
-  clearTwins() {
+  clearNodes() {
     this.selectedNodes = [];
     this.graphControl.elements().remove();
   }
 
-  getTwins() {
+  getNodes() {
     return this.graphControl.nodes().map(x => x.id());
   }
 
-  addRelationships(relationships) {
+  addRelationships(relationships, relationshipClassName = "") {
     const mapped = relationships
       .map(x => ({
         data: {
-          source: x.$sourceId,
-          target: x.$targetId,
-          label: x.$relationshipName,
-          id: getUniqueRelationshipId(x)
-        }
+          source: x.sourceId,
+          target: x.targetId,
+          label: x.relationshipName,
+          id: `${x.sourceId}_${x.relationshipName}`
+        },
+        classes: relationshipClassName
       }))
       .filter(x => this.graphControl.$id(x.id).length === 0);
 
@@ -172,79 +115,27 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     return settingsService.getModelImage(modelId);
   }
 
-  clearSelection = () => {
-    const cy = this.graphControl;
-    cy.nodes().forEach(cyNode => {
-      cy.$id(cyNode.id()).toggleClass("opaque", false);
-      cy.$id(cyNode.id()).toggleClass("highlight", false);
-    });
-    cy.edges().forEach(cyEdge => {
-      cy.$id(cyEdge.id()).toggleClass("opaque", false);
-      cy.$id(cyEdge.id()).toggleClass("highlight", false);
-    });
-  }
-
-  unselectSelectedNodes = () => {
-    if (this.graphControl.$(":selected").length > 0) {
-      this.graphControl.$(":selected").unselect();
-    }
-  }
-
-  showAllNodes = () => {
-    const cy = this.graphControl;
-    cy.nodes().forEach(cyNode => {
-      cy.$id(cyNode.id()).toggleClass("hide", false);
-    });
-    cy.edges().forEach(cyEdge => {
-      cy.$id(cyEdge.id()).toggleClass("hide", false);
-    });
-  }
-
   doLayout() {
     const cy = this.graphControl;
+
     cy.batch(() => {
-      const types = {};
-      const mtypes = {};
-      const rtypes = {};
       const el = cy.nodes("*");
-      const rels = cy.edges("*");
 
-      // Color by type attribute
+      // Add model images
       for (let i = 0; i < el.length; i++) {
-        types[el[i].data("type")] = `#${this.getColor(i)}`;
-      }
-      for (const t of Object.keys(types)) {
-        cy.elements(`node[type="${t}"]`).style("background-color", types[t]);
-      }
-
-      // Color by model type
-      for (let i = 0; i < el.length; i++) {
-        mtypes[el[i].data("modelId")] = {
-          backgroundColor: `#${this.getColor(i)}`,
-          backgroundImage: this.getBackgroundImage(el[i].data("modelId"))
-        };
-      }
-      for (const t of Object.keys(mtypes)) {
-        const { backgroundColor, backgroundImage } = mtypes[t];
-        cy.elements(`node[modelId="${t}"]`).style({
-          "background-color": backgroundColor,
-          "background-image": `url(${backgroundImage})`,
-          "background-fit": "cover",
-          "background-clip": "node"
-        });
-      }
-
-      // Color relationships by label
-      for (let i = 0; i < rels.length; i++) {
-        rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
-      }
-      for (const r of Object.keys(rtypes)) {
-        cy.elements(`edge[label="${r}"]`).style("line-color", rtypes[r]);
+        const modelId = el[i].data("id");
+        const backgroundImage = this.getBackgroundImage(modelId);
+        if (backgroundImage) {
+          cy.elements(`node[id="${modelId}"]`).style({
+            "background-image": `url(${this.getBackgroundImage(modelId)})`,
+            ...modelWithImageStyle
+          });
+        }
       }
     });
 
     return new Promise(resolve => {
-      const layout = cy.layout(GraphViewerCytoscapeLayouts[this.layout]);
+      const layout = cy.layout(ModelGraphViewerCytoscapeLayouts[this.layout]);
       layout.on("layoutstop", () => resolve());
       layout.run();
     });
@@ -256,13 +147,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   updateModelIcon(modelId) {
     const cy = this.graphControl;
-    cy.elements(`node[modelId="${modelId}"]`).style({
-      "background-image": `url(${this.getBackgroundImage(modelId)})`
+    cy.elements(`node[id="${modelId}"]`).style({
+      "background-image": `url(${this.getBackgroundImage(modelId)})`,
+      ...modelWithImageStyle
     });
   }
 
   onNodeSelected = ({ target: node }) => {
-    this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
+    this.selectedNodes.push({ id: node.id() });
     this.highlightRelatedNodes();
     this.onNodeClicked();
   }
@@ -273,9 +165,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       this.selectedNodes.splice(removed, 1);
       this.highlightRelatedNodes();
       this.onNodeClicked();
-    }
-    if (this.selectedNodes.length === 0) {
-      this.clearSelection();
     }
   }
 
@@ -299,10 +188,17 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  onEdgeSelected = e => {
+    if (this.props.onEdgeClicked) {
+      this.props.onEdgeClicked(e.target.data());
+    }
+  }
+
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
+      const cy = this.graphControl;
+      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", false));
       this.props.onControlClicked(e);
-      this.clearSelection();
     }
   }
 
@@ -345,6 +241,20 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   center() {
     this.graphControl.center();
+  }
+
+  zoomIn() {
+    let zoomLevel = this.graphControl.zoom();
+    zoomLevel += 0.5;
+    this.graphControl.zoom(zoomLevel);
+  }
+
+  zoomOut() {
+    let zoomLevel = this.graphControl.zoom();
+    if (zoomLevel > 0.5) {
+      zoomLevel -= 0.5;
+      this.graphControl.zoom(zoomLevel);
+    }
   }
 
   render() {
