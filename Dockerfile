@@ -1,4 +1,11 @@
-FROM node:latest
+FROM node:current-slim
+
+# Install required dependencies
+RUN apt-get update
+RUN apt-get -y install curl python make g++
+
+# Install the Azure CLI, which will be required for authentication
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 # Create app directory
 WORKDIR /usr/src/app/client
@@ -9,15 +16,16 @@ WORKDIR /usr/src/app/client
 COPY ./client/package*.json ./
 WORKDIR /usr/src/app/client/src
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
 
 # Bundle app source
 WORKDIR /usr/src/app
 COPY . .
+WORKDIR /usr/src/app/client/src
 
 # Notify that we want to expose port 3000
 EXPOSE 3000
-# Actually start the app
+# Create startup script & start the app
 WORKDIR /usr/src/app/client/src
-CMD npm run start
+RUN printf "#!/bin/sh\nset -e\naz login && npm run start" > startup.sh
+RUN chmod 0755 startup.sh
+ENTRYPOINT ["./startup.sh"]
