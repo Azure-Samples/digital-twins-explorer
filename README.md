@@ -221,8 +221,8 @@ Clicking the settings cog in the top right corner allows the configuration of th
     * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance)
 1. From a command prompt in the root folder, run `docker build -t adt-explorer .`. This will build the Docker image for the ADT explorer.
 1. From the same command prompt, run `docker run -it -p3000:3000 adt-explorer`.
-    > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 adt-explorer`
-    > A message will appear on the console asking you to login using a code in the Microsoft Login page with your web browser; after doing so the ADT explorer should start.
+    > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 adt-explorer`.
+    > A message will appear on the console asking you to login using a code in the Microsoft device login page with your web browser; after doing so the ADT explorer should start.
     >  * Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside Docker this information might not be accurate, as other port might have been exposed. Be sure to use
     >  the port you chose before.
 1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the apropriate port, if you changed it).
