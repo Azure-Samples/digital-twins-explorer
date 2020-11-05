@@ -129,6 +129,12 @@ export class ModelService {
           .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
           .items()
           .forEach(x => referenced[x.toVertex.id] = x.toVertex);
+        m.getOutgoing("dtmi:dtdl:property:contents;2")
+          .filter(x => x.toVertex.isType("dtmi:dtdl:class:Component;2"))
+          .items()
+          .map(x => x.toVertex.getOutgoing("dtmi:dtdl:property:schema;2").first())
+          .filter(x => x)
+          .forEach(x => referenced[x.toVertex.id] = x.toVertex);
       }
 
       for (const m of models.filter(x => !referenced[x.id])) {
