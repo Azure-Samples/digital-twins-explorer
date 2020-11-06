@@ -145,26 +145,22 @@ export class ModelService {
   }
 
   async createPayload(modelId) {
-    const model = await apiService.getModelById(modelId);
+    await this.initialize();
+    const model = this._getModel(modelId);
     const payload = {
       $metadata: {
-        $model: model.model["@id"]
+        $model: modelId
       }
     };
-    if (model.model.contents) {
-      const components = model.model.contents.filter(content => content["@type"] === "Component");
-      for (const component of components) {
-        const componentModel = await apiService.getModelById(component.schema);
-        const componentPayload = {
-          $metadata: {
-          }
-        };
-        const properties = componentModel.model.contents.filter(content => content["@type"] === "Property");
-        properties.forEach(property => {
-          componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
-        });
-        payload[component.name] = componentPayload;
-      }
+    for (const component of model.components) {
+      const componentPayload = {
+        $metadata: {
+        }
+      };
+      component.properties.forEach(property => {
+        componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
+      });
+      payload[component.name] = componentPayload;
     }
     return payload;
   }
