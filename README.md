@@ -43,7 +43,7 @@ Node.js 10+
 ### Running adt-explorer locally
 
 1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
-    * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-scripted)
+    * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-portal)
 1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
