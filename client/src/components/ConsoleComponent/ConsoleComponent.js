@@ -24,7 +24,7 @@ export class ConsoleComponent extends Component {
       try {
         const twin = await apiService.getTwinById(arg1);
         const properties = await new ModelService().getProperties(twin.$metadata.$model);
-        const prop = properties.filter(p => p.name === arg3);
+        const prop = Object.keys(properties).filter(p => p === arg3);
 
         if (prop <= 0) {
           this.pushToStdout("*** Property doesn\"t exist!");
