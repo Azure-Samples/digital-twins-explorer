@@ -33,15 +33,6 @@ export class GraphViewerCommandBarComponent extends Component {
 
   farItems = [
     {
-      key: "hideTwins",
-      text: "Hide Selected Twins",
-      ariaLabel: "hide selected twins",
-      iconProps: { iconName: "Hide" },
-      onClick: () => this.onTwinsHide(),
-      iconOnly: true,
-      className: this.buttonClass
-    },
-    {
       key: "deleteTwin",
       text: "Delete Selected Twins",
       ariaLabel: "delete selected twins",
@@ -101,6 +92,52 @@ export class GraphViewerCommandBarComponent extends Component {
       className: this.buttonClass,
       iconOnly: true,
       commandBarButtonAs: () => this.renderRelationshipExpansionItem()
+    },
+    {
+      key: "showTwins",
+      text: "Show All",
+      iconProps: { iconName: "RedEye" },
+      onClick: () => this.props.onShowAll(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
+    {
+      key: "hideTwins",
+      text: "Hide",
+      ariaLabel: "show all twins",
+      iconProps: { iconName: "Hide" },
+      iconOnly: true,
+      split: true,
+      onClick: () => this.props.onTriggerHide(),
+      className: `${this.buttonClass} command-bar-dropdown`,
+      subMenuProps: {
+        items: [
+          {
+            key: "hide-others",
+            text: "Hide all others",
+            ariaLabel: "Hide all others",
+            onClick: () => this.props.onHideOthers()
+          },
+          {
+            key: "hide-non-children",
+            text: "Hide non-children",
+            ariaLabel: "Hide non children",
+            onClick: () => this.props.onHideNonChildren()
+          },
+          {
+            key: "hide-selected",
+            text: "Hide selected",
+            ariaLabel: "Hide selected",
+            onClick: () => this.props.onHide()
+          },
+          {
+            key: "hide-with-children",
+            text: "Hide selected and children",
+            ariaLabel: "Hide selected and children",
+            onClick: () => this.props.onHideWithChildren()
+          }
+        ]
+      }
     },
     {
       key: "expansionMode",
@@ -205,9 +242,10 @@ export class GraphViewerCommandBarComponent extends Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes, selectedEdge } = this.props;
-    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes || selectedNodes.length < 1;
+    const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes, selectedEdge, canShowAll } = this.props;
     this.farItems.find(i => i.key === "deleteTwin").disabled = !selectedNode;
+    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes || selectedNodes.length !== 1;
+    this.farItems.find(i => i.key === "showTwins").disabled = !canShowAll;
     this.farItems.find(i => i.key === "getRelationship").disabled = !selectedNodes || selectedNodes.length !== 1;
     this.farItems.find(i => i.key === "addRelationship").disabled = !selectedNodes || selectedNodes.length !== 2;
     this.farItems.find(i => i.key === "deleteRelationship").disabled = !selectedEdge;
@@ -224,7 +262,7 @@ export class GraphViewerCommandBarComponent extends Component {
         item.iconProps = { iconName: item.key === this.state.relTypeLoading ? "CheckMark" : "" };
         return item;
       });
-
+    this.farItems.find(i => i.key === "hideTwins").subMenuProps.items.forEach(item => item.iconProps = { iconName: item.key === this.props.hideMode ? "CheckMark" : "" });
     return (
       <>
         <CommandBar className="gv-commandbar"
