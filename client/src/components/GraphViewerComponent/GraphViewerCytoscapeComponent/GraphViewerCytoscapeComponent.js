@@ -71,7 +71,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.clearSelection();
     const cy = this.graphControl;
     this.selectedNodes.forEach(x => {
-      cy.$id(x.id).toggleClass("hide");
+      cy.$id(x.id).toggleClass("hide", true);
+      cy.$id(x.id).unselect();
     });
     this.selectedNode = [];
   }
@@ -81,7 +82,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const cy = this.graphControl;
     cy.nodes().forEach(node => {
       if (this.selectedNodes.filter(n => n.id === node.id()).length === 0) {
-        cy.$id(node.id()).toggleClass("hide");
+        cy.$id(node.id()).toggleClass("hide", true);
       }
     });
   }
@@ -121,7 +122,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.nodes().forEach(cyNode => {
       if (relatedNodesIds.indexOf(cyNode.id()) !== -1) {
         cy.$id(cyNode.id()).toggleClass("hide", true);
+        cy.$id(cyNode.id()).unselect();
       }
+    });
+    this.selectedNodes.forEach(x => {
+      cy.$id(x.id).unselect();
     });
     this.selectedNode = [];
   }
