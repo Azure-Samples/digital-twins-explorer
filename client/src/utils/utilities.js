@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+import jsonlint from "jsonlint";
 
 export function readFile(file) {
   // Always return a Promise
@@ -11,7 +12,7 @@ export function readFile(file) {
       content = e.target.result;
 
       try {
-        const result = JSON.parse(content);
+        const result = jsonlint.parse(content);
         resolve(result);
       } catch (exp) {
         reject(exp);

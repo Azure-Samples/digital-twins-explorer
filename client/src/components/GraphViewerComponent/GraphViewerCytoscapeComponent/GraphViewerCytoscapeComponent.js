@@ -68,9 +68,67 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   hideSelectedTwins() {
+    this.clearSelection();
+    const cy = this.graphControl;
     this.selectedNodes.forEach(x => {
-      this.graphControl.$id(x.id).toggleClass("hide");
+      cy.$id(x.id).toggleClass("hide", true);
+      cy.$id(x.id).unselect();
     });
+    this.selectedNode = [];
+  }
+
+  hideOtherTwins() {
+    this.clearSelection();
+    const cy = this.graphControl;
+    cy.nodes().forEach(node => {
+      if (this.selectedNodes.filter(n => n.id === node.id()).length === 0) {
+        cy.$id(node.id()).toggleClass("hide", true);
+      }
+    });
+  }
+
+  hideNonChildren() {
+    this.clearSelection();
+    const cy = this.graphControl;
+    const relatedNodesIds = this.getSelectedNodesChildrenIds();
+    cy.nodes().forEach(cyNode => {
+      if (relatedNodesIds.indexOf(cyNode.id()) === -1) {
+        cy.$id(cyNode.id()).toggleClass("hide", true);
+      }
+    });
+  }
+
+  getSelectedNodesChildrenIds() {
+    const cy = this.graphControl;
+    const relatedNodesIds = [];
+    const searchForChildren = nodeIds => {
+      nodeIds.forEach(nodeId => {
+        const selectedNode = cy.nodes().filter(n => n.id() === nodeId);
+        const connectedEdges = selectedNode.connectedEdges();
+        const selectedNodeRelatedNodesIds
+          = connectedEdges.filter(edge => selectedNode.id() === edge.data().source).map(edge => edge.data().target);
+        relatedNodesIds.push(selectedNode.id());
+        searchForChildren(selectedNodeRelatedNodesIds);
+      });
+    };
+    searchForChildren(this.selectedNodes.map(n => n.id));
+    return relatedNodesIds;
+  }
+
+  hideWithChildren() {
+    this.clearSelection();
+    const cy = this.graphControl;
+    const relatedNodesIds = this.getSelectedNodesChildrenIds();
+    cy.nodes().forEach(cyNode => {
+      if (relatedNodesIds.indexOf(cyNode.id()) !== -1) {
+        cy.$id(cyNode.id()).toggleClass("hide", true);
+        cy.$id(cyNode.id()).unselect();
+      }
+    });
+    this.selectedNodes.forEach(x => {
+      cy.$id(x.id).unselect();
+    });
+    this.selectedNode = [];
   }
 
   clearTwins() {
@@ -125,6 +183,28 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   getBackgroundImage(modelId) {
     return settingsService.getModelImage(modelId);
+  }
+
+  clearSelection = () => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("opaque", false);
+      cy.$id(cyNode.id()).toggleClass("highlight", false);
+    });
+    cy.edges().forEach(cyEdge => {
+      cy.$id(cyEdge.id()).toggleClass("opaque", false);
+      cy.$id(cyEdge.id()).toggleClass("highlight", false);
+    });
+  }
+
+  showAllNodes = () => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("hide", false);
+    });
+    cy.edges().forEach(cyEdge => {
+      cy.$id(cyEdge.id()).toggleClass("hide", false);
+    });
   }
 
   doLayout() {
@@ -225,9 +305,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
-      const cy = this.graphControl;
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", false));
       this.props.onControlClicked(e);
+      this.clearSelection();
     }
   }
 

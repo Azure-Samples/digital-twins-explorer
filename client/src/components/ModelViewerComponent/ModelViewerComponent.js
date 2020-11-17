@@ -101,7 +101,11 @@ export class ModelViewerComponent extends Component {
       for (const file of files) {
         print(`- working on ${file.name}`);
         const dtdl = await readFile(file);
-        list.push(dtdl);
+        if (dtdl.length) {
+          dtdl.forEach(model => list.push(model));
+        } else {
+          list.push(dtdl);
+        }
       }
     } catch (exc) {
       exc.customMessage = "Parsing error";

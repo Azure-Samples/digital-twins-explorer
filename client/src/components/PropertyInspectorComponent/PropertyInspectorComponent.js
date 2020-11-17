@@ -28,15 +28,46 @@ const applyDefaultValues = (properties, selection) => {
   }
 
   const modelService = new ModelService();
-  for (const p of properties) {
-    if (selection[p.name]) {
+  for (const p of Object.keys(properties)) {
+    if (!properties[p].schema) {
+      if (!selection[p]) {
+        selection[p] = {};
+      }
+
+      applyDefaultValues(properties[p], selection[p]);
       continue;
     }
 
-    const value = modelService.getPropertyDefaultValue(p.schema);
-    selection[p.name] = value;
+    if (selection[p]) {
+      continue;
+    }
+
+    const value = modelService.getPropertyDefaultValue(properties[p].schema);
+    selection[p] = value;
   }
+
   return selection;
+};
+
+const reTypeDelta = (properties, delta) => {
+  const modelService = new ModelService();
+  for (const d of delta) {
+    const parts = d.path.split("/").filter(x => x);
+
+    let match = properties;
+    for (const p of parts) {
+      match = match[p];
+      if (!match) {
+        break;
+      }
+    }
+
+    if (match && match.schema) {
+      d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
+    }
+  }
+
+  return delta;
 };
 
 export class PropertyInspectorComponent extends Component {
@@ -52,7 +83,6 @@ export class PropertyInspectorComponent extends Component {
     };
     this.editorRef = React.createRef();
     this.properties = null;
-    this.writableProperties = null;
     this.original = null;
     this.updated = null;
   }
@@ -87,8 +117,7 @@ export class PropertyInspectorComponent extends Component {
         print(`*** Error fetching twin properties: ${exc}`, "error");
       }
 
-      this.properties = properties ? properties.filter(property => property.fromChild !== true) : null;
-      this.writableProperties = properties ? properties.filter(property => property.writable) : null;
+      this.properties = properties;
       this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
       this.setState({ changed: false, selection, patch: null });
       if (selection) {
@@ -114,9 +143,18 @@ export class PropertyInspectorComponent extends Component {
       return { field: true, value: true };
     }
 
-    if (node && (NonPatchableFields.indexOf(node.path[0]) > -1
-      || !this.writableProperties.some(x => x.name === node.path.join("-")))) {
-      return { field: false, value: false };
+    if (node) {
+      let current = this.properties;
+      for (const p of node.path) {
+        if (NonPatchableFields.indexOf(p) > -1 || ("writable" in current && !current.writable)) {
+          return { field: false, value: false };
+        }
+
+        current = current[p];
+        if (!current) {
+          break;
+        }
+      }
     }
 
     return { field: false, value: true };
@@ -160,7 +198,7 @@ export class PropertyInspectorComponent extends Component {
     if (changed) {
       const deltaFromDefaults = compare(this.original, this.updated);
       const deltaFromOriginal = compare(selection, this.updated);
-      const delta = deltaFromOriginal.filter(x => deltaFromDefaults.some(y => y.path === x.path));
+      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x => deltaFromDefaults.some(y => y.path === x.path)));
       this.setState({ patch: delta });
 
       const patch = JSON.stringify(delta, null, 2);

@@ -16,6 +16,7 @@ export class BatchService {
 
   async run() {
     const promises = [];
+    this._count = 0;
     this.update(0);
 
     for (let i = 0; i < this._items.length; i++) {
@@ -34,7 +35,7 @@ export class BatchService {
           promises.splice(promises.indexOf(p), 1);
 
           try {
-            this.update((i / this._items.length) * 100);
+            this.update((this._count++ / this._items.length) * 100);
             resolve();
           } catch (e) {
             reject(e);
@@ -62,9 +63,9 @@ export class BatchService {
     }
   }
 
-  refresh() {
+  async refresh() {
     if (this._refresh) {
-      this._refresh();
+      await this._refresh();
     }
   }
 

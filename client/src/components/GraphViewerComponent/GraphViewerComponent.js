@@ -27,7 +27,9 @@ export class GraphViewerComponent extends React.Component {
       selectedNode: null,
       selectedNodes: null,
       selectedEdge: null,
-      layout: "Klay"
+      layout: "Klay",
+      hideMode: "hide-others",
+      canShowAll: false
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -77,7 +79,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   async getData(query) {
-    const { isLoading } = this.state;
+    const { isLoading, selectedNode } = this.state;
     if (!query || isLoading) {
       return;
     }
@@ -88,6 +90,14 @@ export class GraphViewerComponent extends React.Component {
     try {
       const allTwins = await this.getTwinsData(query);
       await this.getRelationshipsData(allTwins, 30, false, true, REL_TYPE_OUTGOING);
+      if (selectedNode) {
+        const selected = allTwins.find(t => t.$dtId === selectedNode.id);
+        if (selected) {
+          eventService.publishSelection(selected);
+        } else {
+          eventService.publishSelection();
+        }
+      }
     } catch (exc) {
       if (exc.errorCode !== "user_cancelled") {
         exc.customMessage = "Error fetching data for graph";
@@ -239,12 +249,18 @@ export class GraphViewerComponent extends React.Component {
     eventService.publishSelection();
   }
 
-  onTwinsHide = () => {
-    const { selectedNodes } = this.state;
-    if (selectedNodes.length > 0) {
-      this.cyRef.current.hideSelectedTwins();
-    }
-  }
+  onHide = () => this.setState({ hideMode: "hide-selected" });
+
+  onHideOthers = () => this.setState({ hideMode: "hide-others" });
+
+  onHideNonChildren = () => this.setState({ hideMode: "hide-non-children" });
+
+  onHideWithChildren = () => this.setState({ hideMode: "hide-with-children" });
+
+  onShowAll = () => {
+    this.cyRef.current.showAllNodes();
+    this.setState({ canShowAll: false });
+  };
 
   onRelationshipCreate = async relationship => {
     if (relationship) {
@@ -266,17 +282,46 @@ export class GraphViewerComponent extends React.Component {
     this.cyRef.current.doLayout();
   }
 
+  onTriggerHide = () => {
+    const { selectedNodes, hideMode } = this.state;
+    if (selectedNodes && selectedNodes.length > 0) {
+      switch (hideMode) {
+        case "hide-selected":
+          this.cyRef.current.hideSelectedTwins();
+          break;
+        case "hide-others":
+          this.cyRef.current.hideOtherTwins();
+          break;
+        case "hide-non-children":
+          this.cyRef.current.hideNonChildren();
+          break;
+        case "hide-with-children":
+          this.cyRef.current.hideWithChildren();
+          break;
+        default:
+          break;
+      }
+    }
+    this.setState({ canShowAll: true });
+  }
+
   render() {
-    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout } = this.state;
+    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout, hideMode, canShowAll } = this.state;
     return (
       <div className="gc-grid">
         <div className="gc-toolbar">
           <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
             selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
-            layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout}
+            layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
             onRelationshipCreate={this.onRelationshipCreate}
             onTwinDelete={this.onTwinDelete}
-            onTwinsHide={this.onTwinsHide}
+            onHideOthers={this.onHideOthers}
+            onHideNonChildren={this.onHideNonChildren}
+            onHide={this.onHide}
+            onHideWithChildren={this.onHideWithChildren}
+            onTriggerHide={this.onTriggerHide}
+            onShowAll={this.onShowAll}
+            canShowAll={canShowAll}
             onLayoutClicked={() => this.cyRef.current.doLayout()}
             onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
             onCenterClicked={() => this.cyRef.current.center()}

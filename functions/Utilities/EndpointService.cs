@@ -2,20 +2,20 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AdtExplorer.Functions.Configuration;
-using AdtExplorer.Functions.Sdk;
+using Azure;
+using Azure.DigitalTwins.Core;
+using Azure.Identity;
+using Microsoft.Azure.Management.DigitalTwins;
+using Microsoft.Azure.Management.DigitalTwins.Models;
 using Microsoft.Azure.Management.EventGrid;
-using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
-using Microsoft.Azure.Management.ResourceManager.Fluent.GenericResource.Definition;
-using Microsoft.Azure.Management.ResourceManager.Fluent.Models;
+using Microsoft.Azure.Management.Subscription;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Rest;
-using Microsoft.Rest.Azure.OData;
 
 namespace AdtExplorer.Functions.Utilities
 {
@@ -38,101 +38,132 @@ namespace AdtExplorer.Functions.Utilities
       _log = log;
     }
 
+    public static string EncodeInstanceNameForSignalR(string instanceName)
+    {
+      // ADT supports '-' in names but not '_'
+      // SignalR supports '_' in hub names but not '-'
+      return instanceName.Replace("-", "_");
+    }
+
     public async Task CreateEndpointAsync(string instanceName)
     {
-      var auth = GetAzureResourceManagerClient();
-      var subs = await auth.Subscriptions.ListAsync();
+      var creds = GetAzureCredentials();
+
+      var subClient = new SubscriptionClient(creds);
+      string nextPageLink = null;
       do
       {
-        GenericResourceInner match = null;
+        var subs = nextPageLink == null
+          ? await subClient.Subscriptions.ListAsync()
+          : await subClient.Subscriptions.ListNextAsync(nextPageLink);
+        nextPageLink = subs.NextPageLink;
+
         foreach (var sub in subs)
         {
-          var rm = auth.WithSubscription(sub.SubscriptionId);
-          var results = await rm.Inner.Resources.ListAsync(
-            new ODataQuery<GenericResourceFilter>(
-              $"resourceType eq 'Microsoft.DigitalTwins/digitaltwinsinstances' and name eq '{instanceName}'"));
+          var dtClient = new AzureDigitalTwinsManagementClient(creds);
+          dtClient.SubscriptionId = sub.SubscriptionId;
 
-          match = results.FirstOrDefault();
-          if (match != null)
+          var instance = await FindDigitalTwinInstanceAsync(dtClient, instanceName);
+          if (instance == null)
           {
-            _log.LogInformation($"Found {instanceName}: {match.Id}, creating endpoint");
-            var rg = match.Id.Split("/", StringSplitOptions.RemoveEmptyEntries)[3];
-            var endpoint = await GetNewEndpoint(rm, instanceName, rg, sub.SubscriptionId);
-            await rm.GenericResources.CreateAsync(new[] { endpoint });
-            break;
+            _log.LogWarning($"Unable to find instance with name {instanceName} in subscription {sub.SubscriptionId}");
+            continue;
           }
-        }
 
-        if (match != null)
-        {
-          break;
-        }
+          var components = instance.Id.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+          if (components.Length != 8)
+          {
+            _log.LogWarning($"Unrecognized instance ID format: {instance.Id}");
+            continue;
+          }
 
-        subs = await subs.GetNextPageAsync();
-      } while (subs != null);
+          DigitalTwinsEndpointResource endpoint = null;
+          try
+          {
+            endpoint = await dtClient.DigitalTwinsEndpoint.GetAsync(components[3], instanceName, EndpointId);
+          }
+          catch (ErrorResponseException e) when (e.Response.StatusCode == HttpStatusCode.NotFound) { }
+
+          if (endpoint == null)
+          {
+            await CreateNewEndpoint(dtClient, components[1], components[3], instanceName);
+          }
+
+          return;
+        }
+      } while (nextPageLink != null);
+
+      throw new Exception($"Unable to find instance {instanceName}");
     }
 
     public async Task CreateRouteAsync(RequestContext context)
     {
-      var client = new AzureDigitalTwinsAPIClient(new TokenCredentials(context.Token.RawData));
-      client.BaseUri = new Uri($"https://{context.Host}/");
+      var client = new DigitalTwinsClient(new Uri($"https://{context.Host}"), new DefaultAzureCredential());
 
-      _log.LogInformation($"Creating route for {context.InstanceName}");
-      await client.EventRoutes.AddAsync(RouteId, new Sdk.Models.EventRoute(EndpointId, filter: "true"));
+      EventRoute route = null;
+      try
+      {
+        route = await client.GetEventRouteAsync(RouteId);
+      }
+      catch (RequestFailedException e) when (e.Status == 404) { }
+
+      if (route == null)
+      {
+        _log.LogInformation($"Creating route for {context.InstanceName}");
+        await client.CreateEventRouteAsync(RouteId, new EventRoute(EndpointId) { Filter = "true" });
+      }
     }
 
-    private ResourceManager.IAuthenticated GetAzureResourceManagerClient()
+    private async Task CreateNewEndpoint(AzureDigitalTwinsManagementClient dtClient, string subscriptionId, string resourceGroup, string instanceName)
     {
-      var credentials = GetAzureCredentials();
-      return ResourceManager
-        .Configure()
-        .Authenticate(credentials);
-    }
+      var egClient = new EventGridManagementClient(GetAzureCredentials());
+      egClient.SubscriptionId = subscriptionId;
 
-    private async Task<IWithCreate> GetNewEndpoint(IResourceManager rm, string instanceName, string resourceGroup, string subscriptionId)
-    {
-      var client = GetEventGridManagementClient();
-      client.SubscriptionId = subscriptionId;
-
-      var topics = await client.Topics.ListBySubscriptionAsync($"name eq '{instanceName}'");
+      var topics = await egClient.Topics.ListBySubscriptionAsync($"name eq '{instanceName}'");
       var topic = topics.FirstOrDefault();
       if (topic == null)
       {
-        throw new Exception($"Unable to find topic {instanceName} in subscription {subscriptionId}");
+        _log.LogError($"Unable to find topic {instanceName} in subscription {subscriptionId}");
+        return;
       }
 
       var topicResourceGroup = topic.Id.Split("/", StringSplitOptions.RemoveEmptyEntries)[3];
-      var keys = await client.Topics.ListSharedAccessKeysAsync(topicResourceGroup, instanceName);
+      var keys = await egClient.Topics.ListSharedAccessKeysAsync(topicResourceGroup, instanceName);
 
-      return rm.GenericResources.Define(EndpointId)
-        .WithRegion((string)null)
-        .WithExistingResourceGroup(resourceGroup)
-        .WithResourceType("endpoints")
-        .WithProviderNamespace("Microsoft.DigitalTwins/digitaltwinsinstances")
-        .WithoutPlan()
-        .WithApiVersion("2020-03-01-preview")
-        .WithParentResource(instanceName)
-        .WithProperties(
-          new Dictionary<string, object>
-          {
-            {"TopicEndpoint", topic.Endpoint},
-            {"endpointType", "EventGrid"},
-            {"accessKey1", keys.Key1},
-            {"accessKey2", keys.Key2}
-          });
-    }
+      _log.LogInformation($"Creating endpoint for {instanceName}");
 
-    private EventGridManagementClient GetEventGridManagementClient()
-    {
-      var credentials = GetAzureCredentials();
-      return new EventGridManagementClient(credentials);
+      await dtClient.DigitalTwinsEndpoint.CreateOrUpdateAsync(resourceGroup, instanceName, EndpointId,
+        new Microsoft.Azure.Management.DigitalTwins.Models.EventGrid(topic.Endpoint, keys.Key1, accessKey2: keys.Key2));
     }
 
     private AzureCredentials GetAzureCredentials()
     {
       return _endpointOptions.UseLocalAuth
-        ? new AzureCredentialsFactory().FromFile("../../azureauth.json")
-        : new AzureCredentialsFactory().FromSystemAssignedManagedServiceIdentity(MSIResourceType.AppService, AzureEnvironment.AzureGlobalCloud);
+        ? new AzureCredentialsFactory().FromFile("../../../azureauth.json")
+        : new AzureCredentialsFactory().FromSystemAssignedManagedServiceIdentity(
+            MSIResourceType.AppService,
+            Microsoft.Azure.Management.ResourceManager.Fluent.AzureEnvironment.AzureGlobalCloud);
+    }
+
+    private async Task<DigitalTwinsDescription> FindDigitalTwinInstanceAsync(AzureDigitalTwinsManagementClient dtClient, string instanceName)
+    {
+      string nextPageLink = null;
+      DigitalTwinsDescription match = null;
+      do
+      {
+        var instances = nextPageLink == null
+          ? await dtClient.DigitalTwins.ListAsync()
+          : await dtClient.DigitalTwins.ListNextAsync(nextPageLink);
+        nextPageLink = instances.NextPageLink;
+
+        match = instances.FirstOrDefault(x => string.Equals(x.Name, instanceName, StringComparison.OrdinalIgnoreCase));
+        if (match != null)
+        {
+          break;
+        }
+      } while (nextPageLink != null);
+
+      return match;
     }
   }
 }

@@ -87,24 +87,7 @@ export class ModelService {
   async getProperties(sourceModelId) {
     await this.initialize();
     const sourceModel = this._getModel(sourceModelId);
-    const properties = [];
-    this.getChildComponentProperties(sourceModel, "", properties, false);
-    return properties;
-  }
-
-  getChildComponentProperties(component, basePropertyName, properties, fromChild) {
-    const baseName = basePropertyName ? `${basePropertyName}-` : "";
-    component.properties.forEach(componentProperty => {
-      properties.push({
-        name: `${baseName}${componentProperty.name}`,
-        schema: componentProperty.schema,
-        writable: componentProperty.writable ?? true,
-        fromChild
-      });
-    });
-    component.components.forEach(c => {
-      this.getChildComponentProperties(c, `${baseName}${c.name}`, properties, true);
-    });
+    return this._getChildComponentProperties(sourceModel);
   }
 
   async getTelemetries(sourceModelId) {
@@ -129,6 +112,12 @@ export class ModelService {
           .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
           .items()
           .forEach(x => referenced[x.toVertex.id] = x.toVertex);
+        m.getOutgoing("dtmi:dtdl:property:contents;2")
+          .filter(x => x.toVertex.isType("dtmi:dtdl:class:Component;2"))
+          .items()
+          .map(x => x.toVertex.getOutgoing("dtmi:dtdl:property:schema;2").first())
+          .filter(x => x)
+          .forEach(x => referenced[x.toVertex.id] = x.toVertex);
       }
 
       for (const m of models.filter(x => !referenced[x.id])) {
@@ -139,40 +128,35 @@ export class ModelService {
   }
 
   async createPayload(modelId) {
-    const model = await apiService.getModelById(modelId);
+    await this.initialize();
+    const model = this._getModel(modelId);
     const payload = {
       $metadata: {
-        $model: model.model["@id"]
+        $model: modelId
       }
     };
-    if (model.model.contents) {
-      const components = model.model.contents.filter(content => content["@type"] === "Component");
-      for (const component of components) {
-        const componentModel = await apiService.getModelById(component.schema);
-        const componentPayload = {
-          $metadata: {
-          }
-        };
-        const properties = componentModel.model.contents.filter(content => content["@type"] === "Property");
-        properties.forEach(property => {
-          componentPayload[property.name] = this.getPropertyDefaultValue(property.schema);
-        });
-        payload[component.name] = componentPayload;
-      }
+    for (const component of model.components) {
+      const componentPayload = {
+        $metadata: {
+        }
+      };
+      payload[component.name] = componentPayload;
     }
     return payload;
   }
 
-  getPropertyDefaultValue(schema) {
+  // eslint-disable-next-line complexity
+  getPropertyDefaultValue(schema, current) {
+    const isCurrentUndefined = typeof current === "undefined";
     if (typeof schema === "object") {
       const schemaType = schema.type ?? schema["@type"];
       const enumValues = schema.values ?? schema.enumValues;
       switch (schemaType) {
         case "Enum":
-          return enumValues.length > 0 ? enumValues[0].value ?? enumValues[0].enumValue : this.getPropertyDefaultValue(schema.valueSchema);
+          return enumValues.length > 0 ? enumValues[0].value ?? enumValues[0].enumValue : this.getPropertyDefaultValue(schema.valueSchema, current);
         case "Map":
         default:
-          return {};
+          return isCurrentUndefined ? {} : current;
       }
     }
 
@@ -185,15 +169,15 @@ export class ModelService {
       case "integer":
       case "long":
       case "float":
-        return 0;
+        return isCurrentUndefined ? 0 : current;
       case "dtmi:dtdl:instance:Schema:string;2":
       case "string":
-        return " ";
+        return isCurrentUndefined ? " " : current.toString();
       case "dtmi:dtdl:instance:Schema:boolean;2":
       case "boolean":
-        return false;
+        return isCurrentUndefined ? false : current;
       default:
-        return "";
+        return isCurrentUndefined ? "" : current;
     }
   }
 
@@ -251,6 +235,22 @@ export class ModelService {
         contents.bases.push(x.toVertex.id);
         this._mapModel(x.toVertex, contents);
       });
+  }
+
+  _getChildComponentProperties(component) {
+    const properties = {};
+    component.properties.forEach(property => {
+      properties[property.name] = {
+        schema: property.schema,
+        writable: property.writable ?? true
+      };
+    });
+
+    component.components.forEach(c => {
+      properties[c.name] = this._getChildComponentProperties(c);
+    });
+
+    return properties;
   }
 
 }

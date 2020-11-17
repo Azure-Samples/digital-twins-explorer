@@ -31,27 +31,21 @@ namespace AdtExplorer.Functions
       [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "signalr/negotiate")] HttpRequest req,
       IBinder binder)
     {
-      var rpr = await _requestProcessor.ProcessAsync(req);
+      var rpr = _requestProcessor.Process(req);
       if (!rpr.IsSuccess)
       {
         return HttpUtilities.BadRequest(rpr.Message);
       }
 
-      if (!(await rpr.Context.CheckAccessAsync()))
-      {
-        return HttpUtilities.BadRequest($"Invalid auth header for {rpr.Context.Host}");
-      }
-
       await SetupEndpointAsync(rpr.Context.InstanceName);
       await SetupRouteAsync(rpr.Context);
 
-      var hubName = rpr.Context.InstanceName;
-      var userId = rpr.Context.Token.Id;
+      var hubName = EndpointService.EncodeInstanceNameForSignalR(rpr.Context.InstanceName);
       var connectionInfo = binder.Bind<SignalRConnectionInfo>(
         new SignalRConnectionInfoAttribute
         {
           HubName = hubName,
-          UserId = userId
+          UserId = Guid.NewGuid().ToString()
         });
 
       _log.LogInformation($"Negotiated connection to {hubName}");
@@ -66,7 +60,7 @@ namespace AdtExplorer.Functions
       }
       catch (Exception e)
       {
-        _log.LogWarning($"Failed to setup endpoint, manual steps required: ${e}");
+        _log.LogWarning($"Failed to setup endpoint, manual steps required: {e}");
       }
     }
 
@@ -78,7 +72,7 @@ namespace AdtExplorer.Functions
       }
       catch (Exception e)
       {
-        _log.LogWarning($"Failed to setup route, manual steps required: ${e}");
+        _log.LogWarning($"Failed to setup route, manual steps required: {e}");
       }
     }
   }
