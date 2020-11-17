@@ -72,9 +72,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const cy = this.graphControl;
     this.selectedNodes.forEach(x => {
       cy.$id(x.id).toggleClass("hide", true);
-      cy.$id(x.id).unselect();
     });
-    this.selectedNode = [];
+    cy.$(":selected").unselect();
+    this.selectedNodes = [];
   }
 
   hideOtherTwins() {
@@ -125,9 +125,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         cy.$id(cyNode.id()).unselect();
       }
     });
-    this.selectedNodes.forEach(x => {
-      cy.$id(x.id).unselect();
-    });
+    cy.$(":selected").unselect();
     this.selectedNode = [];
   }
 
@@ -280,6 +278,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       this.selectedNodes.splice(removed, 1);
       this.highlightRelatedNodes();
       this.onNodeClicked();
+    }
+    if (this.selectedNodes.length === 0) {
+      this.clearSelection();
     }
   }
 
