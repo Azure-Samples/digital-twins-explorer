@@ -141,9 +141,13 @@ export class ModelViewerComponent extends Component {
           .slice(0, -1)
           .join(".")
           .toLowerCase();
-        const matchedModels = models.filter(model =>
-          model.id.toLowerCase().split(":")
-            .pop() === fileNameWithoutExtension);
+        const matchedModels = models.filter(model => {
+          const formatedModelName = model.id.toLowerCase().split(":")
+            .join("-")
+            .split(";")
+            .join("_");
+          return formatedModelName === fileNameWithoutExtension;
+        });
         if (matchedModels.length > 0) {
           const id = matchedModels[0].id;
           print(`*** Uploading model image for ${id}`, "info");
