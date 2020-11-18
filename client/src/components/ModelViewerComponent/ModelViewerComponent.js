@@ -142,11 +142,11 @@ export class ModelViewerComponent extends Component {
           .join(".")
           .toLowerCase();
         const matchedModels = models.filter(model => {
-          const formatedModelName = model.id.toLowerCase().split(":")
-            .join("-")
+          const formattedModelName = model.id.toLowerCase().split(":")
+            .join("_")
             .split(";")
-            .join("_");
-          return formatedModelName === fileNameWithoutExtension;
+            .join("-");
+          return formattedModelName === fileNameWithoutExtension;
         });
         if (matchedModels.length > 0) {
           const id = matchedModels[0].id;
