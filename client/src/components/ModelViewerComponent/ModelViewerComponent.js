@@ -17,7 +17,7 @@ import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { settingsService } from "../../services/SettingsService";
 // JACDAC imports
-import { serviceSpecifications, deviceSpecifications } from "jacdac-ts/dist/jacdac-jdom"
+import { serviceSpecifications, deviceSpecifications, imageDeviceOf } from "jacdac-ts/dist/jacdac-jdom"
 import { serviceToDTDL, deviceToDTDL } from "jacdac-ts/dist/jacdac-azure-iot"
 
 import "./ModelViewerComponent.scss";
@@ -136,15 +136,43 @@ export class ModelViewerComponent extends Component {
    */
   handleJACDACUpload = async evt => {
     this.setState({ isLoading: true });
-    const list =
-      [
-        ...serviceSpecifications().map(serviceToDTDL),
-        ...deviceSpecifications().map(deviceToDTDL)
-      ];
+
     try {
-      const res = await apiService.addModels(list);
-      print("*** Upload result:", "info");
-      print(JSON.stringify(res, null, 2), "info");
+      const devices = deviceSpecifications();
+
+      // import DTDL
+      const list =
+        [
+          ...serviceSpecifications().map(serviceToDTDL),
+          ...devices.map(deviceToDTDL)
+        ];
+      let uploads = [];
+      for (const model of list) {
+        const existingModel = await apiService.getModelById(model["@id"])
+        if (!existingModel) {
+          uploads.push(model);
+        }
+      }
+      if (uploads.length > 0) {
+        const res = await apiService.addModels(uploads);
+        print("*** Upload result:", "info");
+        print(JSON.stringify(res, null, 2), "info");
+      }
+
+      // import images
+      const deviceImages = devices.map(device => ({
+        device,
+        dtdl: deviceToDTDL(device),
+        imageUrl: imageDeviceOf(device)
+      }))
+        .filter(di => !!di.imageUrl)
+      for (const di of deviceImages) {
+        const id = di.dtdl["@id"]
+        settingsService.setModelImage(id, di.imageUrl);
+        eventService.publishModelIconUpdate(id);
+        print(`*** Model image uploaded for ${id}`, "info");
+      }
+
     } catch (exc) {
       exc.customMessage = "Upload error";
       eventService.publishError(exc);
@@ -152,7 +180,6 @@ export class ModelViewerComponent extends Component {
 
     this.setState({ isLoading: false });
     this.retrieveModels();
-    this.uploadModelRef.current.value = "";
   }
 
   handleUploadOfModelImages = async evt => {
