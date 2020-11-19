@@ -16,6 +16,9 @@ import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { settingsService } from "../../services/SettingsService";
+// JACDAC imports
+import { serviceSpecifications, deviceSpecifications } from "jacdac-ts/dist/jacdac-jdom"
+import { serviceToDTDL, deviceToDTDL } from "jacdac-ts/dist/jacdac-azure-iot"
 
 import "./ModelViewerComponent.scss";
 
@@ -128,6 +131,30 @@ export class ModelViewerComponent extends Component {
     this.uploadModelRef.current.value = "";
   }
 
+  /**
+   * Uploads all known JACDAC for services and devices
+   */
+  handleJACDACUpload = async evt => {
+    this.setState({ isLoading: true });
+    const list =
+      [
+        ...serviceSpecifications().map(serviceToDTDL),
+        ...deviceSpecifications().map(deviceToDTDL)
+      ];
+    try {
+      const res = await apiService.addModels(list);
+      print("*** Upload result:", "info");
+      print(JSON.stringify(res, null, 2), "info");
+    } catch (exc) {
+      exc.customMessage = "Upload error";
+      eventService.publishError(exc);
+    }
+
+    this.setState({ isLoading: false });
+    this.retrieveModels();
+    this.uploadModelRef.current.value = "";
+  }
+
   handleUploadOfModelImages = async evt => {
     const files = evt.target.files;
     this.setState({ isLoading: true });
@@ -225,7 +252,9 @@ export class ModelViewerComponent extends Component {
               buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
-              onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
+              onUploadJACDACModelsClicked={() => this.handleJACDACUpload()}
+              onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()}
+            />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
