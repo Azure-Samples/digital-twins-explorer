@@ -10,3 +10,4 @@ export const CUSTOM_AUTH_ERROR_MESSAGE
   If you need more information, please see the readme, or look up DefaultAzureCredential in the Azure.Identity documentation. 
   If you are running adt-explorer hosted in the cloud, please make sure that your hosting Azure Function has a system-assigned managed identity set up. 
   See the readme for more information.`;
+export const MORE_INFORMATION_LINK = "https://docs.microsoft.com/en-us/azure/digital-twins/";

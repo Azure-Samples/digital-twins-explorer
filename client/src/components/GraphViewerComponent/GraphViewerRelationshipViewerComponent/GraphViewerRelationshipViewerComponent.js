@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { DefaultButton } from "office-ui-fabric-react";
+import { DefaultButton, Icon } from "office-ui-fabric-react";
 import jsonMarkup from "json-markup";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
@@ -91,22 +91,25 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     const { incomingRelationships, outgoingRelationships, isLoading, showModal } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-relationship-view-modal">
-        <h2 className="heading-2">Relationship Information</h2>
-        <div className="modal-scroll">
-          {!!incomingRelationships
-          && incomingRelationships.length > 0
-          && <div>
-            <h3>Incoming</h3>
-            <pre dangerouslySetInnerHTML={this.getMarkup(incomingRelationships)} />
-          </div>}
-
-          {!!outgoingRelationships
-          && outgoingRelationships.length > 0
-          && <div>
+        <h2 className="heading-2"><Icon iconName="Relationship" />Relationship Information</h2>
+        {!!incomingRelationships
+          && incomingRelationships.length > 0 && (
+          <div className="relationship-type">
+            <h3>Incomming</h3>
+            <div className="relationships">
+              <pre dangerouslySetInnerHTML={this.getMarkup(incomingRelationships)} />
+            </div>
+          </div>
+        )}
+        {!!outgoingRelationships
+          && outgoingRelationships.length > 0 && (
+          <div className="relationship-type">
             <h3>Outgoing</h3>
-            <pre dangerouslySetInnerHTML={this.getMarkup(outgoingRelationships)} />
-          </div>}
-        </div>
+            <div className="relationships">
+              <pre dangerouslySetInnerHTML={this.getMarkup(outgoingRelationships)} />
+            </div>
+          </div>
+        )}
         <div className="btn-group">
           <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
         </div>
