@@ -28,7 +28,7 @@ export class GraphViewerComponent extends React.Component {
       selectedNodes: null,
       selectedEdge: null,
       layout: "Klay",
-      hideMode: "hide-others",
+      hideMode: "hide-selected",
       canShowAll: false
     };
     this.cyRef = React.createRef();

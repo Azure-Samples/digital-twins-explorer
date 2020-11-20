@@ -113,18 +113,6 @@ export class GraphViewerCommandBarComponent extends Component {
       subMenuProps: {
         items: [
           {
-            key: "hide-others",
-            text: "Hide all others",
-            ariaLabel: "Hide all others",
-            onClick: () => this.props.onHideOthers()
-          },
-          {
-            key: "hide-non-children",
-            text: "Hide non-children",
-            ariaLabel: "Hide non children",
-            onClick: () => this.props.onHideNonChildren()
-          },
-          {
             key: "hide-selected",
             text: "Hide selected",
             ariaLabel: "Hide selected",
@@ -135,6 +123,18 @@ export class GraphViewerCommandBarComponent extends Component {
             text: "Hide selected and children",
             ariaLabel: "Hide selected and children",
             onClick: () => this.props.onHideWithChildren()
+          },
+          {
+            key: "hide-others",
+            text: "Hide all others",
+            ariaLabel: "Hide all others",
+            onClick: () => this.props.onHideOthers()
+          },
+          {
+            key: "hide-non-children",
+            text: "Hide non-children",
+            ariaLabel: "Hide non children",
+            onClick: () => this.props.onHideNonChildren()
           }
         ]
       }
@@ -244,7 +244,7 @@ export class GraphViewerCommandBarComponent extends Component {
   render() {
     const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes, selectedEdge, canShowAll } = this.props;
     this.farItems.find(i => i.key === "deleteTwin").disabled = !selectedNode;
-    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes || selectedNodes.length !== 1;
+    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes;
     this.farItems.find(i => i.key === "showTwins").disabled = !canShowAll;
     this.farItems.find(i => i.key === "getRelationship").disabled = !selectedNodes || selectedNodes.length !== 1;
     this.farItems.find(i => i.key === "addRelationship").disabled = !selectedNodes || selectedNodes.length !== 2;
