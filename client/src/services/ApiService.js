@@ -295,6 +295,10 @@ class ApiService {
     await this.client.decomissionModel(modelId);
   }
 
+  async addReaderRBAC(){
+    console.log("Got to addReaderRBAC");
+  }
+
 }
 
 class CachedApiService extends ApiService {

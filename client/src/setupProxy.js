@@ -6,13 +6,26 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function (app) {
   const credential = new DefaultAzureCredential();
+  const credentialRBAC = new DefaultAzureCredential();
   let token = null;
+  let tokenRBAC = null;
 
   const pathRewrite = async function (path, req) {
-    if (!token || token.expiresOnTimestamp < Date.now()) {
-      token = await credential.getToken("https://digitaltwins.azure.net/.default");
+    if(path.startsWith("/api/proxy/RBAC")){
+      if (!tokenRBAC || tokenRBAC.expiresOnTimestamp < Date.now()) {
+        tokenRBAC = await credentialRBAC.getToken("https://management.azure.com/.default");
+      }
+      req.headers.authorization = `Bearer ${tokenRBAC.token}`;
+      console.log(`Bearer ${tokenRBAC.token}`);
     }
-    req.headers.authorization = `Bearer ${token.token}`;
+    else{
+      if (!token || token.expiresOnTimestamp < Date.now()) {
+        token = await credential.getToken("https://digitaltwins.azure.net/.default");
+      }
+      req.headers.authorization = `Bearer ${token.token}`;
+      console.log(`Bearer ${token.token}`);
+    }
+
 
     return path.replace("/api/proxy", "");
   };
