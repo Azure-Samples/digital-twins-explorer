@@ -17,6 +17,7 @@ module.exports = function (app) {
       }
       req.headers.authorization = `Bearer ${tokenRBAC.token}`;
       console.log(`Bearer ${tokenRBAC.token}`);
+      return path.replace("/api/proxy/RBAC", "");
     }
     else{
       if (!token || token.expiresOnTimestamp < Date.now()) {
@@ -24,10 +25,9 @@ module.exports = function (app) {
       }
       req.headers.authorization = `Bearer ${token.token}`;
       console.log(`Bearer ${token.token}`);
+      return path.replace("/api/proxy", "");
     }
 
-
-    return path.replace("/api/proxy", "");
   };
 
   app.use(

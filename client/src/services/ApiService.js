@@ -8,6 +8,7 @@ import { configService } from "./ConfigService";
 import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
 import { print } from "./LoggingService";
 import { settingsService } from "./SettingsService";
+import { HttpResponse } from "@microsoft/signalr";
 
 const getAllTwinsQuery = "SELECT * FROM digitaltwins";
 
@@ -61,6 +62,30 @@ class ApiService {
     this.client = null;
   }
 
+  async addReaderRBAC(){
+    console.log("Got to addReaderRBAC");
+    const url = new URL("https://management.azure.com/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview");
+    var httpRequest;
+
+    this.client = new DefaultHttpClient();
+    
+    httpRequest.headers.set("x-adt-host", "management.azure.com/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview");
+
+    const baseUrl = new URL(window.location.origin);
+    url.host = baseUrl.host;
+    url.pathname = `/api/proxy/RBAC${url.pathname}`;
+    url.protocol = baseUrl.protocol;
+    httpRequest.url = url.toString();
+    httpRequest.body = {
+        "properties": {
+          "principalId": "aa2f4710-bfc0-42c0-a3a6-726d8a450250",
+          "roleDefinitionId": "/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleDefinitions/bcd981a7-7f74-457b-83e1-cceb9e632ffe"
+        }
+      }
+
+    await this.client.sendRequest(httpRequest);
+  }
+
   async initialize() {
     const { appAdtUrl } = await configService.getConfig();
 
@@ -74,7 +99,7 @@ class ApiService {
 
   async queryTwinsPaged(query, callback) {
     await this.initialize();
-    
+
     let count = 1;
     for await (const page of this.client.queryTwins(query).byPage()) {
       print(`Ran query for twins, page ${count++}:`, "info");
@@ -293,10 +318,6 @@ class ApiService {
     print(`Decommission model with ID: ${modelId}`, "info");
     await this.initialize();
     await this.client.decomissionModel(modelId);
-  }
-
-  async addReaderRBAC(){
-    console.log("Got to addReaderRBAC");
   }
 
 }
