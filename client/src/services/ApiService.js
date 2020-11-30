@@ -64,26 +64,101 @@ class ApiService {
 
   async addReaderRBAC(){
     console.log("Got to addReaderRBAC");
-    const url = new URL("https://management.azure.com/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview");
-    var httpRequest;
 
-    this.client = new DefaultHttpClient();
-    
-    httpRequest.headers.set("x-adt-host", "management.azure.com/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview");
+    //Get our current twins instance from settings
+    const { appAdtUrl } = await configService.getConfig();
+    let requestParams = {
+      "appName": appAdtUrl.split(".api.")[0].substring(8)
+    };
+    //let appName = appAdtUrl.split(".api.")[0].substring(8);
+    console.log("App name is: "+requestParams.appName);
 
-    const baseUrl = new URL(window.location.origin);
-    url.host = baseUrl.host;
-    url.pathname = `/api/proxy/RBAC${url.pathname}`;
-    url.protocol = baseUrl.protocol;
-    httpRequest.url = url.toString();
-    httpRequest.body = {
-        "properties": {
-          "principalId": "aa2f4710-bfc0-42c0-a3a6-726d8a450250",
-          "roleDefinitionId": "/subscriptions/ce1ad85f-bccc-449c-991d-99334ecbb2dd/resourceGroups/ADT-Explorer-Test/providers/Microsoft.DigitalTwins/digitalTwinsInstances/alkarcheADTExplorerHackathon/providers/Microsoft.Authorization/roleDefinitions/bcd981a7-7f74-457b-83e1-cceb9e632ffe"
-        }
+    //Get the user's principle ID
+    const requestOptions = {
+      method: 'GET',
+      headers: { 
+          'x-adt-host': 'graph.microsoft.com'
       }
+    };
+    fetch('http://localhost:3000/api/proxy/Graph/v1.0/me', requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        requestParams.userId = result.id;
+        return requestParams;
+    }).then(function(requestParams){
+    //Get subscriptions from logged in user
+      console.log(requestParams.userId);
 
-    await this.client.sendRequest(httpRequest);
+      const requestOptions = {
+        method: 'GET',
+        headers: { 
+            'x-adt-host': 'management.azure.com'
+        }
+      };
+      return fetch('http://localhost:3000/api/proxy/RBAC/subscriptions?api-version=2020-01-01', requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result);
+          requestParams.subscriptions = result;
+          return requestParams;
+      });
+    }).then(function(requestParams){
+    //Loop through our subscriptions to get the twins instance
+      console.log(requestParams);
+      
+      const requestOptions = {
+        method: 'GET',
+        headers: { 
+            'x-adt-host': 'management.azure.com'
+        }
+      };
+
+      for(let x of requestParams.subscriptions.value){
+        //console.log(x);
+        fetch(`http://localhost:3000/api/proxy/RBAC${x.id}/providers/Microsoft.DigitalTwins/digitalTwinsInstances?api-version=2020-10-31`, requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            //console.log(result);
+            if(result.value.length>0){
+              for(let value in result.value){
+                //console.log(result.value[value])
+                if(typeof result.value[value].name === 'string'){
+                  if(result.value[value].name.toLowerCase() === requestParams.appName.toLowerCase()){
+                    requestParams.ARMId = result.value[value].id;
+                    return requestParams;
+                  }
+                }
+              }
+            }
+            return 0;
+          }).
+          then(requestParams => {
+            if (requestParams === 0){
+              return;
+            }
+            else{
+              console.log(requestParams);
+
+              // POST request using fetch with set headers
+              const requestOptions = {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-adt-host': 'management.azure.com'
+                },
+                body: JSON.stringify({
+                  "properties": {
+                    "principalId": `${requestParams.userId}`,
+                    "roleDefinitionId": `${requestParams.ARMId}/providers/Microsoft.Authorization/roleDefinitions/bcd981a7-7f74-457b-83e1-cceb9e632ffe`
+                  }
+                })
+              };
+              return fetch(`http://localhost:3000/api/proxy/RBAC${requestParams.ARMId}/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview`, requestOptions)
+            }
+          });
+      }
+      return requestParams;
+    });
   }
 
   async initialize() {
