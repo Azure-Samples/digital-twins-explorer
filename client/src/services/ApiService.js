@@ -63,16 +63,19 @@ class ApiService {
   }
 
   async addReaderRBAC(){
-    console.log("Got to addReaderRBAC");
+    //Function to generate a random GUID
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
 
     //Get our current twins instance from settings
     const { appAdtUrl } = await configService.getConfig();
     let requestParams = {
       "appName": appAdtUrl.split(".api.")[0].substring(8)
     };
-    //let appName = appAdtUrl.split(".api.")[0].substring(8);
-    console.log("App name is: "+requestParams.appName);
-
     //Get the user's principle ID
     const requestOptions = {
       method: 'GET',
@@ -87,8 +90,6 @@ class ApiService {
         return requestParams;
     }).then(function(requestParams){
     //Get subscriptions from logged in user
-      console.log(requestParams.userId);
-
       const requestOptions = {
         method: 'GET',
         headers: { 
@@ -98,14 +99,11 @@ class ApiService {
       return fetch('http://localhost:3000/api/proxy/RBAC/subscriptions?api-version=2020-01-01', requestOptions)
         .then(response => response.json())
         .then(result => {
-          console.log(result);
           requestParams.subscriptions = result;
           return requestParams;
       });
     }).then(function(requestParams){
-    //Loop through our subscriptions to get the twins instance
-      console.log(requestParams);
-      
+    //Loop through our subscriptions to get the twins instance      
       const requestOptions = {
         method: 'GET',
         headers: { 
@@ -137,8 +135,6 @@ class ApiService {
               return;
             }
             else{
-              console.log(requestParams);
-
               // POST request using fetch with set headers
               const requestOptions = {
                 method: 'PUT',
@@ -153,7 +149,7 @@ class ApiService {
                   }
                 })
               };
-              return fetch(`http://localhost:3000/api/proxy/RBAC${requestParams.ARMId}/providers/Microsoft.Authorization/roleAssignments/d8025bce-7e12-41c4-adca-34b87d0fb588?api-version=2020-04-01-preview`, requestOptions)
+              return fetch(`http://localhost:3000/api/proxy/RBAC${requestParams.ARMId}/providers/Microsoft.Authorization/roleAssignments/${uuidv4()}?api-version=2020-04-01-preview`, requestOptions)
             }
           });
       }
