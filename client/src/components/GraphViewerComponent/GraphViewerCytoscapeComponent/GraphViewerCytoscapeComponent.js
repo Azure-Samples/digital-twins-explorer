@@ -41,12 +41,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   componentDidMount() {
-    eventService.subscribeSelection((selection) => {
-      if (!selection) {
-        console.log(this.graphControl.$(":selected").length);
+    eventService.subscribeSelection(selection => {
+      if (!selection && this.graphControl.$(":selected").length > 0) {
         this.graphControl.$(":selected").unselect();
       }
-    })
+    });
   }
 
   addTwins(twins) {
