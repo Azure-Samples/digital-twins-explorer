@@ -15,6 +15,7 @@ import { getUniqueRelationshipId } from "../../../utils/utilities";
 
 import "./GraphViewerCytoscapeComponent.scss";
 import { settingsService } from "../../../services/SettingsService";
+import { eventService } from "../../../services/EventService";
 
 cytoscape.use(klay);
 cytoscape.use(dagre);
@@ -37,6 +38,15 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "Klay";
+  }
+
+  componentDidMount() {
+    eventService.subscribeSelection((selection) => {
+      if (!selection) {
+        console.log(this.graphControl.$(":selected").length);
+        this.graphControl.$(":selected").unselect();
+      }
+    })
   }
 
   addTwins(twins) {
