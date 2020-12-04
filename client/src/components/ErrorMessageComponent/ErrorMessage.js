@@ -59,9 +59,9 @@ export class ErrorMessageComponent extends Component {
                 case 201:
                   this.setState({showFixAuth: <p style={{color:"green", "text-align":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
                   break;
-                  case 403:
-                    this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
-                    break;
+                case 403:
+                  this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
+                  break;
                 case 409:
                   this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_CONFLICT_MESSAGE}</p>});
                   break;
