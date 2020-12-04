@@ -18,21 +18,20 @@ export class ErrorMessageComponent extends Component {
     this.state = {
       showModal: false,
       errorMessage: "",
-      showFixAuth: false
+      showFixAuth: ""
     };
   }
 
   componentDidMount() {
     eventService.subscribeError(exc => {
       let message = "";
-      let auth = false;
+      let auth = "";
       // Service does not return an error code - only a name
       if (exc && exc.name === "RestError" && !exc.code) {
         message = CUSTOM_AUTH_ERROR_MESSAGE;
-        auth = true;
+        auth = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions}>Fix Permissions</DefaultButton>;
       } else {
         message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
-        auth = false;
       }
 
       print(message, "error");
@@ -50,7 +49,6 @@ export class ErrorMessageComponent extends Component {
   }
 
   fixPermissions = () => {
-    console.log("Let's get to implementing this method!");
     apiService.addReaderRBAC();
   }
 
@@ -65,7 +63,7 @@ export class ErrorMessageComponent extends Component {
           <p>{errorMessage}</p>
           <div className="btn-group">
             <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
-            <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} isVisible={this.showFixAuth}>Fix Permissions</DefaultButton>
+            {showFixAuth}
           </div>
         </div>
       </ModalComponent>
