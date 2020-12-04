@@ -12,3 +12,4 @@ export const CUSTOM_AUTH_ERROR_MESSAGE
   See the readme for more information.`;
 export const AUTH_SUCCESS_MESSAGE = "Success! Reload the page to load your new credentials. It may take several seconds for changes to propagate.";
 export const AUTH_CONFLICT_MESSAGE = "Role already exists. Restart the app to reload your credentials";
+export const AUTH_FORBIDDEN_MESSAGE = "Forbidden. You do not have permission to changes roles on this twin instance";

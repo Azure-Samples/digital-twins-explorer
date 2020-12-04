@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { apiService } from "../../services/ApiService";
 
@@ -59,8 +59,11 @@ export class ErrorMessageComponent extends Component {
                 case 201:
                   this.setState({showFixAuth: <p style={{color:"green", "text-align":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
                   break;
+                  case 403:
+                    this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
+                    break;
                 case 409:
-                  this.setState({showFixAuth: <p>{AUTH_CONFLICT_MESSAGE}</p>});
+                  this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_CONFLICT_MESSAGE}</p>});
                   break;
                 default:
                   this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
