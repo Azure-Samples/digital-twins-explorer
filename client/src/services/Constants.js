@@ -10,3 +10,5 @@ export const CUSTOM_AUTH_ERROR_MESSAGE
   If you need more information, please see the readme, or look up DefaultAzureCredential in the Azure.Identity documentation. 
   If you are running adt-explorer hosted in the cloud, please make sure that your hosting Azure Function has a system-assigned managed identity set up. 
   See the readme for more information.`;
+export const AUTH_SUCCESS_MESSAGE = "Success! Reload the page to load your new credentials. It may take several seconds for changes to propagate.";
+export const AUTH_CONFLICT_MESSAGE = "Role already exists. Restart the app to reload your credentials";

@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { apiService } from "../../services/ApiService";
 
@@ -57,13 +57,13 @@ export class ErrorMessageComponent extends Component {
             if(requestParams[i]){
               switch(requestParams[i].status){
                 case 201:
-                  this.setState({showFixAuth: <p style={{color:"green"}}>Success! Reload the page to load your new credentials.<br/>It may take several seconds for the changes to propagate.</p>});
+                  this.setState({showFixAuth: <p style={{color:"green", "text-align":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
                   break;
-                case 407:
-                  this.setState({showFixAuth: <p>"Role already exists. Retry the instructions above"</p>});
+                case 409:
+                  this.setState({showFixAuth: <p>{AUTH_CONFLICT_MESSAGE}</p>});
                   break;
                 default:
-                  this.setState({showFixAuth: <p>requestParams[i].statusText</p>});
+                  this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
               }
             }
           }
