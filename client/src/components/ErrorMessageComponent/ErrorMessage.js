@@ -28,7 +28,6 @@ export class ErrorMessageComponent extends Component {
       let auth = "";
       // Service does not return an error code - only a name
       if (exc && exc.name === "RestError" && !exc.code) {
-        console.log(exc);
         message = CUSTOM_AUTH_ERROR_MESSAGE;
         auth = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width:150}}>Assign yourself data reader access</DefaultButton>;
       } else {
@@ -57,7 +56,7 @@ export class ErrorMessageComponent extends Component {
             if(requestParams[i]){
               switch(requestParams[i].status){
                 case 201:
-                  this.setState({showFixAuth: <p style={{color:"green", "text-align":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
+                  this.setState({showFixAuth: <p style={{color:"green", "textAlign":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
                   break;
                 case 403:
                   this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
