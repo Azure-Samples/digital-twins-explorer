@@ -65,6 +65,7 @@ export class ModelViewerCreateComponent extends Component {
       print(JSON.stringify(twinResult, null, 2), "info");
 
       eventService.publishCreateTwin({ $dtId: name, $metadata: { $model: item.key } });
+      eventService.publishSelection();
     } catch (exc) {
       exc.customMessage = "Error in instance creation";
       eventService.publishError(exc);

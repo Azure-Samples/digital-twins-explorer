@@ -195,6 +195,12 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
+  unselectSelectedNodes = () => {
+    if (this.graphControl.$(":selected").length > 0) {
+      this.graphControl.$(":selected").unselect();
+    }
+  }
+
   showAllNodes = () => {
     const cy = this.graphControl;
     cy.nodes().forEach(cyNode => {
