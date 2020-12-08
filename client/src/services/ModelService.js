@@ -74,6 +74,24 @@ export class ModelService {
     }
   }
 
+  async initializeWithModels(models) {
+    this.modelGraph = new JsonldGraph([
+      { uri: "dtmi:dtdl:context;2", context }
+    ]);
+    await this.modelGraph.load(models);
+  }
+
+  async getModelIdsForUpload(models) {
+    await this.initializeWithModels(models);
+    const sortedModels = [];
+    const checkedList = [];
+    const vertices = this.modelGraph.getVertices(x => x.isType("dtmi:dtdl:class:Interface;2")).items();
+    for (const vertice of vertices) {
+      this._addReferencedModels(vertice, sortedModels, checkedList);
+    }
+    return sortedModels;
+  }
+
   async getRelationships(sourceModelId, targetModelId) {
     await this.initialize();
     const sourceModel = this._getModel(sourceModelId);
@@ -179,6 +197,24 @@ export class ModelService {
       default:
         return isCurrentUndefined ? "" : current;
     }
+  }
+
+  _addReferencedModels(vertice, sortedModels, checkedList) {
+    if (checkedList.some(id => id === vertice.id)) {
+      return;
+    }
+    checkedList.push(vertice.id);
+    vertice.getOutgoing("dtmi:dtdl:property:extends;2")
+      .filter(x => x.toVertex.isType("dtmi:dtdl:class:Interface;2"))
+      .items()
+      .forEach(x => this._addReferencedModels(x.toVertex, sortedModels, checkedList));
+    vertice.getOutgoing("dtmi:dtdl:property:contents;2")
+      .filter(x => x.toVertex.isType("dtmi:dtdl:class:Component;2"))
+      .items()
+      .map(x => x.toVertex.getOutgoing("dtmi:dtdl:property:schema;2").first())
+      .filter(x => x)
+      .forEach(x => this._addReferencedModels(x.toVertex, sortedModels, checkedList));
+    sortedModels.push(vertice.id);
   }
 
   _getModel(modelId) {
