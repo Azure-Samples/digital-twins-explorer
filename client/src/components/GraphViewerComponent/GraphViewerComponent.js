@@ -93,6 +93,7 @@ export class GraphViewerComponent extends React.Component {
     this.canceled = false;
 
     try {
+      this.cyRef.current.clearSelection();
       const allTwins = await this.getTwinsData(query);
       await this.getRelationshipsData(allTwins, 30, false, true, REL_TYPE_OUTGOING);
       if (selectedNode) {
