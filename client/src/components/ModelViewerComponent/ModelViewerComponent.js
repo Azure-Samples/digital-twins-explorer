@@ -15,6 +15,7 @@ import { print } from "../../services/LoggingService";
 import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
+import { ModelService } from "../../services/ModelService";
 import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
@@ -113,19 +114,39 @@ export class ModelViewerComponent extends Component {
     }
 
     if (list.length > 0) {
-      try {
-        const res = await apiService.addModels(list);
-        print("*** Upload result:", "info");
-        print(JSON.stringify(res, null, 2), "info");
-      } catch (exc) {
-        exc.customMessage = "Upload error";
-        eventService.publishError(exc);
-      }
+      await this.addModels(list);
     }
 
     this.setState({ isLoading: false });
     this.retrieveModels();
     this.uploadModelRef.current.value = "";
+  }
+
+  addModels = async list => {
+    try {
+      const modelService = new ModelService();
+      const sortedModelsId = await modelService.getModelIdsForUpload(list);
+      const sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
+      const chunks = this.chunkModelsList(sortedModels, 250);
+      chunks.forEach(async chunk => {
+        const res = await apiService.addModels(chunk);
+        print("*** Upload result:", "info");
+        print(JSON.stringify(res, null, 2), "info");
+      });
+    } catch (exc) {
+      exc.customMessage = "Upload error";
+      eventService.publishError(exc);
+    }
+  }
+
+  chunkModelsList(array, size) {
+    const chunkedArr = [];
+    let index = 0;
+    while (index < array.length) {
+      chunkedArr.push(array.slice(index, size + index));
+      index += size;
+    }
+    return chunkedArr;
   }
 
   handleUploadOfModelImages = async evt => {
