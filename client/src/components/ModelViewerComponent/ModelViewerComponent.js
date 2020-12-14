@@ -124,7 +124,8 @@ export class ModelViewerComponent extends Component {
     }
 
     this.setState({ isLoading: false });
-    this.retrieveModels();
+    await this.retrieveModels();
+    eventService.publishModelsUpdate();
     this.uploadModelRef.current.value = "";
   }
 

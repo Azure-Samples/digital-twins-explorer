@@ -5,16 +5,17 @@ import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 
 import { graphStyles, modelWithImageStyle } from "./config";
-import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions } from "../../../config/CytoscapeConfig";
+import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions, d3ForceOptions } from "../../../config/CytoscapeConfig";
 import { settingsService } from "../../../services/SettingsService";
 
 import "./ModelGraphViewerCytoscapeComponent.scss";
 
 export const ModelGraphViewerCytoscapeLayouts = {
-  "Cola": colaOptions,
+  "Cola": { ...colaOptions, nodeSpacing: () => 40 },
   "Dagre": dagreOptions,
   "fCoSE": fcoseOptions,
-  "Klay": klayOptions
+  "Klay": klayOptions,
+  "d3Force": d3ForceOptions
 };
 
 export class ModelGraphViewerCytoscapeComponent extends React.Component {
@@ -24,7 +25,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.state = { };
     this.graphControl = null;
     this.selectedNodes = [];
-    this.layout = "Cola";
+    this.layout = "d3Force";
   }
 
   addNodes(nodes) {
@@ -234,6 +235,18 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       cy.edges().toggleClass("opaque", false);
     }
   }
+
+  hideRelationships = () => this.graphControl.$("edge.related").toggleClass("hide", true);
+
+  showRelationships = () => this.graphControl.$("edge.related").toggleClass("hide", false);
+
+  hideInheritances = () => this.graphControl.$("edge.extends").toggleClass("hide", true);
+
+  showInheritances = () => this.graphControl.$("edge.extends").toggleClass("hide", false);
+
+  hideComponents = () => this.graphControl.$("edge.component").toggleClass("hide", true);
+
+  showComponents = () => this.graphControl.$("edge.component").toggleClass("hide", false);
 
   zoomToFit() {
     this.graphControl.fit();

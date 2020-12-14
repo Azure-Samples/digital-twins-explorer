@@ -80,38 +80,35 @@ export const graphStyles = [
   {
     selector: "edge.related",
     style: {
-      "border-color": "#0471BD",
-      "line-color": "#0471BD",
-      "target-arrow-color": "#0471BD",
-      "source-arrow-color": "#0471BD",
+      "border-color": "#FFB500",
+      "line-color": "#FFB500",
+      "target-arrow-color": "#FFB500",
+      "source-arrow-color": "#FFB500",
       "target-arrow-shape": "chevron",
-      "arrow-scale": 1.25,
-      width: 1.5
+      "arrow-scale": 1.25
     },
   },
   {
     selector: "edge.extends",
     style: {
-      "border-color": "#B70609",
-      "line-color": "#B70609",
-      "target-arrow-color": "#B70609",
-      "source-arrow-color": "#B70609",
+      "border-color": "#126139",
+      "line-color": "#126139",
+      "target-arrow-color": "#126139",
+      "source-arrow-color": "#126139",
       "target-arrow-shape": "triangle",
       "target-arrow-fill" : "hollow",
-      "arrow-scale": 1.25,
-      width: 1.5
+      "arrow-scale": 1.25
     },
   },
   {
     selector: "edge.component",
     style: {
-      "border-color": "#FFB500",
-      "line-color": "#FFB500",
-      "target-arrow-color": "#FFB500",
-      "source-arrow-color": "#FFB500",
+      "border-color": "#0471BD",
+      "line-color": "#0471BD",
+      "target-arrow-color": "#0471BD",
+      "source-arrow-color": "#0471BD",
       "source-arrow-shape": "diamond",
-      "arrow-scale": 1.25,
-      width: 1.5
+      "arrow-scale": 1.25
     },
   },
   {

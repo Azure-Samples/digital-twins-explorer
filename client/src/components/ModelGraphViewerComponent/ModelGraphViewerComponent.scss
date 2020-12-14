@@ -18,18 +18,38 @@
                     color: $textColorLight2;
                     display: flex;
                     align-items: center;
+                    display: flex;
+                    margin-bottom: 3px;
                     .line {
                         width: 25px;
                         height: 3px;
                         margin-right: 5px;
                         &.relationship {
-                            background: #0471BD;
+                            background: #FFB500;
                         }
                         &.extends {
-                            background: #B70609;
+                            background: #126139;
                         }
                         &.component {
-                            background: #FFB500;
+                            background: #0471BD;
+                        }
+                    }
+                    .rel-title {
+                        min-width: 75px;
+                        margin-right: 5px;
+                    }
+                    .rel-toggle {
+                        margin-bottom: 0;
+                        button {
+                            font-size: 16px;
+                            width: 32px;
+                            height: 16px;
+                            border-radius: 8px;
+                            span {
+                                width: 10px;
+                                height: 10px;
+                                background: #fff;
+                            }
                         }
                     }
                 }

@@ -285,3 +285,27 @@ export const klayOptions = {
     return null;
   }, // Edges with a non-nil value are skipped when greedy edge cycle breaking is enabled
 };
+
+export const d3ForceOptions = {
+  name: "d3-force",
+  animate: false,
+  fit: true,
+  linkId: (data) => data.id,
+  linkDistance: (link) => {
+    const length = link.edgeLength;
+    if (length && length > 1) {
+      return length;
+    }
+    return 500;
+  },
+  linkStrength: () => 0.05,
+  xStrength: 0,
+  yStrength: 0.12,
+  yY: 0.5,
+  velocityDecay: 0.6,
+  collideRadius: 3,
+  collideStrength: 1,
+  manyBodyStrength: () => {
+    return -300;
+  }
+}

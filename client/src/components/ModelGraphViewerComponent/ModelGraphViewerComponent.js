@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React from "react";
-import { IconButton } from "office-ui-fabric-react";
+import { Toggle } from "office-ui-fabric-react";
 
 import { ModelGraphViewerCytoscapeComponent } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
@@ -12,20 +12,6 @@ import { ModelService } from "../../services/ModelService";
 
 import "./ModelGraphViewerComponent.scss";
 
-
-const relsKeyButtonStyles = {
-  root: {
-    background: "#999999",
-    borderRadius: "50%",
-    height: "15px",
-    width: "15px",
-    position: "absolute",
-    top: "10px",
-    right: "10px"
-  },
-  icon: { color: "#1e1e1e", fontSize: "10px" }
-};
-
 export class ModelGraphViewerComponent extends React.Component {
 
   constructor(props) {
@@ -34,7 +20,9 @@ export class ModelGraphViewerComponent extends React.Component {
       progress: 0,
       isLoading: false,
       filterIsOpen: false,
-      showKey: true
+      showRelationships: true,
+      showInheritances: true,
+      showComponents: true
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -52,12 +40,17 @@ export class ModelGraphViewerComponent extends React.Component {
     eventService.subscribeCreateModel(() => this.retrieveModels());
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
+        this.cyRef.current.clearNodes();
+        this.setState({ isLoading: false });
         this.retrieveModels();
       }
     });
     eventService.subscribeClearData(() => {
       this.cyRef.current.clearNodes();
       this.setState({ isLoading: false });
+    });
+    eventService.subscribeModelsUpdate(() => {
+      this.retrieveModels();
     });
   }
 
@@ -129,29 +122,65 @@ export class ModelGraphViewerComponent extends React.Component {
     this.cyRef.current.zoomToFit();
   }
 
-  toggleShowKey = () => {
-    const { showKey } = this.state;
-    this.setState({ showKey: !showKey });
+  onRelationshipsToggleChange = () => {
+    const { showRelationships } = this.state;
+    if (showRelationships) {
+      this.cyRef.current.hideRelationships();
+    } else {
+      this.cyRef.current.showRelationships();
+    }
+    this.setState({ showRelationships: !showRelationships });
+  }
+
+  onInheritancesToggleChange = () => {
+    const { showInheritances } = this.state;
+    if (showInheritances) {
+      this.cyRef.current.hideInheritances();
+    } else {
+      this.cyRef.current.showInheritances();
+    }
+    this.setState({ showInheritances: !showInheritances });
+  }
+
+  onComponentsToggleChange = () => {
+    const { showComponents } = this.state;
+    if (showComponents) {
+      this.cyRef.current.hideComponents();
+    } else {
+      this.cyRef.current.showComponents();
+    }
+    this.setState({ showComponents: !showComponents });
   }
 
   render() {
-    const { isLoading, progress, filterIsOpen, showKey } = this.state;
+    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents } = this.state;
     return (
       <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
         <div className="gc-wrap">
           <ModelGraphViewerCytoscapeComponent
             ref={this.cyRef} />
-          {showKey && <div className="relationship-key">
+          <div className="relationship-key">
             <div className="rels-wrap">
-              <IconButton
-                iconProps={{ iconName: "ChromeClose"}}
-                styles={relsKeyButtonStyles}
-                onClick={this.toggleShowKey} />
-              <div className="rel-key"><span className="line relationship" />Relationship</div>
-              <div className="rel-key"><span className="line extends" />Inheritance</div>
-              <div className="rel-key"><span className="line component" />Component</div>
+              <div className="rel-key">
+                <span className="line relationship" />
+                <span className="rel-title">Relationships</span>
+                <Toggle id="relationships-toggle" className="rel-toggle"
+                  checked={showRelationships} onChange={this.onRelationshipsToggleChange} />
+              </div>
+              <div className="rel-key">
+                <span className="line extends" />
+                <span className="rel-title">Inheritances</span>
+                <Toggle id="relationships-toggle" className="rel-toggle"
+                  checked={showInheritances} onChange={this.onInheritancesToggleChange} />
+              </div>
+              <div className="rel-key">
+                <span className="line component" />
+                <span className="rel-title">Components</span>
+                <Toggle id="relationships-toggle" className="rel-toggle"
+                  checked={showComponents} onChange={this.onComponentsToggleChange} />
+              </div>
             </div>
-          </div>}
+          </div>
         </div>
         <div className="gc-filter">
           <ModelGraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} />

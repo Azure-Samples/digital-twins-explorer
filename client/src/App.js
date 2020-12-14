@@ -9,6 +9,7 @@ import fcose from "cytoscape-fcose";
 import cola from "cytoscape-cola";
 import dagre from "cytoscape-dagre";
 import klay from "cytoscape-klay";
+import d3Force from "cytoscape-d3-force";
 import dblclick from "cytoscape-dblclick";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
@@ -33,6 +34,7 @@ cytoscape.use(klay);
 cytoscape.use(dagre);
 cytoscape.use(cola);
 cytoscape.use(fcose);
+cytoscape.use(d3Force);
 cytoscape.use(dblclick);
 
 class App extends Component {
