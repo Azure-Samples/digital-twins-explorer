@@ -18,7 +18,7 @@ export class ErrorMessageComponent extends Component {
     this.state = {
       showModal: false,
       errorMessage: "",
-      showFixAuth: ""
+      showFixAuth: false
     };
   }
 
@@ -29,7 +29,7 @@ export class ErrorMessageComponent extends Component {
       // Service does not return an error code - only a name
       if (exc && exc.name === "RestError" && !exc.code) {
         message = CUSTOM_AUTH_ERROR_MESSAGE;
-        auth = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
+        auth = true;
       } else {
         message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
@@ -72,6 +72,10 @@ export class ErrorMessageComponent extends Component {
 
   render() {
     const { showModal, errorMessage, showFixAuth } = this.state;
+    let authButton = "";
+    if (showFixAuth) {
+      authButton = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
+    }
     return (
       <ModalComponent
         isVisible={showModal}
@@ -81,7 +85,7 @@ export class ErrorMessageComponent extends Component {
           <p>{errorMessage}</p>
           <div className="btn-group">
             <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
-            {showFixAuth}
+            {authButton}
           </div>
         </div>
       </ModalComponent>

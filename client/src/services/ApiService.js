@@ -75,7 +75,7 @@ class ApiService {
 
   async queryTwinsPaged(query, callback) {
     await this.initialize();
-
+    
     let count = 1;
     for await (const page of this.client.queryTwins(query).byPage()) {
       print(`Ran query for twins, page ${count++}:`, "info");
