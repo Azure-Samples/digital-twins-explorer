@@ -295,102 +295,102 @@ class ApiService {
     await this.client.decomissionModel(modelId);
   }
 
-    async addReaderRBAC(){
-    //Function to generate a random GUID
+  async addReaderRBAC() {
+  // Function to generate a random GUID
     function uuidv4() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r | 0x3 | 0x8);
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        /* eslint no-bitwise: [2, { allow: ["|"] }] */
+        const r = Math.random() * 16 | 0;
+        const v = c === "x" ? r : (r | 0x3 | 0x8);
         return v.toString(16);
       });
     }
 
-    //Get our current twins instance from settings
+    // Get our current twins instance from settings
     const { appAdtUrl } = await configService.getConfig();
-    let requestParams = {
+    const requestParams = {
       "appName": appAdtUrl.split(".api.")[0].substring(8)
     };
-    //Get the user's principle ID
+    // Get the user"s principle ID
     const requestOptions = {
-      method: 'GET',
-      headers: { 
-          'x-adt-host': 'graph.microsoft.com'
+      method: "GET",
+      headers: {
+        "x-adt-host": "graph.microsoft.com"
       }
     };
-    return fetch('http://localhost:3000/api/proxy/Graph/v1.0/me', requestOptions)
+    return fetch("http://localhost:3000/api/proxy/Graph/v1.0/me", requestOptions)
       .then(response => response.json())
       .then(result => {
         requestParams.userId = result.id;
         return requestParams;
-    }).then(function(requestParams){
-    //Get subscriptions from logged in user
-      const requestOptions = {
-        method: 'GET',
-        headers: { 
-            'x-adt-host': 'management.azure.com'
-        }
-      };
-      return fetch('http://localhost:3000/api/proxy/RBAC/subscriptions?api-version=2020-01-01', requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          requestParams.subscriptions = result;
-          return requestParams;
-      });
-    }).then(function(requestParams){
-    //Loop through our subscriptions to get the twins instance      
-      const requestOptions = {
-        method: 'GET',
-        headers: { 
-            'x-adt-host': 'management.azure.com'
-        }
-      };
-
-      var subscriptionRequests = [];
-      for(let x of requestParams.subscriptions.value){
-        //console.log(x);
-        subscriptionRequests.push(
-          fetch(`http://localhost:3000/api/proxy/RBAC${x.id}/providers/Microsoft.DigitalTwins/digitalTwinsInstances?api-version=2020-10-31`, requestOptions)
+      })
+      .then(userParams => {
+        // Get subscriptions from logged in user
+        const userOptions = {
+          method: "GET",
+          headers: {
+            "x-adt-host": "management.azure.com"
+          }
+        };
+        return fetch("http://localhost:3000/api/proxy/RBAC/subscriptions?api-version=2020-01-01", userOptions)
           .then(response => response.json())
           .then(result => {
-            //console.log(result);
-            if(result.value.length>0){
-              for(let value in result.value){
-                //console.log(result.value[value])
-                if(typeof result.value[value].name === 'string'){
-                  if(result.value[value].name.toLowerCase() === requestParams.appName.toLowerCase()){
-                    requestParams.ARMId = result.value[value].id;
-                    return requestParams;
+            userParams.subscriptions = result;
+            return userParams;
+          });
+      })
+      .then(subscriptionParams => {
+        // Loop through our subscriptions to get the twins instance
+        const subscriptionOptions = {
+          method: "GET",
+          headers: {
+            "x-adt-host": "management.azure.com"
+          }
+        };
+
+        const subscriptionRequests = [];
+        for (const x of subscriptionParams.subscriptions.value) {
+          subscriptionRequests.push(
+            fetch(`http://localhost:3000/api/proxy/RBAC${x.id}/providers/Microsoft.DigitalTwins/digitalTwinsInstances?api-version=2020-10-31`, subscriptionOptions)
+              .then(response => response.json())
+              .then(result => {
+                if (result.value.length > 0) {
+                  for (const value in result.value) {
+                    if (typeof result.value[value].name === "string") {
+                      if (result.value[value].name.toLowerCase() === subscriptionParams.appName.toLowerCase()) {
+                        subscriptionParams.ARMId = result.value[value].id;
+                        return subscriptionParams;
+                      }
+                    }
                   }
                 }
+                return 0;
+              })
+              .then(roleParams => {
+                if (roleParams === 0) {
+                  return false;
+                }
+                // POST request using fetch with set headers
+                const roleOptions = {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-adt-host": "management.azure.com"
+                  },
+                  body: JSON.stringify({
+                    "properties": {
+                      "principalId": `${roleParams.userId}`,
+                      "roleDefinitionId": `${roleParams.ARMId}/providers/Microsoft.Authorization/roleDefinitions/bcd981a7-7f74-457b-83e1-cceb9e632ffe`
+                    }
+                  })
+                };
+                return fetch(`http://localhost:3000/api/proxy/RBAC${roleParams.ARMId}/providers/Microsoft.Authorization/roleAssignments/${uuidv4()}?api-version=2020-04-01-preview`, roleOptions);
               }
-            }
-            return 0;
-          })
-          .then(requestParams => {
-            if (requestParams === 0){
-              return false;
-            }
-            else{
-              // POST request using fetch with set headers
-              const requestOptions = {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-adt-host': 'management.azure.com'
-                },
-                body: JSON.stringify({
-                  "properties": {
-                    "principalId": `${requestParams.userId}`,
-                    "roleDefinitionId": `${requestParams.ARMId}/providers/Microsoft.Authorization/roleDefinitions/bcd981a7-7f74-457b-83e1-cceb9e632ffe`
-                  }
-                })
-              };
-              return fetch(`http://localhost:3000/api/proxy/RBAC${requestParams.ARMId}/providers/Microsoft.Authorization/roleAssignments/${uuidv4()}?api-version=2020-04-01-preview`, requestOptions)
-            }
-          })
-        );
-      }
-      return Promise.all(subscriptionRequests);
-    });
+              )
+          );
+        }
+        return Promise.all(subscriptionRequests);
+      });
   }
 
 }

@@ -29,7 +29,7 @@ export class ErrorMessageComponent extends Component {
       // Service does not return an error code - only a name
       if (exc && exc.name === "RestError" && !exc.code) {
         message = CUSTOM_AUTH_ERROR_MESSAGE;
-        auth = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width:150}}>Assign yourself data reader access</DefaultButton>;
+        auth = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
       } else {
         message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
@@ -49,28 +49,27 @@ export class ErrorMessageComponent extends Component {
   }
 
   fixPermissions = () => {
-      this.setState({showFixAuth: <Spinner/>});
-      apiService.addReaderRBAC().then(requestParams => 
-        {
-          for(var i in requestParams){
-            if(requestParams[i]){
-              switch(requestParams[i].status){
-                case 201:
-                  this.setState({showFixAuth: <p style={{color:"green", "textAlign":"left", width:400, margin:0}}>{AUTH_SUCCESS_MESSAGE}</p>});
-                  break;
-                case 403:
-                  this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
-                  break;
-                case 409:
-                  this.setState({showFixAuth: <p style={{margin:7}}>{AUTH_CONFLICT_MESSAGE}</p>});
-                  break;
-                default:
-                  this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
-              }
-            }
+    this.setState({showFixAuth: <Spinner />});
+    apiService.addReaderRBAC().then(requestParams => {
+      for (const i in requestParams) {
+        if (requestParams[i]) {
+          switch (requestParams[i].status) {
+            case 201:
+              this.setState({showFixAuth: <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>});
+              break;
+            case 403:
+              this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
+              break;
+            case 409:
+              this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>});
+              break;
+            default:
+              this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
           }
-      });
-    }
+        }
+      }
+    });
+  }
 
   render() {
     const { showModal, errorMessage, showFixAuth } = this.state;

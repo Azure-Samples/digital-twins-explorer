@@ -13,31 +13,25 @@ module.exports = function (app) {
   let tokenGraph = null;
 
   const pathRewrite = async function (path, req) {
-    if(path.startsWith("/api/proxy/RBAC")){
+    if (path.startsWith("/api/proxy/RBAC")) {
       if (!tokenRBAC || tokenRBAC.expiresOnTimestamp < Date.now()) {
         tokenRBAC = await credentialRBAC.getToken("https://management.azure.com/.default");
       }
       req.headers.authorization = `Bearer ${tokenRBAC.token}`;
-      //console.log(`Bearer ${tokenRBAC.token}`);
       return path.replace("/api/proxy/RBAC", "");
     }
-    else if(path.startsWith("/api/proxy/Graph")){
+    if (path.startsWith("/api/proxy/Graph")) {
       if (!tokenGraph || tokenGraph.expiresOnTimestamp < Date.now()) {
         tokenGraph = await credentialGraph.getToken("https://graph.microsoft.com/.default");
       }
       req.headers.authorization = `Bearer ${tokenGraph.token}`;
-      //console.log(`Bearer ${tokenRBAC.token}`);
       return path.replace("/api/proxy/Graph", "");
     }
-    else{
-      if (!token || token.expiresOnTimestamp < Date.now()) {
-        token = await credential.getToken("https://digitaltwins.azure.net/.default");
-      }
-      req.headers.authorization = `Bearer ${token.token}`;
-      //console.log(`Bearer ${token.token}`);
-      return path.replace("/api/proxy", "");
+    if (!token || token.expiresOnTimestamp < Date.now()) {
+      token = await credential.getToken("https://digitaltwins.azure.net/.default");
     }
-
+    req.headers.authorization = `Bearer ${token.token}`;
+    return path.replace("/api/proxy", "");
   };
 
   app.use(
