@@ -50,25 +50,24 @@ export class ErrorMessageComponent extends Component {
 
   fixPermissions = () => {
     this.setState({showFixAuth: <Spinner />});
-    apiService.addReaderRBAC().then(requestParams => {
-      for (const i in requestParams) {
-        if (requestParams[i]) {
-          switch (requestParams[i].status) {
-            case 201:
-              this.setState({showFixAuth: <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>});
-              break;
-            case 403:
-              this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
-              break;
-            case 409:
-              this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>});
-              break;
-            default:
-              this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
-          }
+    const requestParams = await apiService.addReaderRBAC();
+    for (const i in requestParams) {
+      if (requestParams[i]) {
+        switch (requestParams[i].status) {
+          case 201:
+            this.setState({showFixAuth: <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>});
+            break;
+          case 403:
+            this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
+            break;
+          case 409:
+            this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>});
+            break;
+          default:
+            this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
         }
       }
-    });
+    }
   }
 
   render() {
