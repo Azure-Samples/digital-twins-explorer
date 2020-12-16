@@ -8,7 +8,6 @@ import { configService } from "./ConfigService";
 import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
 import { print } from "./LoggingService";
 import { settingsService } from "./SettingsService";
-import { HttpResponse } from "@microsoft/signalr";
 
 const getAllTwinsQuery = "SELECT * FROM digitaltwins";
 
