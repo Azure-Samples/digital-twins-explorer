@@ -198,6 +198,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   unselectSelectedNodes = () => {
     if (this.graphControl.$(":selected").length > 0) {
       this.graphControl.$(":selected").unselect();
+      this.selectedNodes = [];
     }
   }
 
@@ -283,7 +284,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     if (removed >= 0) {
       this.selectedNodes.splice(removed, 1);
       this.highlightRelatedNodes();
-      this.onNodeClicked();
     }
     if (this.selectedNodes.length === 0) {
       this.clearSelection();
@@ -314,6 +314,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
       this.clearSelection();
+      this.unselectSelectedNodes();
     }
   }
 

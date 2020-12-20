@@ -58,10 +58,8 @@ export class GraphViewerComponent extends React.Component {
       this.clearData();
     });
     eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
-    eventService.subscribeSelection(selection => {
-      if (!selection) {
-        this.cyRef.current.unselectSelectedNodes();
-      }
+    eventService.subscribeCreateTwin(() => {
+      this.cyRef.current.unselectSelectedNodes();
     });
   }
 
