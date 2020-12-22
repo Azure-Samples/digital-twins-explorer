@@ -9,6 +9,7 @@ import cola from "cytoscape-cola";
 import dagre from "cytoscape-dagre";
 import klay from "cytoscape-klay";
 import dblclick from "cytoscape-dblclick";
+import popper from "cytoscape-popper";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions } from "./config";
 import { getUniqueRelationshipId } from "../../../utils/utilities";
@@ -21,6 +22,7 @@ cytoscape.use(dagre);
 cytoscape.use(cola);
 cytoscape.use(fcose);
 cytoscape.use(dblclick);
+cytoscape.use(popper);
 
 export const GraphViewerCytoscapeLayouts = {
   "Cola": colaOptions,
@@ -310,6 +312,66 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  getContents = (properties, relationships) => {
+    let definedProperties = "";
+    let definedRelationships = "";
+    for (const [ key ] of Object.entries(properties)) {
+      definedProperties += `<li>${key}</li>`;
+    }
+    relationships.forEach(r => definedRelationships += `<li>${r.name}</li>`);
+    return { definedRelationships, definedProperties };
+  }
+
+  getPopperContent = (label, modelId, modelDisplayName, modelDescription, properties, relationships) => {
+    const { definedProperties, definedRelationships } = this.getContents(properties, relationships);
+    const div = document.createElement("div");
+    div.setAttribute("id", "cy-popper");
+    div.innerHTML = `
+      <div>
+        <h4>DTID:</h4>
+        <p>${label}</p>
+        <h4>MODEL DISPLAY NAME:</h4>
+        <p>${modelDisplayName}</p>
+        <h4>MODEL ID:</h4>
+        <p>${modelId}</p>
+        <h4>DESCRIPTION:</h4>
+        <p>${modelDescription ? modelDescription : ""}</p>
+      </div>
+      <div>
+        <h4>DEFINED RELATIONSHIPS</h4>
+        <ul>${definedRelationships}</ul>
+      </div>
+      <div>
+        <h4>DEFINED PROPERTIES</h4>
+        <ul>${definedProperties}</ul>
+      </div>
+    `;
+    return div;
+  };
+
+  onNodeHover = async ({ target: node }) => {
+    this.onNodeUnhover();
+    const { category, label, modelId } = node.data();
+    if (category === "Twin") {
+      const { displayName, description, properties, relationships } = await this.props.onNodeMouseEnter(modelId);
+      node.popper({
+        content: () => {
+          const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
+          document.body.appendChild(contentDiv);
+          return contentDiv;
+        },
+        popper: {}
+      });
+    }
+  }
+
+  onNodeUnhover = () => {
+    const activePopper = document.querySelector("#cy-popper");
+    if (activePopper) {
+      activePopper.parentNode.removeChild(activePopper);
+    }
+  }
+
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
@@ -369,6 +431,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           if (this.graphControl !== cy) {
             this.graphControl = cy;
             this.graphControl.dblclick();
+            this.graphControl.on("mouseover", this.onNodeHover);
             this.graphControl.on("select", "node", this.onNodeSelected);
             this.graphControl.on("unselect", "node", this.onNodeUnselected);
             this.graphControl.on("select", "edge", this.onEdgeSelected);
