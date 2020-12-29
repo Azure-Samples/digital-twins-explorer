@@ -200,5 +200,19 @@
         "name": "[parameters('signalrPricingTier')]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('functionAppName')]"
+    },
+    "functionIdentity": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2015-08-01', 'full').identity.principalId]"
+    }
+  }
 }
