@@ -2,79 +2,53 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { CommandBar, TextField, Icon } from "office-ui-fabric-react";
+import { CommandBar, TextField, Icon, CommandBarButton } from "office-ui-fabric-react";
 
-import { GraphViewerRelationshipCreateComponent } from "../GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
-import { GraphViewerRelationshipViewerComponent } from "../GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
-import { GraphViewerTwinDeleteComponent } from "../GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
-import { GraphViewerRelationshipDeleteComponent } from "../GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
 import { eventService } from "../../../services/EventService";
 import { settingsService } from "../../../services/SettingsService";
 import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "../../../services/Constants";
 
 import "./GraphViewerCommandBarComponent.scss";
 
+const buttonStyles = {
+  label: { fontSize: 18 },
+  icon: { color: "#a3a3a3" },
+  iconHovered: { color: "#ffffff" }
+};
+
+const singleButtonStyles = {
+  width: 30,
+  height: 30
+};
+
+const dropdownButtonStyles = {
+  borderRadius: 5,
+  width: 45,
+  height: 30,
+  marginLeft: 10
+};
+
 export class GraphViewerCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
     this.buttonClass = this.props.buttonClass;
-    this.view = React.createRef();
-    this.create = React.createRef();
-    this.delete = React.createRef();
-    this.deleteRel = React.createRef();
-    this.importModelRef = React.createRef();
-    this.settings = React.createRef();
     this.state = {
       relTypeLoading: settingsService.relTypeLoading,
       relExpansionLevel: settingsService.relExpansionLevel
     };
+    this.importModelRef = React.createRef();
   }
 
-  farItems = [
-    {
-      key: "deleteTwin",
-      text: "Delete Selected Twins",
-      ariaLabel: "delete selected twins",
-      iconProps: { iconName: "Delete" },
-      onClick: () => this.delete.current.open(),
-      iconOnly: true,
-      className: this.buttonClass
-    },
-    {
-      key: "getRelationship",
-      text: "Get Relationships",
-      ariaLabel: "get relationships",
-      iconProps: { iconName: "Relationship" },
-      onClick: () => this.view.current.open(),
-      iconOnly: true,
-      className: this.buttonClass
-    },
-    {
-      key: "addRelationship",
-      text: "Add Relationship",
-      ariaLabel: "add relationship",
-      iconProps: { iconName: "AddLink" },
-      onClick: () => this.create.current.open(),
-      iconOnly: true,
-      className: this.buttonClass
-    },
-    {
-      key: "deleteRelationship",
-      text: "Delete Relationship",
-      ariaLabel: "delete relationship",
-      iconProps: { iconName: "RemoveLink" },
-      onClick: () => this.deleteRel.current.open(),
-      iconOnly: true,
-      className: this.buttonClass
-    },
+  buttonGroupItems = [
     {
       key: "exportGraph",
       text: "Export Graph",
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.onExportGraphClicked(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      style: singleButtonStyles
     },
     {
       key: "importGraph",
@@ -82,16 +56,8 @@ export class GraphViewerCommandBarComponent extends Component {
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
-      className: this.buttonClass
-    },
-    {
-      key: "expansionLevel",
-      text: "Expansion Level",
-      ariaLabel: "Select number of layers to expand",
-      iconProps: { iconName: "Org" },
       className: this.buttonClass,
-      iconOnly: true,
-      commandBarButtonAs: () => this.renderRelationshipExpansionItem()
+      style: singleButtonStyles
     },
     {
       key: "showTwins",
@@ -99,46 +65,22 @@ export class GraphViewerCommandBarComponent extends Component {
       iconProps: { iconName: "RedEye" },
       onClick: () => this.props.onShowAll(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      style: singleButtonStyles
     },
     {
-      key: "hideTwins",
-      text: "Hide",
-      ariaLabel: "show all twins",
-      iconProps: { iconName: "Hide" },
+      key: "showRelationships",
+      text: "Show All Relationships",
+      ariaLabel: "show all relationships",
+      iconProps: { iconName: "Link" },
+      onClick: () => this.props.onShowAllRelationships(),
       iconOnly: true,
-      split: true,
-      onClick: () => this.props.onTriggerHide(),
-      className: `${this.buttonClass} command-bar-dropdown`,
-      subMenuProps: {
-        items: [
-          {
-            key: "hide-selected",
-            text: "Hide selected",
-            ariaLabel: "Hide selected",
-            onClick: () => this.props.onHide()
-          },
-          {
-            key: "hide-with-children",
-            text: "Hide selected and children",
-            ariaLabel: "Hide selected and children",
-            onClick: () => this.props.onHideWithChildren()
-          },
-          {
-            key: "hide-others",
-            text: "Hide all others",
-            ariaLabel: "Hide all others",
-            onClick: () => this.props.onHideOthers()
-          },
-          {
-            key: "hide-non-children",
-            text: "Hide non-children",
-            ariaLabel: "Hide non children",
-            onClick: () => this.props.onHideNonChildren()
-          }
-        ]
-      }
-    },
+      className: this.buttonClass,
+      style: singleButtonStyles
+    }
+  ]
+
+  expansionModeItems = [
     {
       key: "expansionMode",
       text: "Expansion Mode",
@@ -146,7 +88,7 @@ export class GraphViewerCommandBarComponent extends Component {
       iconOnly: true,
       iconProps: { iconName: "ModelingView" },
       className: `${this.buttonClass} command-bar-dropdown`,
-      split: true,
+      style: dropdownButtonStyles,
       subMenuProps: {
         items: [
           {
@@ -172,7 +114,22 @@ export class GraphViewerCommandBarComponent extends Component {
           }
         ]
       }
-    },
+    }
+  ]
+
+  expansionLevelItems = [
+    {
+      key: "expansionLevel",
+      text: "Expansion Level",
+      ariaLabel: "Select number of layers to expand",
+      iconProps: { iconName: "Org" },
+      className: this.buttonClass,
+      iconOnly: true,
+      style: singleButtonStyles
+    }
+  ]
+
+  layoutItems = [
     {
       key: "relayout",
       text: "Run Layout",
@@ -181,26 +138,8 @@ export class GraphViewerCommandBarComponent extends Component {
       iconProps: { iconName: "ArrangeSendToBack" },
       onClick: () => this.props.onLayoutClicked(),
       className: this.buttonClass,
-      split: true,
-      subMenuProps: {}
-    },
-    {
-      key: "zoomToFit",
-      text: "Zoom to Fit",
-      ariaLabel: "zoom to fit",
-      iconOnly: true,
-      iconProps: { iconName: "ZoomToFit" },
-      onClick: () => this.props.onZoomToFitClicked(),
-      className: this.buttonClass
-    },
-    {
-      key: "centerGraph",
-      text: "Center Graph",
-      ariaLabel: "center graph",
-      iconOnly: true,
-      iconProps: { iconName: "FitPage" },
-      onClick: () => this.props.onCenterClicked(),
-      className: this.buttonClass
+      subMenuProps: {},
+      style: dropdownButtonStyles
     }
   ]
 
@@ -208,18 +147,16 @@ export class GraphViewerCommandBarComponent extends Component {
     <div className="expansion-level-option">
       <Icon iconName="Org" />
       <TextField id="relExpansionLevelField"
-        className="command-bar-input configuration-input numeric-input" styles={this.getStyles} value={this.state.relExpansionLevel}
+        className="command-bar-input configuration-input numeric-input" value={this.state.relExpansionLevel}
         onChange={this.onExpansionLevelChange} type="number" min="1" max="5" />
     </div>
   )
 
-  onTwinsHide = () => {
-    const { onTwinsHide } = this.props;
-
-    if (onTwinsHide) {
-      onTwinsHide();
-    }
-  }
+  renderButton = props => (
+    <CommandBarButton {...props}
+      styles={buttonStyles}
+      style={{ backgroundColor: "#252526", minWidth: 0, ...props.style }} />
+  )
 
   onSelectedRelTypeChange = type => {
     settingsService.relTypeLoading = type;
@@ -242,41 +179,44 @@ export class GraphViewerCommandBarComponent extends Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, onTwinDelete, onRelationshipCreate, query, onGetCurrentNodes, selectedEdge, canShowAll } = this.props;
-    this.farItems.find(i => i.key === "deleteTwin").disabled = !selectedNode;
-    this.farItems.find(i => i.key === "hideTwins").disabled = !selectedNodes;
-    this.farItems.find(i => i.key === "showTwins").disabled = !canShowAll;
-    this.farItems.find(i => i.key === "getRelationship").disabled = !selectedNodes || selectedNodes.length !== 1;
-    this.farItems.find(i => i.key === "addRelationship").disabled = !selectedNodes || selectedNodes.length !== 2;
-    this.farItems.find(i => i.key === "deleteRelationship").disabled = !selectedEdge;
-    this.farItems.find(i => i.key === "exportGraph").disabled = this.farItems.find(i => i.key === "relayout").disabled = !query;
-    this.farItems.find(i => i.key === "relayout").subMenuProps.items = this.props.layouts.map(x => ({
+    const { query, canShowAll, canShowAllRelationships } = this.props;
+    this.buttonGroupItems.find(i => i.key === "showRelationships").disabled = !canShowAllRelationships;
+    this.buttonGroupItems.find(i => i.key === "showTwins").disabled = !canShowAll;
+    this.buttonGroupItems.find(i => i.key === "exportGraph").disabled = this.layoutItems.find(i => i.key === "relayout").disabled = !query;
+    this.layoutItems.find(i => i.key === "relayout").subMenuProps.items = this.props.layouts.map(x => ({
       key: x,
       text: x,
       ariaLabel: x.toLowerCase(),
       iconProps: { iconName: this.props.layout === x ? "CheckMark" : "" },
       onClick: () => this.props.onLayoutChanged(x)
     }));
-    this.farItems.find(item => item.key === "expansionMode").subMenuProps.items
-      = this.farItems.find(item => item.key === "expansionMode").subMenuProps.items.map(item => {
+    this.expansionModeItems.find(item => item.key === "expansionMode").subMenuProps.items
+      = this.expansionModeItems.find(item => item.key === "expansionMode").subMenuProps.items.map(item => {
         item.iconProps = { iconName: item.key === this.state.relTypeLoading ? "CheckMark" : "" };
         return item;
       });
-    this.farItems.find(i => i.key === "hideTwins").subMenuProps.items.forEach(item => item.iconProps = { iconName: item.key === this.props.hideMode ? "CheckMark" : "" });
     return (
       <>
-        <CommandBar className="gv-commandbar"
-          farItems={this.farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands" />
+        <div className="commands-wrap">
+          <CommandBar className="gv-commandbar button-group"
+            farItems={this.buttonGroupItems}
+            buttonAs={this.renderButton}
+            ariaLabel="Use left and right arrow keys to navigate between commands" />
+          <CommandBar className="gv-commandbar"
+            farItems={this.expansionLevelItems}
+            buttonAs={this.renderRelationshipExpansionItem}
+            ariaLabel="Use left and right arrow keys to navigate between commands" />
+          <CommandBar className="gv-commandbar"
+            farItems={this.expansionModeItems}
+            buttonAs={this.renderButton}
+            ariaLabel="Use left and right arrow keys to navigate between commands" />
+          <CommandBar className="gv-commandbar"
+            farItems={this.layoutItems}
+            buttonAs={this.renderButton}
+            ariaLabel="Use left and right arrow keys to navigate between commands" />
+        </div>
         <input id="file-input" type="file" name="name" className="gc-fileInput" ref={this.importModelRef}
           onChange={this.onImportGraphClicked} />
-        <GraphViewerRelationshipCreateComponent ref={this.create}
-          selectedNode={selectedNode} selectedNodes={selectedNodes}
-          onCreate={onRelationshipCreate} />
-        <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
-        <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
-          onDelete={onTwinDelete} onGetCurrentNodes={onGetCurrentNodes} />
-        <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
       </>
     );
   }

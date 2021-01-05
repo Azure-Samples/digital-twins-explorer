@@ -10,6 +10,7 @@
     "@types/react-dom": "^16.9.5",
     "cytoscape": "^3.14.0",
     "cytoscape-cola": "^2.3.0",
+    "cytoscape-context-menus": "^4.0.0",
     "cytoscape-dagre": "^2.2.2",
     "cytoscape-dblclick": "^0.3.1",
     "cytoscape-fcose": "^1.2.0",
