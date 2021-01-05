@@ -472,7 +472,10 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onEdgeSelected = e => {
-    this.props.onEdgeClicked(e.target.data());
+    const { onEdgeClicked } = this.props;
+    if (onEdgeClicked) {
+      onEdgeClicked(e.target.data());
+    }
   }
 
   onNodeClicked = async () => {
@@ -486,8 +489,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeDoubleClicked = e => {
-    if (this.props.onNodeDoubleClicked) {
-      this.props.onNodeDoubleClicked({ id: e.target.id() });
+    const { onNodeDoubleClicked } = this.props;
+    if (onNodeDoubleClicked) {
+      onNodeDoubleClicked({ id: e.target.id() });
     }
   }
 
