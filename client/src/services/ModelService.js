@@ -77,11 +77,14 @@ export class ModelService {
   async getRelationships(sourceModelId, targetModelId) {
     await this.initialize();
     const sourceModel = this._getModel(sourceModelId);
-    const targetModel = this._getModel(targetModelId);
-    return sourceModel
-      .relationships
-      .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
-      .map(x => x.name);
+    if (targetModelId) {
+      const targetModel = this._getModel(targetModelId);
+      return sourceModel
+        .relationships
+        .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
+        .map(x => x.name);
+    }
+    return sourceModel.relationships;
   }
 
   async getProperties(sourceModelId) {

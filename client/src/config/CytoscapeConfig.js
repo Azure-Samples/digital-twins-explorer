@@ -12,6 +12,7 @@ export const colors = [
   "00d067", "f43600", "4ba93b", "5779bb", "927acc", "97ee3f", "bf3947",
   "9f5b00", "f48758", "8caed6", "f2b94f", "eff26e", "e43872", "d9b100",
   "9d7a00", "698cff", "00d27e", "d06800", "009f82", "c49200", "cbe8ff",
+  "fecddf", "c27eb6", "8cd2ce", "c4b8d9", "f883b0", "a49100", "f48800",
   "27d0df", "a04a9b"
 ];
 
@@ -291,21 +292,6 @@ export const d3ForceOptions = {
   animate: false,
   fit: true,
   linkId: (data) => data.id,
-  linkDistance: (link) => {
-    const length = link.edgeLength;
-    if (length && length > 1) {
-      return length;
-    }
-    return 500;
-  },
-  linkStrength: () => 0.05,
-  xStrength: 0,
-  yStrength: 0.12,
-  yY: 0.5,
-  velocityDecay: 0.6,
-  collideRadius: 3,
-  collideStrength: 1,
-  manyBodyStrength: () => {
-    return -300;
-  }
-}
+  linkDistance: 100,
+  manyBodyStrength: -500
+};

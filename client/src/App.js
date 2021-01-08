@@ -11,6 +11,7 @@ import dagre from "cytoscape-dagre";
 import klay from "cytoscape-klay";
 import d3Force from "cytoscape-d3-force";
 import dblclick from "cytoscape-dblclick";
+import popper from "cytoscape-popper";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
@@ -36,6 +37,7 @@ cytoscape.use(cola);
 cytoscape.use(fcose);
 cytoscape.use(d3Force);
 cytoscape.use(dblclick);
+cytoscape.use(popper);
 
 class App extends Component {
 

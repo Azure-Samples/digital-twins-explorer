@@ -2,10 +2,9 @@
 // Licensed under the MIT license.
 
 import React from "react";
-import { Toggle } from "office-ui-fabric-react";
-
 import { ModelGraphViewerCytoscapeComponent } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
+import { ModelGraphViewerRelationshipsToggle } from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
@@ -28,6 +27,7 @@ export class ModelGraphViewerComponent extends React.Component {
     this.commandRef = React.createRef();
     this.canceled = false;
     this.props.glContainer.on("show", this.initialize);
+    this.modelService = new ModelService();
   }
 
   initialize = async () => {
@@ -59,24 +59,16 @@ export class ModelGraphViewerComponent extends React.Component {
 
     let list = [];
     try {
-      list = await new ModelService().getAllModels();
+      list = await this.modelService.getAllModels();
     } catch (exc) {
       exc.customMessage = "Error fetching models";
       eventService.publishError(exc);
     }
     const nodes = list.map(i => ({
       id: i.id,
-      label: i.displayName
+      label: i.displayName ? i.displayName : i.id
     }));
-    const relationships = list.flatMap(m =>
-      m.relationships.map(r => ({
-        sourceId: m.id,
-        targetId: r.target,
-        relationshipName: r.name,
-        relationshipId: r.name
-      }))
-    );
-    const componentRelationships = list.flatMap(m =>
+    this.componentRelationships = list.flatMap(m =>
       m.components.map(c => ({
         sourceId: m.id,
         targetId: c.schema,
@@ -84,7 +76,7 @@ export class ModelGraphViewerComponent extends React.Component {
         relationshipId: c.name
       }))
     );
-    const extendRelationships = list.flatMap(m =>
+    this.extendRelationships = list.flatMap(m =>
       m.bases.map(b => ({
         sourceId: m.id,
         targetId: b,
@@ -92,10 +84,30 @@ export class ModelGraphViewerComponent extends React.Component {
         relationshipId: "extends"
       }))
     );
+    this.relationships = list.flatMap(m =>
+      m.relationships.filter(r => {
+        let parentHasSameRelationship = false;
+        if (m.bases && m.bases.length > 0) {
+          m.bases.forEach(base => {
+            const baseModel = list.find(i => i.id === base);
+            const hasSameRel = baseModel.relationships.some(br => br.name === r.name);
+            if (hasSameRel) {
+              parentHasSameRelationship = true;
+            }
+          });
+        }
+        return !parentHasSameRelationship;
+      }).map(r => ({
+        sourceId: m.id,
+        targetId: r.target,
+        relationshipName: r.name,
+        relationshipId: r.name
+      }))
+    );
     this.cyRef.current.addNodes(nodes);
-    this.cyRef.current.addRelationships(relationships, "related");
-    this.cyRef.current.addRelationships(componentRelationships, "component");
-    this.cyRef.current.addRelationships(extendRelationships, "extends");
+    this.cyRef.current.addRelationships(this.relationships, "related");
+    this.cyRef.current.addRelationships(this.componentRelationships, "component");
+    this.cyRef.current.addRelationships(this.extendRelationships, "extends");
     await this.cyRef.current.doLayout();
     this.setState({ isLoading: false });
   }
@@ -122,35 +134,90 @@ export class ModelGraphViewerComponent extends React.Component {
     this.cyRef.current.zoomToFit();
   }
 
-  onRelationshipsToggleChange = () => {
+  onRelationshipsToggleChange = async () => {
     const { showRelationships } = this.state;
+    this.setState({ isLoading: true });
     if (showRelationships) {
-      this.cyRef.current.hideRelationships();
+      this.cyRef.current.removeRelationships(this.relationships);
+      await this.cyRef.current.doLayout();
     } else {
-      this.cyRef.current.showRelationships();
+      this.cyRef.current.addRelationships(this.relationships, "related");
+      await this.cyRef.current.doLayout();
     }
-    this.setState({ showRelationships: !showRelationships });
+    this.setState({ showRelationships: !showRelationships, isLoading: false });
   }
 
-  onInheritancesToggleChange = () => {
+  onInheritancesToggleChange = async () => {
     const { showInheritances } = this.state;
+    this.setState({ isLoading: true });
     if (showInheritances) {
-      this.cyRef.current.hideInheritances();
+      this.cyRef.current.removeRelationships(this.extendRelationships);
+      await this.cyRef.current.doLayout();
     } else {
-      this.cyRef.current.showInheritances();
+      this.cyRef.current.addRelationships(this.extendRelationships, "extends");
+      await this.cyRef.current.doLayout();
     }
-    this.setState({ showInheritances: !showInheritances });
+    this.setState({ showInheritances: !showInheritances, isLoading: false });
   }
 
-  onComponentsToggleChange = () => {
+  onComponentsToggleChange = async () => {
     const { showComponents } = this.state;
+    this.setState({ isLoading: true });
     if (showComponents) {
-      this.cyRef.current.hideComponents();
+      this.cyRef.current.removeRelationships(this.componentRelationships);
+      await this.cyRef.current.doLayout();
     } else {
-      this.cyRef.current.showComponents();
+      this.cyRef.current.addRelationships(this.componentRelationships, "component");
+      await this.cyRef.current.doLayout();
     }
-    this.setState({ showComponents: !showComponents });
+    this.setState({ showComponents: !showComponents, isLoading: false });
   }
+
+  onNodeHover = async modelId => {
+    const properties = await this.modelService.getProperties(modelId);
+    const telemetries = await this.modelService.getTelemetries(modelId);
+    const contentDiv = this.getPopperContent(modelId, properties, telemetries);
+    document.body.appendChild(contentDiv);
+    this.cyRef.current.renderInfoPane(modelId, contentDiv);
+  }
+
+  onNodeUnhover = () => {
+    const activePopper = document.querySelector("#cy-popper");
+    if (activePopper) {
+      activePopper.parentNode.removeChild(activePopper);
+    }
+  }
+
+  getContents = (properties, telemetries) => {
+    let definedProperties = "";
+    let definedTelemetries = "";
+    for (const [ key ] of Object.entries(properties)) {
+      definedProperties += `<li>${key}</li>`;
+    }
+    telemetries.forEach(r => definedTelemetries += `<li>${r.name}</li>`);
+    return { definedTelemetries, definedProperties };
+  }
+
+  getPopperContent = (modelId, properties, telemetries) => {
+    const { definedProperties, definedTelemetries } = this.getContents(properties, telemetries);
+    const div = document.createElement("div");
+    div.setAttribute("id", "cy-popper");
+    div.innerHTML = `
+      <div>
+        <h4>DTID:</h4>
+        <p>${modelId}</p>
+      </div>
+      <div>
+        <h4>PROPERTIES</h4>
+        <ul>${definedProperties}</ul>
+      </div>
+      <div>
+        <h4>TELEMETRY</h4>
+        <ul>${definedTelemetries}</ul>
+      </div>`;
+
+    return div;
+  };
 
   render() {
     const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents } = this.state;
@@ -158,29 +225,16 @@ export class ModelGraphViewerComponent extends React.Component {
       <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
         <div className="gc-wrap">
           <ModelGraphViewerCytoscapeComponent
+            onNodeHover={this.onNodeHover}
+            onNodeUnhover={this.onNodeUnhover}
             ref={this.cyRef} />
-          <div className="relationship-key">
-            <div className="rels-wrap">
-              <div className="rel-key">
-                <span className="line relationship" />
-                <span className="rel-title">Relationships</span>
-                <Toggle id="relationships-toggle" className="rel-toggle"
-                  checked={showRelationships} onChange={this.onRelationshipsToggleChange} />
-              </div>
-              <div className="rel-key">
-                <span className="line extends" />
-                <span className="rel-title">Inheritances</span>
-                <Toggle id="relationships-toggle" className="rel-toggle"
-                  checked={showInheritances} onChange={this.onInheritancesToggleChange} />
-              </div>
-              <div className="rel-key">
-                <span className="line component" />
-                <span className="rel-title">Components</span>
-                <Toggle id="relationships-toggle" className="rel-toggle"
-                  checked={showComponents} onChange={this.onComponentsToggleChange} />
-              </div>
-            </div>
-          </div>
+          <ModelGraphViewerRelationshipsToggle
+            onRelationshipsToggleChange={this.onRelationshipsToggleChange}
+            onInheritancesToggleChange={this.onInheritancesToggleChange}
+            onComponentsToggleChange={this.onComponentsToggleChange}
+            showRelationships={showRelationships}
+            showInheritances={showInheritances}
+            showComponents={showComponents} />
         </div>
         <div className="gc-filter">
           <ModelGraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} />

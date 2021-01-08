@@ -103,7 +103,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   removeRelationships(relationships) {
     relationships.forEach(x => {
-      this.graphControl.$id(x).remove();
+      this.graphControl.$id(`${x.sourceId}_${x.relationshipName}`).remove();
     });
   }
 
@@ -236,18 +236,6 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  hideRelationships = () => this.graphControl.$("edge.related").toggleClass("hide", true);
-
-  showRelationships = () => this.graphControl.$("edge.related").toggleClass("hide", false);
-
-  hideInheritances = () => this.graphControl.$("edge.extends").toggleClass("hide", true);
-
-  showInheritances = () => this.graphControl.$("edge.extends").toggleClass("hide", false);
-
-  hideComponents = () => this.graphControl.$("edge.component").toggleClass("hide", true);
-
-  showComponents = () => this.graphControl.$("edge.component").toggleClass("hide", false);
-
   zoomToFit() {
     this.graphControl.fit();
   }
@@ -270,6 +258,30 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  onNodeUnhover = () => {
+    if (this.props.onNodeUnhover) {
+      this.props.onNodeUnhover();
+    }
+  }
+
+  onNodeHover = ({ target }) => {
+    this.onNodeUnhover();
+    if (target !== this.graphControl) {
+      const { category, label } = target.data();
+      if (category === "Model" && this.props.onNodeHover) {
+        this.props.onNodeHover(target.id(), label);
+      }
+    }
+  }
+
+  renderInfoPane = (nodeId, content) => {
+    const cy = this.graphControl;
+    cy.$id(nodeId).popper({
+      content,
+      popper: {}
+    });
+  }
+
   render() {
     return (
       <CytoscapeComponent elements={[]}
@@ -285,6 +297,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
             this.graphControl.on("select", "edge", this.onEdgeSelected);
             this.graphControl.on("click", this.onControlClicked);
             this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
+            this.graphControl.on("mouseover", this.onNodeHover);
           }
         }} />
     );

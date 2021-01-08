@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-@import './theme/theme.scss';
+@import "./theme/theme.scss";
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1e1e1e;
@@ -46,16 +46,19 @@ body {
   opacity: 1; /* Firefox */
 }
 
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
- color: grey !important;
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: grey !important;
 }
 
-::-ms-input-placeholder { /* Microsoft Edge */
- color: grey !important;
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: grey !important;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 html,
@@ -156,7 +159,6 @@ body {
     color: $textColorLight1;
     font-size: 11px;
   }
-
 }
 
 .error-page {
@@ -186,6 +188,46 @@ body {
   &.is-checked {
     .ms-Toggle-background {
       background: $inputOutlineColor;
+    }
+  }
+}
+
+#cy-popper {
+  background-color: $backgroundColor2;
+  box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  color: white;
+  div {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgb(78, 76, 82);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  h4,
+  p,
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  h4 {
+    color: $textColorLight2;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  p {
+    color: $textColorLight1;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  ul {
+    list-style: none;
+    max-height: 50px;
+    overflow: auto;
+    li {
+      padding: 2px 8px 2px 4px;
+      font-size: 13px;
     }
   }
 }

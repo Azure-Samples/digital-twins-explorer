@@ -8,6 +8,7 @@ import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./Gr
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { apiService } from "../../services/ApiService";
+import { ModelService } from "../../services/ModelService";
 import { eventService } from "../../services/EventService";
 import { print } from "../../services/LoggingService";
 import { BatchService } from "../../services/BatchService";
@@ -58,10 +59,8 @@ export class GraphViewerComponent extends React.Component {
       this.clearData();
     });
     eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
-    eventService.subscribeSelection(selection => {
-      if (!selection) {
-        this.cyRef.current.unselectSelectedNodes();
-      }
+    eventService.subscribeCreateTwin(() => {
+      this.cyRef.current.unselectSelectedNodes();
     });
   }
 
@@ -240,6 +239,19 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ isLoading: false, progress: 0 });
   }
 
+  onNodeMouseEnter = async modelId => {
+    const modelService = new ModelService();
+    const model = await apiService.getModelById(modelId);
+    const properties = await modelService.getProperties(modelId);
+    const relationships = await modelService.getRelationships(modelId);
+    return {
+      displayName: model && model.model ? model.model.displayName : "",
+      description: model && model.model ? model.model.description : "",
+      properties,
+      relationships
+    };
+  };
+
   onControlClicked = () => {
     this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
     eventService.publishSelection();
@@ -339,7 +351,8 @@ export class GraphViewerComponent extends React.Component {
             onEdgeClicked={this.onEdgeClicked}
             onNodeClicked={this.onNodeClicked}
             onNodeDoubleClicked={this.onNodeDoubleClicked}
-            onControlClicked={this.onControlClicked} />
+            onControlClicked={this.onControlClicked}
+            onNodeMouseEnter={this.onNodeMouseEnter} />
         </div>
         {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
       </div>
