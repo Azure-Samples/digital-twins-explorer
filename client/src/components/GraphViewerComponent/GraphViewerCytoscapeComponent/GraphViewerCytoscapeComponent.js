@@ -44,6 +44,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "Klay";
+    this.isFetchingTwinData = false;
+    this.contextMenuIsOpen = false;
     this.contextMenuItems = [
       {
         id: "header-1",
@@ -458,6 +460,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
     this.highlightRelatedNodes();
     this.onNodeClicked();
+    this.contextMenuIsOpen = false;
   }
 
   onNodeUnselected = e => {
@@ -476,6 +479,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     if (onEdgeClicked) {
       onEdgeClicked(e.target.data());
     }
+    this.contextMenuIsOpen = false;
   }
 
   onNodeClicked = async () => {
@@ -496,6 +500,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeRightClick = ({ target: node }) => {
+    this.contextMenuIsOpen = true;
+    this.onNodeUnhover();
     if (this.selectedNodes.length === 1 && this.selectedNodes[0].id !== node.id()) {
       this.contextMenu.showMenuItem("add-relationship");
     } else if (this.selectedNodes.length === 2 && this.selectedNodes.filter(n => n.id === node.id()).length === 1) {
@@ -545,16 +551,20 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   onNodeHover = async ({ target: node }) => {
     this.onNodeUnhover();
     const { category, label, modelId } = node.data();
-    if (category === "Twin") {
+    if (category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
+      this.isFetchingTwinData = true;
       const { displayName, description, properties, relationships } = await this.props.onNodeMouseEnter(modelId);
-      node.popper({
-        content: () => {
-          const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
-          document.body.appendChild(contentDiv);
-          return contentDiv;
-        },
-        popper: {}
-      });
+      if (!this.contextMenuIsOpen) {
+        node.popper({
+          content: () => {
+            const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
+            document.body.appendChild(contentDiv);
+            return contentDiv;
+          },
+          popper: {}
+        });
+      }
+      this.isFetchingTwinData = false;
     }
   }
 
@@ -571,6 +581,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       this.clearSelection();
       this.contextMenu.hideMenuItem("add-relationship");
       this.unselectSelectedNodes();
+      this.contextMenuIsOpen = false;
     }
   }
 
