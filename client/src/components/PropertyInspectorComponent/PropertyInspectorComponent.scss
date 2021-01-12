@@ -80,6 +80,17 @@
   }
 }
 
+.pi-command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px;
+  color: #888888;
+  .pi-title {
+    text-transform: uppercase;
+  }
+}
+
 .jsoneditor-expandable:nth-child(2) {
   width: 0px;
 }

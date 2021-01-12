@@ -71,7 +71,7 @@ class App extends Component {
               },
               {
                 type: "stack",
-                width: 65,
+                width: 85,
                 content: [
                   {
                     title: "GRAPH VIEW",
@@ -86,17 +86,6 @@ class App extends Component {
                     }
                   }
                 ]
-              },
-              {
-                title: "PROPERTY EXPLORER",
-                isClosable: false,
-                id: "gl-property-inspector",
-                width: 20,
-                type: "react-component",
-                component: "propInspector",
-                setting: {
-                  showCloseIcon: false
-                }
               }
             ]
           }

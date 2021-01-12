@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import React from "react";
+import { Icon } from "office-ui-fabric-react";
 
 import { GraphViewerCommandBarComponent } from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
 import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
@@ -9,6 +10,7 @@ import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshi
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
 import { GraphViewerRelationshipDeleteComponent } from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
+import { PropertyInspectorComponent } from "../PropertyInspectorComponent/PropertyInspectorComponent";
 import GraphViewerFilteringComponent from "./GraphViewerFilteringComponent/GraphViewerFilteringComponent";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
@@ -37,6 +39,7 @@ export class GraphViewerComponent extends React.Component {
       hideMode: "hide-selected",
       canShowAll: false,
       filterIsOpen: false,
+      propertyInspectorIsOpen: true,
       canShowAllRelationships: false
     };
     this.view = React.createRef();
@@ -392,6 +395,11 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ filterIsOpen: !filterIsOpen });
   }
 
+  togglePropertyInspector = () => {
+    const { propertyInspectorIsOpen } = this.state;
+    this.setState({ propertyInspectorIsOpen: !propertyInspectorIsOpen });
+  }
+
   onZoomIn = () => {
     this.cyRef.current.zoomIn();
   }
@@ -417,58 +425,72 @@ export class GraphViewerComponent extends React.Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout, hideMode, canShowAll, canShowAllRelationships, filterIsOpen } = this.state;
+    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout, hideMode, canShowAll, canShowAllRelationships, filterIsOpen, propertyInspectorIsOpen } = this.state;
     return (
-      <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
-        <div className="gc-toolbar">
-          <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
-            selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
-            layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
-            onRelationshipCreate={this.onRelationshipCreate}
-            onShowAllRelationships={this.onShowAllRelationships}
-            onTwinDelete={this.onTwinDelete}
-            onHideOthers={this.onHideOthers}
-            onHideNonChildren={this.onHideNonChildren}
-            onHide={this.onHide}
-            onHideWithChildren={this.onHideWithChildren}
-            onTriggerHide={this.onTriggerHide}
-            onShowAll={this.onShowAll}
-            canShowAll={canShowAll}
-            canShowAllRelationships={canShowAllRelationships}
-            onLayoutClicked={() => this.cyRef.current.doLayout()}
-            onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
-            onCenterClicked={() => this.cyRef.current.center()}
-            onLayoutChanged={this.onLayoutChanged}
-            onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
-          <GraphViewerRelationshipCreateComponent ref={this.create}
-            selectedNode={selectedNode} selectedNodes={selectedNodes}
-            onCreate={this.onRelationshipCreate} />
-          <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
-          <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
-            onDelete={this.onTwinDelete} onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
-          <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
+      <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
+        <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
+          <div className="gc-toolbar">
+            <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
+              selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
+              layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
+              onRelationshipCreate={this.onRelationshipCreate}
+              onShowAllRelationships={this.onShowAllRelationships}
+              onTwinDelete={this.onTwinDelete}
+              onHideOthers={this.onHideOthers}
+              onHideNonChildren={this.onHideNonChildren}
+              onHide={this.onHide}
+              onHideWithChildren={this.onHideWithChildren}
+              onTriggerHide={this.onTriggerHide}
+              onShowAll={this.onShowAll}
+              canShowAll={canShowAll}
+              canShowAllRelationships={canShowAllRelationships}
+              onLayoutClicked={() => this.cyRef.current.doLayout()}
+              onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
+              onCenterClicked={() => this.cyRef.current.center()}
+              onLayoutChanged={this.onLayoutChanged}
+              onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
+            <GraphViewerRelationshipCreateComponent ref={this.create}
+              selectedNode={selectedNode} selectedNodes={selectedNodes}
+              onCreate={this.onRelationshipCreate} />
+            <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
+            <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
+              onDelete={this.onTwinDelete} onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
+            <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
+          </div>
+          <div className="gc-wrap">
+            <GraphViewerCytoscapeComponent ref={this.cyRef}
+              onEdgeClicked={this.onEdgeClicked}
+              onNodeClicked={this.onNodeClicked}
+              onNodeDoubleClicked={this.onNodeDoubleClicked}
+              onHideRelationship={this.onHideRelationship}
+              onControlClicked={this.onControlClicked}
+              onHideOthers={this.onHideOthers}
+              onHideNonChildren={this.onHideNonChildren}
+              onHide={this.onHide}
+              onHideWithChildren={this.onHideWithChildren}
+              onCreateRelationship={this.onConfirmRelationshipCreate}
+              onGetRelationships={this.onGetRelationships}
+              onConfirmTwinDelete={this.onConfirmTwinDelete}
+              onConfirmRelationshipDelete={this.onConfirmRelationshipDelete}
+              onNodeMouseEnter={this.onNodeMouseEnter} />
+          </div>
+          <div className="gc-filter">
+            <GraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} onCenter={this.onCenter} />
+          </div>
+          {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
-        <div className="gc-wrap">
-          <GraphViewerCytoscapeComponent ref={this.cyRef}
-            onEdgeClicked={this.onEdgeClicked}
-            onNodeClicked={this.onNodeClicked}
-            onNodeDoubleClicked={this.onNodeDoubleClicked}
-            onHideRelationship={this.onHideRelationship}
-            onControlClicked={this.onControlClicked}
-            onHideOthers={this.onHideOthers}
-            onHideNonChildren={this.onHideNonChildren}
-            onHide={this.onHide}
-            onHideWithChildren={this.onHideWithChildren}
-            onCreateRelationship={this.onConfirmRelationshipCreate}
-            onGetRelationships={this.onGetRelationships}
-            onConfirmTwinDelete={this.onConfirmTwinDelete}
-            onConfirmRelationshipDelete={this.onConfirmRelationshipDelete}
-            onNodeMouseEnter={this.onNodeMouseEnter} />
+        <div className="pi-wrap">
+          <div className="pi-toggle">
+            <Icon
+              className="toggle-icon"
+              iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
+              onClick={this.togglePropertyInspector}
+              aria-label="Toggle property inspector"
+              role="button"
+              title="Toggle property inspector" />
+          </div>
+          <PropertyInspectorComponent />
         </div>
-        <div className="gc-filter">
-          <GraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} onCenter={this.onCenter} />
-        </div>
-        {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
       </div>
     );
   }
