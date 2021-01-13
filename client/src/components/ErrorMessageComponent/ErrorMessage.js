@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { apiService } from "../../services/ApiService";
 
@@ -18,7 +18,9 @@ export class ErrorMessageComponent extends Component {
     this.state = {
       showModal: false,
       errorMessage: "",
-      showFixAuth: false
+      showFixAuth: false,
+      showAuthSpinner: false,
+      showAuthStatus: 0
     };
   }
 
@@ -48,34 +50,45 @@ export class ErrorMessageComponent extends Component {
     this.setState({ showModal: false });
   }
 
-  fixPermissions = () => {
-    this.setState({showFixAuth: <Spinner />});
+  fixPermissions = async () => {
+    this.setState(
+      {showAuthSpinner: true,
+      showFixAuth: false});
     const requestParams = await apiService.addReaderRBAC();
-    for (const i in requestParams) {
-      if (requestParams[i]) {
-        switch (requestParams[i].status) {
-          case 201:
-            this.setState({showFixAuth: <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>});
-            break;
-          case 403:
-            this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>});
-            break;
-          case 409:
-            this.setState({showFixAuth: <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>});
-            break;
-          default:
-            this.setState({showFixAuth: <p>{requestParams[i].statusText}</p>});
-        }
-      }
-    }
+      this.setState(
+        {showAuthSpinner: false,
+        showAuthStatus: requestParams});
   }
 
   render() {
-    const { showModal, errorMessage, showFixAuth } = this.state;
-    let authButton = "";
+    const { showModal, errorMessage, showFixAuth, showAuthSpinner, showAuthStatus} = this.state;
+    let authComponent = "";
     if (showFixAuth) {
-      authButton = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
+      authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
     }
+    else if (showAuthSpinner) {
+      authComponent = <Spinner />;
+    }
+    else if (showAuthStatus !== 0){
+      authComponent = <p style={{margin: 7}}>{AUTH_NOT_FOUND_MESSAGE}</p>;
+      for (const i in showAuthStatus) {
+        if (showAuthStatus[i]) {
+          switch (showAuthStatus[i].status) {
+            case 201:
+              authComponent =  <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>;
+              break;
+            case 403:
+              authComponent =  <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>;
+              break;
+            case 409:
+              authComponent =  <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>;
+              break;
+            default:
+              authComponent =  <p>{showAuthStatus[i].statusText}</p>;
+          }
+        }
+      }
+    } 
     return (
       <ModalComponent
         isVisible={showModal}
@@ -85,7 +98,7 @@ export class ErrorMessageComponent extends Component {
           <p>{errorMessage}</p>
           <div className="btn-group">
             <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
-            {authButton}
+            {authComponent}
           </div>
         </div>
       </ModalComponent>

@@ -12,26 +12,29 @@ module.exports = function (app) {
   let tokenRBAC = null;
   let tokenGraph = null;
 
+  async function tokenSetRefresh(trToken, trCredential, trContext) {
+    let tmpTrToken = trToken;
+    if (!tmpTrToken || tmpTrToken.expiresOnTimestamp < Date.now()) {
+      tmpTrToken = await trCredential.getToken(trContext);
+    }
+    return tmpTrToken;
+  }
+
   const pathRewrite = async function (path, req) {
+    let destinationPath = "/api/proxy";
+    let requestToken = token;
     if (path.startsWith("/api/proxy/RBAC")) {
-      if (!tokenRBAC || tokenRBAC.expiresOnTimestamp < Date.now()) {
-        tokenRBAC = await credentialRBAC.getToken("https://management.azure.com/.default");
-      }
-      req.headers.authorization = `Bearer ${tokenRBAC.token}`;
-      return path.replace("/api/proxy/RBAC", "");
+      destinationPath = "/api/proxy/RBAC";
+      requestToken = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
+    } else if (path.startsWith("/api/proxy/Graph")) {
+      destinationPath = "/api/proxy/Graph";
+      requestToken = await tokenSetRefresh(tokenGraph, credentialGraph, "https://graph.microsoft.com/.default");
+    } else {
+      destinationPath = "/api/proxy";
+      requestToken = await tokenSetRefresh(token, credential, "https://digitaltwins.azure.net/.default");
     }
-    if (path.startsWith("/api/proxy/Graph")) {
-      if (!tokenGraph || tokenGraph.expiresOnTimestamp < Date.now()) {
-        tokenGraph = await credentialGraph.getToken("https://graph.microsoft.com/.default");
-      }
-      req.headers.authorization = `Bearer ${tokenGraph.token}`;
-      return path.replace("/api/proxy/Graph", "");
-    }
-    if (!token || token.expiresOnTimestamp < Date.now()) {
-      token = await credential.getToken("https://digitaltwins.azure.net/.default");
-    }
-    req.headers.authorization = `Bearer ${token.token}`;
-    return path.replace("/api/proxy", "");
+    req.headers.authorization = `Bearer ${requestToken.token}`;
+    return path.replace(destinationPath, "");
   };
 
   app.use(
