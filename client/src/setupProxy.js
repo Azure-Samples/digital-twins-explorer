@@ -25,13 +25,16 @@ module.exports = function (app) {
     let requestToken = token;
     if (path.startsWith("/api/proxy/RBAC")) {
       destinationPath = "/api/proxy/RBAC";
-      requestToken = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
+      tokenRBAC = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
+      requestToken = tokenRBAC;
     } else if (path.startsWith("/api/proxy/Graph")) {
       destinationPath = "/api/proxy/Graph";
-      requestToken = await tokenSetRefresh(tokenGraph, credentialGraph, "https://graph.microsoft.com/.default");
+      tokenGraph = await tokenSetRefresh(tokenGraph, credentialGraph, "https://graph.microsoft.com/.default");
+      requestToken = tokenGraph;
     } else {
       destinationPath = "/api/proxy";
-      requestToken = await tokenSetRefresh(token, credential, "https://digitaltwins.azure.net/.default");
+      token = await tokenSetRefresh(token, credential, "https://digitaltwins.azure.net/.default");
+      requestToken = token;
     }
     req.headers.authorization = `Bearer ${requestToken.token}`;
     return path.replace(destinationPath, "");

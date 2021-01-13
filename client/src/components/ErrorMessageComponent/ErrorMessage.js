@@ -53,10 +53,10 @@ export class ErrorMessageComponent extends Component {
   fixPermissions = async () => {
     this.setState(
       {showAuthSpinner: true,
-      showFixAuth: false});
+        showFixAuth: false});
     const requestParams = await apiService.addReaderRBAC();
-      this.setState(
-        {showAuthSpinner: false,
+    this.setState(
+      {showAuthSpinner: false,
         showAuthStatus: requestParams});
   }
 
@@ -65,30 +65,28 @@ export class ErrorMessageComponent extends Component {
     let authComponent = "";
     if (showFixAuth) {
       authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
-    }
-    else if (showAuthSpinner) {
+    } else if (showAuthSpinner) {
       authComponent = <Spinner />;
-    }
-    else if (showAuthStatus !== 0){
+    } else if (showAuthStatus !== 0) {
       authComponent = <p style={{margin: 7}}>{AUTH_NOT_FOUND_MESSAGE}</p>;
       for (const i in showAuthStatus) {
         if (showAuthStatus[i]) {
           switch (showAuthStatus[i].status) {
             case 201:
-              authComponent =  <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>;
+              authComponent = <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>;
               break;
             case 403:
-              authComponent =  <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>;
+              authComponent = <p style={{margin: 7}}>{AUTH_FORBIDDEN_MESSAGE}</p>;
               break;
             case 409:
-              authComponent =  <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>;
+              authComponent = <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>;
               break;
             default:
-              authComponent =  <p>{showAuthStatus[i].statusText}</p>;
+              authComponent = <p>{showAuthStatus[i].statusText}</p>;
           }
         }
       }
-    } 
+    }
     return (
       <ModalComponent
         isVisible={showModal}

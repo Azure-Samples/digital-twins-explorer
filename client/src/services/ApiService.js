@@ -354,8 +354,7 @@ class ApiService {
             fetch(`http://localhost:3000/api/proxy/RBAC${x.id}/providers/Microsoft.DigitalTwins/digitalTwinsInstances?api-version=2020-10-31`, subscriptionOptions)
               .then(response => response.json())
               .then(result => {
-                //console.log(result);
-                if ('value' in result && result.value.length > 0) {
+                if ("value" in result && result.value.length > 0) {
                   for (const value in result.value) {
                     if (typeof result.value[value].name === "string") {
                       if (result.value[value].name.toLowerCase() === subscriptionParams.appName.toLowerCase()) {
