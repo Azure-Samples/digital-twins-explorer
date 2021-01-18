@@ -103,7 +103,8 @@ export class PropertyInspectorComponent extends Component {
         const appendedSelection = {...selection};
         appendedSelection.telemetry = telemetry.data;
         this.setState({ selection: appendedSelection });
-        this.editor.update(appendedSelection);
+        this.original.telemetry = this.updated.telemetry = telemetry.data;
+        this.editor.update(this.updated);
       }
     });
   }
