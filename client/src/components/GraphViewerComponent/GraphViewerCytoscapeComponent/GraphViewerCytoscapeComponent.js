@@ -657,6 +657,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             this.graphControl.on("click", this.onControlClicked);
             this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
             this.graphControl.on("cxttap", "node", this.onNodeRightClick);
+            this.graphControl.on("mouseout", this.onNodeUnhover);
+            this.graphControl.on("mousedown", this.onNodeUnhover);
           }
         }} />
     );
