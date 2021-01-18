@@ -537,12 +537,12 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         <p>${modelDescription ? modelDescription : ""}</p>
       </div>
       <div>
-        <h4>DEFINED RELATIONSHIPS</h4>
-        <ul>${definedRelationships}</ul>
-      </div>
-      <div>
         <h4>DEFINED PROPERTIES</h4>
         <ul>${definedProperties}</ul>
+      </div>
+      <div>
+        <h4>DEFINED RELATIONSHIPS</h4>
+        <ul>${definedRelationships}</ul>
       </div>
     `;
     return div;
