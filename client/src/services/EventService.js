@@ -14,8 +14,8 @@ class EventService {
     this.queue = [];
   }
 
-  publishQuery(query) {
-    this._emit("query", { query });
+  publishQuery(query, overlayResults) {
+    this._emit("query", { query, overlayResults });
   }
 
   subscribeQuery(callback) {

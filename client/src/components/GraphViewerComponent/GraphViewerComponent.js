@@ -38,6 +38,8 @@ export class GraphViewerComponent extends React.Component {
       layout: "Klay",
       hideMode: "hide-selected",
       canShowAll: false,
+      overlayResults: false,
+      overlayItems: [],
       filterIsOpen: false,
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false
@@ -53,7 +55,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   componentDidMount() {
-    eventService.subscribeQuery(data => this.getData(data.query));
+    eventService.subscribeQuery(({ query, overlayResults }) => this.getData(query, overlayResults));
     eventService.subscribeDeleteTwin(id => {
       if (id) {
         this.onTwinDelete(id);
@@ -97,19 +99,20 @@ export class GraphViewerComponent extends React.Component {
     }
   }
 
-  async getData(query) {
+  async getData(query, overlayResults) {
     const { isLoading, selectedNode } = this.state;
     if (!query || isLoading) {
       return;
     }
 
-    this.setState({ query });
+    this.setState({ query, overlayResults });
     this.canceled = false;
 
     try {
       this.cyRef.current.clearSelection();
-      const allTwins = await this.getTwinsData(query);
-      await this.getRelationshipsData(allTwins, 30, false, true, REL_TYPE_OUTGOING);
+      const allTwins = await this.getTwinsData(query, overlayResults);
+      await this.getRelationshipsData(allTwins, 30, false, !overlayResults, REL_TYPE_OUTGOING);
+
       if (selectedNode) {
         const selected = allTwins.find(t => t.$dtId === selectedNode.id);
         if (selected) {
@@ -117,6 +120,8 @@ export class GraphViewerComponent extends React.Component {
         } else {
           eventService.publishSelection();
         }
+      } else if (overlayResults) {
+        this.cyRef.current.selectNodes(allTwins.filter(t => t.selected).map(t => t.$dtId));
       }
     } catch (exc) {
       if (exc.errorCode !== "user_cancelled") {
@@ -128,21 +133,32 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ isLoading: false, progress: 0 });
   }
 
-  async getTwinsData(query) {
+  async getTwinsData(query, overlayResults = false) {
     const allTwins = [];
+    let extraTwins = [];
     const existingTwins = this.cyRef.current.getTwins();
     this.updateProgress(5);
 
     await apiService.queryTwinsPaged(query, async twins => {
-      this.cyRef.current.addTwins(twins);
+      if (overlayResults) {
+        extraTwins = twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
+        this.cyRef.current.addTwins(extraTwins);
+      } else {
+        await this.cyRef.current.clearTwins();
+        this.cyRef.current.addTwins(twins);
+      }
       await this.cyRef.current.doLayout();
-      twins.forEach(x => allTwins.push(x));
+      twins.forEach(x => allTwins.push(overlayResults ? { ...x, selected: true } : x));
+      this.setState({ overlayItems: twins.map(t => t.$dtId) });
       this.updateProgress();
     });
     this.updateProgress(25);
 
-    const removeTwins = existingTwins.filter(x => allTwins.every(y => y.$dtId !== x));
-    this.cyRef.current.removeTwins(removeTwins);
+    if (overlayResults && extraTwins.length > 0) {
+      extraTwins.forEach(t => allTwins.push(t));
+    } else {
+      this.cyRef.current.removeTwins(extraTwins);
+    }
 
     return allTwins;
   }
@@ -356,6 +372,10 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ canShowAll: true });
   }
 
+  disableOverlay = () => {
+    this.setState({ overlayResults: false, overlayItems: [] });
+  }
+
   onConfirmTwinDelete = ({ target: node }) => {
     let { selectedNode, selectedNodes } = this.state;
     if (node && node.id()) {
@@ -425,7 +445,22 @@ export class GraphViewerComponent extends React.Component {
   }
 
   render() {
-    const { selectedNode, selectedNodes, selectedEdge, isLoading, query, progress, layout, hideMode, canShowAll, canShowAllRelationships, filterIsOpen, propertyInspectorIsOpen } = this.state;
+    const {
+      selectedNode,
+      selectedNodes,
+      selectedEdge,
+      isLoading,
+      query,
+      progress,
+      layout,
+      hideMode,
+      canShowAll,
+      canShowAllRelationships,
+      filterIsOpen,
+      propertyInspectorIsOpen,
+      overlayResults,
+      overlayItems
+    } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
         <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
@@ -459,6 +494,9 @@ export class GraphViewerComponent extends React.Component {
           </div>
           <div className="gc-wrap">
             <GraphViewerCytoscapeComponent ref={this.cyRef}
+              overlayResults={overlayResults}
+              overlayItems={overlayItems}
+              disableOverlay={this.disableOverlay}
               onEdgeClicked={this.onEdgeClicked}
               onNodeClicked={this.onNodeClicked}
               onNodeDoubleClicked={this.onNodeDoubleClicked}

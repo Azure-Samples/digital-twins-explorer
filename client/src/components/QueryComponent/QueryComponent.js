@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { TextField, Dropdown, DefaultButton, Icon, IconButton, FocusZone, FocusZoneTabbableElements } from "office-ui-fabric-react";
+import { TextField, Dropdown, DefaultButton, Icon, IconButton,
+  FocusZone, FocusZoneTabbableElements, Checkbox } from "office-ui-fabric-react";
 
 import { print } from "../../services/LoggingService";
 import { eventService } from "../../services/EventService";
@@ -29,7 +30,8 @@ export class QueryComponent extends Component {
       showSaveQueryModal: false,
       showConfirmDeleteModal: false,
       showConfirmOverwriteModal: false,
-      newQueryName: ""
+      newQueryName: "",
+      isOverlayResultsChecked: false
     };
   }
 
@@ -48,7 +50,7 @@ export class QueryComponent extends Component {
   executeQuery = event => {
     event.preventDefault();
     print(`Requested query: ${this.state.selectedQuery}`);
-    eventService.publishQuery(this.state.selectedQuery);
+    eventService.publishQuery(this.state.selectedQuery, this.state.isOverlayResultsChecked);
   }
 
   saveQueryButtonClicked = () => {
@@ -128,9 +130,13 @@ export class QueryComponent extends Component {
         tabIndex="0" />
     </div>)
 
+  onOverlayResultsChange = (e, checked) => {
+    this.setState({ isOverlayResultsChecked: !!checked });
+  };
+
   render() {
-    const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName, showConfirmDeleteModal, showConfirmOverwriteModal }
-      = this.state;
+    const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
+      showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
     return (
       <>
         <div className="qc-grid">
@@ -152,6 +158,7 @@ export class QueryComponent extends Component {
               </form>
             </FocusZone>
             <div className="qc-queryControls">
+              <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
               <DefaultButton className="query-button" onClick={this.executeQuery}>
                 Run Query
               </DefaultButton>

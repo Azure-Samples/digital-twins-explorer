@@ -44,6 +44,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "Klay";
+    this.isSelectingOnOverlay = false;
     this.isFetchingTwinData = false;
     this.contextMenuIsOpen = false;
     this.contextMenuItems = [
@@ -376,6 +377,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       this.graphControl.$(":selected").unselect();
       this.selectedNodes = [];
     }
+    this.selectedNodes = [];
   }
 
   showAllNodes = () => {
@@ -457,6 +459,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeSelected = ({ target: node }) => {
+    if (this.props.overlayResults && !this.isSelectingOnOverlay) {
+      this.isSelectingOnOverlay = true;
+      this.clearSelection();
+      this.selectedNodes = [];
+    }
     this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
     this.highlightRelatedNodes();
     this.onNodeClicked();
@@ -471,6 +478,32 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
     if (this.selectedNodes.length === 0) {
       this.clearSelection();
+    }
+  }
+
+  selectNodes = nodeIds => {
+    if (nodeIds.length > 0) {
+      const cy = this.graphControl;
+      this.selectedNodes = [];
+      cy.edges().toggleClass("opaque", true);
+      cy.edges().toggleClass("highlighted", false);
+      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", true));
+      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
+      nodeIds.forEach(id => {
+        const node = cy.elements(`node[id="${id}"]`);
+        if (node) {
+          this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
+          cy.$id(node.data().id).toggleClass("highlighted", true);
+          cy.$id(node.data().id).toggleClass("opaque", false);
+          node.connectedEdges().forEach(edge => {
+            const relatedNodeId = node.id() === edge.data().source ? edge.data().target : edge.data().source;
+            if (nodeIds.indexOf(relatedNodeId) !== -1) {
+              cy.$id(edge.data().id).toggleClass("highlighted", true);
+              cy.$id(edge.data().id).toggleClass("opaque", false);
+            }
+          });
+        }
+      });
     }
   }
 
@@ -578,10 +611,21 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
-      this.clearSelection();
-      this.contextMenu.hideMenuItem("add-relationship");
-      this.unselectSelectedNodes();
-      this.contextMenuIsOpen = false;
+      if (this.props.overlayResults) {
+        if (this.isSelectingOnOverlay) {
+          this.selectNodes(this.props.overlayItems);
+          this.isSelectingOnOverlay = false;
+        } else {
+          this.clearSelection();
+          this.unselectSelectedNodes();
+          this.props.disableOverlay();
+        }
+      } else {
+        this.clearSelection();
+        this.contextMenu.hideMenuItem("add-relationship");
+        this.unselectSelectedNodes();
+        this.contextMenuIsOpen = false;
+      }
     }
   }
 
