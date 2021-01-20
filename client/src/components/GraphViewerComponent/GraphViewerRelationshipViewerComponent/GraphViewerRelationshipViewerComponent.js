@@ -3,7 +3,7 @@
 
 import React, { Component } from "react";
 import { DefaultButton, Icon } from "office-ui-fabric-react";
-import jsonMarkup from "json-markup";
+import Prism from "prismjs";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -40,10 +40,6 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     }
   }
 
-  getMarkup(relationships) {
-    return { __html: jsonMarkup(relationships || {}) };
-  }
-
   async open() {
     const { selectedNode } = this.props;
     if (!selectedNode) {
@@ -64,7 +60,9 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       exc.customMessage = `Error in retrieving outgoing relationships for ${nodeId}`;
       eventService.publishError(exc);
     }
-    this.setState({ outgoingRelationships });
+    this.setState({ outgoingRelationships }, () => {
+      Prism.highlightAll();
+    });
   }
 
   async getIncomingRelationships(nodeId) {
@@ -76,7 +74,9 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       exc.customMessage = `Error in retrieving incoming relationships for ${nodeId}`;
       eventService.publishError(exc);
     }
-    this.setState({ incomingRelationships });
+    this.setState({ incomingRelationships }, () => {
+      Prism.highlightAll();
+    });
   }
 
   close = () => {
@@ -97,7 +97,11 @@ export class GraphViewerRelationshipViewerComponent extends Component {
           <div className="relationship-type">
             <h3>Incomming</h3>
             <div className="relationships">
-              <pre dangerouslySetInnerHTML={this.getMarkup(incomingRelationships)} />
+              <pre>
+                <code className="language-json">
+                  {JSON.stringify(incomingRelationships, null, 1)}
+                </code>
+              </pre>
             </div>
           </div>
         )}
@@ -106,7 +110,11 @@ export class GraphViewerRelationshipViewerComponent extends Component {
           <div className="relationship-type">
             <h3>Outgoing</h3>
             <div className="relationships">
-              <pre dangerouslySetInnerHTML={this.getMarkup(outgoingRelationships)} />
+              <pre>
+                <code className="language-json">
+                  {JSON.stringify(outgoingRelationships, null, 1)}
+                </code>
+              </pre>
             </div>
           </div>
         )}

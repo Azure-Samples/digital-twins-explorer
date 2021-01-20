@@ -165,3 +165,26 @@ body {
   font-family: $fontFamilyMain;
   padding: 30px;
 }
+
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+  background: transparent;
+  text-shadow: none;
+}
+
+code[class*="language-"], pre[class*="language-"] {
+  text-shadow: none;
+}
+
+.language-json {
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+    background: transparent;
+  }
+
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+    color: orange;
+  }
+
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+    color: lightgreen;
+  }
+}

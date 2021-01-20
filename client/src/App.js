@@ -22,6 +22,9 @@ import Messages from "./messages/messages";
 import { eventService } from "./services/EventService";
 import logo from "./assets/logo192.png";
 
+import "prismjs/components/prism-json";
+import "prismjs/themes/prism.css";
+
 class App extends Component {
 
   goldenLayoutConfig = {
