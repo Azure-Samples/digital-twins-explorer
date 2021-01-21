@@ -52,6 +52,7 @@ export class GraphViewerComponent extends React.Component {
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
     this.canceled = false;
+    this.modelService = new ModelService();
   }
 
   componentDidMount() {
@@ -271,15 +272,15 @@ export class GraphViewerComponent extends React.Component {
   }
 
   onNodeMouseEnter = async modelId => {
-    const modelService = new ModelService();
-    const model = await apiService.getModelById(modelId);
-    const properties = await modelService.getProperties(modelId);
-    const relationships = await modelService.getRelationships(modelId);
+    const model = await this.modelService.getModelById(modelId);
+    const properties = await this.modelService.getProperties(modelId);
+    const displayName = model && model.model ? model.model.displayName : model.displayName;
+    const description = model && model.model ? model.model.description : model.description;
     return {
-      displayName: model && model.model ? model.model.displayName : "",
-      description: model && model.model ? model.model.description : "",
+      displayName: displayName ? displayName : "",
+      description: description ? description : "",
       properties,
-      relationships
+      relationships: model ? model.relationships : []
     };
   };
 

@@ -7,6 +7,8 @@ import { apiService } from "./ApiService";
 import context from "./ref/context";
 
 const REL_TARGET_ANY = "*";
+const getModelDisplayName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:displayName;2");
+const getModelDescription = vertex => vertex.getAttributeValue("dtmi:dtdl:property:description;2");
 const getPropertyName = vertex => vertex.getAttributeValue("dtmi:dtdl:property:name;2");
 const getPropertyWritable = vertex => vertex.getAttributeValue("http://azure.com/DigitalTwin/MetaModel/undefinedTerm/writable");
 
@@ -103,6 +105,11 @@ export class ModelService {
         .map(x => x.name);
     }
     return sourceModel.relationships;
+  }
+
+  async getModelById(sourceModelId) {
+    await this.initialize();
+    return this._getModel(sourceModelId);
   }
 
   async getProperties(sourceModelId) {
@@ -221,7 +228,7 @@ export class ModelService {
   }
 
   _getModel(modelId) {
-    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [] };
+    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [], displayName: "", description: "" };
     const model = this.modelGraph.getVertex(modelId);
     if (model) {
       this._mapModel(model, contents);
@@ -232,6 +239,9 @@ export class ModelService {
 
   _mapModel(vertex, contents) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
+
+    contents.displayName = getModelDisplayName(vertex);
+    contents.description = getModelDescription(vertex);
 
     vertex
       .getOutgoing("dtmi:dtdl:property:contents;2")

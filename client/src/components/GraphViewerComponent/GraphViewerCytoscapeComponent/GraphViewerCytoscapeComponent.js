@@ -562,21 +562,37 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       <div>
         <h4>DTID:</h4>
         <p>${label}</p>
-        <h4>MODEL DISPLAY NAME:</h4>
-        <p>${modelDisplayName}</p>
+        ${
+          modelDisplayName
+            ? `<h4>MODEL DISPLAY NAME:</h4>
+          <p>${modelDisplayName}</p>`
+            : ""
+        }
         <h4>MODEL ID:</h4>
         <p>${modelId}</p>
-        <h4>DESCRIPTION:</h4>
-        <p>${modelDescription ? modelDescription : ""}</p>
+        ${
+          modelDescription
+            ? `<h4>DESCRIPTION:</h4>
+          <p>${modelDescription ? modelDescription : ""}</p>`
+            : ""
+        }
       </div>
-      <div>
-        <h4>DEFINED PROPERTIES</h4>
-        <ul>${definedProperties}</ul>
-      </div>
-      <div>
-        <h4>DEFINED RELATIONSHIPS</h4>
-        <ul>${definedRelationships}</ul>
-      </div>
+      ${
+        definedProperties
+          ? `<div>
+          <h4>DEFINED PROPERTIES</h4>
+          <ul>${definedProperties}</ul>
+        </div>`
+          : ""
+      }
+      ${
+        definedRelationships
+          ? `<div>
+          <h4>DEFINED RELATIONSHIPS</h4>
+          <ul>${definedRelationships}</ul>
+        </div>`
+          : ""
+      }
     `;
     return div;
   };
@@ -586,8 +602,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const { category, label, modelId } = node.data();
     if (category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
       this.isFetchingTwinData = true;
-      const { displayName, description, properties, relationships } = await this.props.onNodeMouseEnter(modelId);
-      if (!this.contextMenuIsOpen) {
+      const twinData = await this.props.onNodeMouseEnter(modelId);
+      if (twinData) {
+        const { displayName, description, properties, relationships } = twinData;
         node.popper({
           content: () => {
             const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
