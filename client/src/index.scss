@@ -173,6 +173,7 @@ body {
 
 code[class*="language-"], pre[class*="language-"] {
   text-shadow: none;
+  user-select: text;
 }
 
 .language-json {

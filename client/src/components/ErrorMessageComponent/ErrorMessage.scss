@@ -79,4 +79,8 @@
       margin-right: 0;
     }
   }
+
+  pre {
+    user-select: text;
+  }
 }
