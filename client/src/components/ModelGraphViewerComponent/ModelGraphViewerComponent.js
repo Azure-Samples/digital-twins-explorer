@@ -10,6 +10,8 @@ import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
 
 import "./ModelGraphViewerComponent.scss";
+import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
+import { Icon } from "office-ui-fabric-react";
 
 export class ModelGraphViewerComponent extends React.Component {
 
@@ -19,12 +21,16 @@ export class ModelGraphViewerComponent extends React.Component {
       progress: 0,
       isLoading: false,
       filterIsOpen: false,
+      modelDetailIsOpen: false,
       showRelationships: true,
       showInheritances: true,
-      showComponents: true
+      showComponents: true,
+      highlightingTerms: [],
+      filteringTerms: []
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
+    this.modelDetail = React.createRef();
     this.canceled = false;
     this.props.glContainer.on("show", this.initialize);
     this.modelService = new ModelService();
@@ -40,6 +46,7 @@ export class ModelGraphViewerComponent extends React.Component {
     eventService.subscribeCreateModel(() => this.retrieveModels());
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
+        this.modelService = new ModelService();
         this.cyRef.current.clearNodes();
         this.setState({ isLoading: false });
         this.retrieveModels();
@@ -64,7 +71,7 @@ export class ModelGraphViewerComponent extends React.Component {
       exc.customMessage = "Error fetching models";
       eventService.publishError(exc);
     }
-    const nodes = list.map(i => ({
+    this.allNodes = list.map(i => ({
       id: i.id,
       label: i.displayName ? i.displayName : i.id
     }));
@@ -104,7 +111,7 @@ export class ModelGraphViewerComponent extends React.Component {
         relationshipId: r.name
       }))
     );
-    this.cyRef.current.addNodes(nodes);
+    this.cyRef.current.addNodes(this.allNodes);
     this.cyRef.current.addRelationships(this.relationships, "related");
     this.cyRef.current.addRelationships(this.componentRelationships, "component");
     this.cyRef.current.addRelationships(this.extendRelationships, "extends");
@@ -188,6 +195,14 @@ export class ModelGraphViewerComponent extends React.Component {
     }
   }
 
+  onNodeClicked = modelId => {
+    this.modelDetail.current.loadModel(modelId);
+  }
+
+  onControlClicked = () => {
+    this.modelDetail.current.clear();
+  }
+
   getContents = (properties, telemetries) => {
     let definedProperties = "";
     let definedTelemetries = "";
@@ -219,31 +234,119 @@ export class ModelGraphViewerComponent extends React.Component {
     return div;
   };
 
+  onAddFilteringTerm = term => {
+    const { filteringTerms } = this.state;
+    filteringTerms.push(term);
+    this.setState({ filteringTerms }, () => {
+      this.filterNodes();
+    });
+  }
+
+  onRemoveFilteringTerm = term => {
+    const { filteringTerms } = this.state;
+    filteringTerms.splice(filteringTerms.map(t => t.text).indexOf(term.text), 1);
+    this.setState({ filteringTerms }, () => {
+      this.filterNodes();
+    });
+  }
+
+  onAddHighlightingTerm = term => {
+    const { highlightingTerms } = this.state;
+    highlightingTerms.push(term);
+    this.setState({ highlightingTerms }, () => {
+      this.highlightNodes();
+    });
+  }
+
+  onRemoveHighlightingTerm = term => {
+    const { highlightingTerms } = this.state;
+    highlightingTerms.splice(highlightingTerms.map(t => t.text).indexOf(term.text), 1);
+    this.setState({ highlightingTerms }, () => {
+      this.highlightNodes();
+    });
+  }
+
+  highlightNodes = () => {
+    const { highlightingTerms } = this.state;
+    this.cyRef.current.clearHighlighting();
+    const termsFilteringId = highlightingTerms.filter(term => term.matchDtmi).map(term => term.text);
+    const highlightedNodes = this.allNodes.filter(node => termsFilteringId.some(term => node.id.toLowerCase().includes(term.toLowerCase())));
+    if (highlightedNodes.length > 0) {
+      this.cyRef.current.highlightNodes(highlightedNodes);
+    }
+  }
+
+  filterNodes = () => {
+    const { filteringTerms } = this.state;
+    const termsFilteringId = filteringTerms.filter(term => term.matchDtmi).map(term => term.text);
+    const filteredNodes = this.allNodes.filter(node => termsFilteringId.some(term => node.id.toLowerCase().includes(term.toLowerCase())));
+    this.cyRef.current.showAllNodes();
+    if (filteredNodes.length > 0) {
+      this.cyRef.current.filterNodes(filteredNodes);
+    }
+  }
+
+  resetFiltering = () => {
+    this.cyRef.current.showAllNodes();
+    this.cyRef.current.clearHighlighting();
+  }
+
+  toggleModelDetail = () => {
+    const { modelDetailIsOpen } = this.state;
+    this.setState({ modelDetailIsOpen: !modelDetailIsOpen });
+  }
+
   render() {
-    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents } = this.state;
+    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen } = this.state;
     return (
-      <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
-        <div className="gc-wrap">
-          <ModelGraphViewerCytoscapeComponent
-            onNodeHover={this.onNodeHover}
-            onNodeUnhover={this.onNodeUnhover}
-            ref={this.cyRef} />
-          <ModelGraphViewerRelationshipsToggle
-            onRelationshipsToggleChange={this.onRelationshipsToggleChange}
-            onInheritancesToggleChange={this.onInheritancesToggleChange}
-            onComponentsToggleChange={this.onComponentsToggleChange}
-            showRelationships={showRelationships}
-            showInheritances={showInheritances}
-            showComponents={showComponents} />
+      <div className={`mgv-wrap ${modelDetailIsOpen ? "md-open" : "md-closed"}`}>
+        <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
+          <div className="gc-wrap">
+            <ModelGraphViewerCytoscapeComponent
+              onNodeClicked={this.onNodeClicked}
+              onControlClicked={this.onControlClicked}
+              onNodeHover={this.onNodeHover}
+              onNodeUnhover={this.onNodeUnhover}
+              isHighlighting={highlightingTerms && highlightingTerms.length > 0}
+              highlightFilteredNodes={this.highlightFilteredNodes}
+              ref={this.cyRef} />
+            <ModelGraphViewerRelationshipsToggle
+              onRelationshipsToggleChange={this.onRelationshipsToggleChange}
+              onInheritancesToggleChange={this.onInheritancesToggleChange}
+              onComponentsToggleChange={this.onComponentsToggleChange}
+              showRelationships={showRelationships}
+              showInheritances={showInheritances}
+              showComponents={showComponents} />
+          </div>
+          <div className="gc-filter">
+            <ModelGraphViewerFilteringComponent
+              toggleFilter={this.toggleFilter}
+              onZoomIn={this.onZoomIn}
+              onZoomOut={this.onZoomOut}
+              onZoomToFit={this.onZoomToFit}
+              onAddHighlightingTerm={this.onAddHighlightingTerm}
+              onRemoveHighlightingTerm={this.onRemoveHighlightingTerm}
+              onAddFilteringTerm={this.onAddFilteringTerm}
+              onRemoveFilteringTerm={this.onRemoveFilteringTerm}
+              resetFiltering={this.resetFiltering} />
+          </div>
+          {isLoading && (
+            <LoaderComponent
+              message={`${Math.round(progress)}%`}
+              cancel={() => (this.canceled = true)} />
+          )}
         </div>
-        <div className="gc-filter">
-          <ModelGraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} />
+        <div className="model-detail">
+          <div className="detail-toggle" onClick={this.toggleModelDetail}>
+            <Icon
+              className="toggle-icon"
+              iconName={modelDetailIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
+              aria-label="Toggle model details"
+              role="button"
+              title="Toggle model details" />
+          </div>
+          <ModelGraphViewerModelDetailComponent ref={this.modelDetail} />
         </div>
-        {isLoading && (
-          <LoaderComponent
-            message={`${Math.round(progress)}%`}
-            cancel={() => (this.canceled = true)} />
-        )}
       </div>
     );
   }

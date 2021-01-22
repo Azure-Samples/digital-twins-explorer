@@ -8,23 +8,23 @@ export const graphStyles = [
   {
     selector: "node",
     style: {
-      width: "80px",
-      height: "20px",
+      width: "60px",
+      height: "12px",
       shape: "round-rectangle",
-      "border-radius": "5px",
       "background-color": "#0471BD",
       label: "data(label)",
       "text-halign": "center",
       "text-valign": "center",
       color: "#ccc",
-      "font-size": "10px",
+      "font-size": "6px",
       "font-family": "Segoe UI, sans-serif",
       "font-weight": 400,
       "text-wrap": "ellipsis",
-      "text-max-width": "60px",
+      "text-max-width": "54px",
       "background-fit": "contain",
       "background-repeat": "no-repeat",
       "background-clip": "none",
+      "text-justification": "center"
     },
   },
   {
@@ -47,14 +47,14 @@ export const graphStyles = [
       //"mid-target-arrow-color": "#ccc",
       //"mid-target-arrow-shape": "triangle",
       label: "data(label)",
-      color: "#777",
+      color: "#fff",
       "font-size": "8px",
       "font-family": "Segoe UI, sans-serif",
       "font-weight": 200,
       "text-rotation": "autorotate",
       "text-wrap": "ellipsis",
       "text-max-width": "60px",
-      "text-margin-y": "-7px",
+      "text-margin-y": "-7px"
     },
   },
   {
@@ -85,7 +85,7 @@ export const graphStyles = [
       "target-arrow-color": "#FFB500",
       "source-arrow-color": "#FFB500",
       "target-arrow-shape": "chevron",
-      "arrow-scale": 1.25
+      "arrow-scale": 1
     },
   },
   {
@@ -97,7 +97,7 @@ export const graphStyles = [
       "source-arrow-color": "#126139",
       "target-arrow-shape": "triangle",
       "target-arrow-fill" : "hollow",
-      "arrow-scale": 1.25
+      "arrow-scale": 1
     },
   },
   {
@@ -108,7 +108,7 @@ export const graphStyles = [
       "target-arrow-color": "#0471BD",
       "source-arrow-color": "#0471BD",
       "source-arrow-shape": "diamond",
-      "arrow-scale": 1.25
+      "arrow-scale": 1
     },
   },
   {
@@ -123,14 +123,22 @@ export const graphStyles = [
       opacity: "0.4",
     },
   },
+  {
+    selector: ".hide-label",
+    style: {
+      "text-opacity": "0",
+    },
+  },
 ];
 
 export const modelWithImageStyle = {
-  "background-height": "14px",
-  "background-width": "14px",
+  "background-height": "9px",
+  "background-width": "9px",
   "background-fit": "none",
-  "background-position-x": "3px",
-  "background-position-y": "3px",
+  "background-position-x": "1.5px",
+  "background-position-y": "1.5px",
   "text-margin-x": "3px",
-  "text-max-width": "50px",
+  "text-max-width": "44px",
 };
+
+export const minZoomShowLabels = 0.85;

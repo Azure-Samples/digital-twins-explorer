@@ -12,6 +12,7 @@ import klay from "cytoscape-klay";
 import d3Force from "cytoscape-d3-force";
 import dblclick from "cytoscape-dblclick";
 import popper from "cytoscape-popper";
+import navigator from "cytoscape-navigator";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
@@ -38,6 +39,7 @@ cytoscape.use(fcose);
 cytoscape.use(d3Force);
 cytoscape.use(dblclick);
 cytoscape.use(popper);
+cytoscape.use(navigator);
 
 class App extends Component {
 
@@ -88,7 +90,7 @@ class App extends Component {
               },
               {
                 type: "stack",
-                width: 65,
+                width: 85,
                 content: [
                   {
                     title: "GRAPH VIEW",
@@ -115,17 +117,6 @@ class App extends Component {
                     }
                   }
                 ]
-              },
-              {
-                title: "PROPERTY EXPLORER",
-                isClosable: false,
-                id: "gl-property-inspector",
-                width: 20,
-                type: "react-component",
-                component: "propInspector",
-                setting: {
-                  showCloseIcon: false
-                }
               }
             ]
           }

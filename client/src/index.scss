@@ -231,3 +231,60 @@ body {
     }
   }
 }
+
+.cytoscape-navigator{
+	position: fixed;
+	border: 1px solid #000;
+	background: #fff;
+	z-index: 99999;
+	width: 400px;
+	height: 400px;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+}
+
+.cytoscape-navigator > img{
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.cytoscape-navigator > canvas{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
+.cytoscape-navigatorView{
+	position: absolute;
+	top: 0;
+	left: 0;
+	cursor: move;
+	background: #B7E1ED;
+	-moz-opacity: 0.50;
+	opacity: 0.50;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=50);
+	z-index: 102;
+}
+
+.cytoscape-navigatorOverlay{
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+  z-index: 103;
+}
+
+.language-json {
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+    background: transparent;
+  }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+    color: orange;
+  }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+    color: lightgreen;
+  }
+}

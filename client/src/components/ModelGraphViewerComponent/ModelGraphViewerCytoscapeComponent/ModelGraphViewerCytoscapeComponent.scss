@@ -8,3 +8,22 @@
   background-color: $backgroundColor3;
   grid-row: 2;
 }
+
+.navigator-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: $backgroundColor2;
+  height: 200px;
+  width: 240px;
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid $backgroundColor4;
+  .graph-navigator {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: $backgroundColor3;
+  }
+}

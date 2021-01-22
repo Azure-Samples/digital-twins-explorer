@@ -4,8 +4,8 @@
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 
-import { graphStyles, modelWithImageStyle } from "./config";
-import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions, d3ForceOptions } from "../../../config/CytoscapeConfig";
+import { graphStyles, modelWithImageStyle, minZoomShowLabels } from "./config";
+import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions, d3ForceOptions, navigationOptions } from "../../../config/CytoscapeConfig";
 import { settingsService } from "../../../services/SettingsService";
 
 import "./ModelGraphViewerCytoscapeComponent.scss";
@@ -26,6 +26,8 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "d3Force";
+    this.hoverTimeout = null;
+    this.isHidingLabels = false;
   }
 
   addNodes(nodes) {
@@ -155,9 +157,12 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeSelected = ({ target: node }) => {
+    const { onNodeClicked } = this.props;
     this.selectedNodes.push({ id: node.id() });
     this.highlightRelatedNodes();
-    this.onNodeClicked();
+    if (onNodeClicked) {
+      onNodeClicked(node.id());
+    }
   }
 
   onNodeUnselected = e => {
@@ -165,22 +170,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     if (removed >= 0) {
       this.selectedNodes.splice(removed, 1);
       this.highlightRelatedNodes();
-      this.onNodeClicked();
     }
   }
 
   onEdgeSelected = e => {
     this.props.onEdgeClicked(e.target.data());
-  }
-
-  onNodeClicked = async () => {
-    const { onNodeClicked } = this.props;
-    if (onNodeClicked) {
-      await onNodeClicked({
-        selectedNode: this.selectedNodes.length > 0 ? this.selectedNodes[this.selectedNodes.length - 1] : null,
-        selectedNodes: this.selectedNodes.length > 0 ? this.selectedNodes : null
-      });
-    }
   }
 
   onNodeDoubleClicked = e => {
@@ -196,10 +190,16 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   }
 
   onControlClicked = e => {
-    if (e.target === this.graphControl && this.props.onControlClicked) {
-      const cy = this.graphControl;
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", false));
-      this.props.onControlClicked(e);
+    if (e.target === this.graphControl) {
+      const { isHighlighting, highlightFilteredNodes } = this.props;
+      if (isHighlighting && highlightFilteredNodes) {
+        highlightFilteredNodes();
+      } else {
+        this.clearHighlighting();
+      }
+      if (this.props.onControlClicked) {
+        this.props.onControlClicked(e);
+      }
     }
   }
 
@@ -228,12 +228,35 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
           cy.$id(cyNode.id()).toggleClass("opaque", false);
         }
       });
-    } else {
-      cy.nodes().forEach(cyNode => {
-        cy.$id(cyNode.id()).toggleClass("opaque", false);
-      });
-      cy.edges().toggleClass("opaque", false);
     }
+  }
+
+  highlightNodes(nodes) {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", true);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("opaque", true);
+    });
+    nodes.forEach(node => {
+      const selectedNode = cy.nodes().filter(n => n.id() === node.id);
+      cy.$id(selectedNode.id()).toggleClass("opaque", false);
+      const connectedEdges = selectedNode.connectedEdges();
+      connectedEdges.forEach(edge => {
+        cy.$id(edge.data().id).toggleClass("highlighted", true);
+        cy.$id(edge.data().id).toggleClass("opaque", false);
+      });
+    });
+  }
+
+  clearHighlighting = () => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", false);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("highlighted", false);
+      cy.$id(cyNode.id()).toggleClass("opaque", false);
+    });
   }
 
   zoomToFit() {
@@ -259,6 +282,10 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeUnhover = () => {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
     if (this.props.onNodeUnhover) {
       this.props.onNodeUnhover();
     }
@@ -269,7 +296,9 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     if (target !== this.graphControl) {
       const { category, label } = target.data();
       if (category === "Model" && this.props.onNodeHover) {
-        this.props.onNodeHover(target.id(), label);
+        this.hoverTimeout = setTimeout(() => {
+          this.props.onNodeHover(target.id(), label);
+        }, 1000);
       }
     }
   }
@@ -282,24 +311,62 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
+  showAllNodes = () => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("hide", false);
+    });
+    cy.edges().forEach(cyEdge => {
+      cy.$id(cyEdge.id()).toggleClass("hide", false);
+    });
+  }
+
+  filterNodes = nodes => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => node.id === cyNode.id()));
+    });
+  }
+
+  onGraphZoom = () => {
+    const cy = this.graphControl;
+    if (cy.zoom() <= minZoomShowLabels && !this.isHidingLabels) {
+      this.isHidingLabels = true;
+      cy.edges().toggleClass("hide-label", true);
+    } else {
+      this.isHidingLabels = false;
+      cy.edges().toggleClass("hide-label", false);
+      cy.edges(".extends").toggleClass("hide-label", true);
+    }
+  }
+
   render() {
     return (
-      <CytoscapeComponent elements={[]}
-        className="graph-control"
-        stylesheet={graphStyles}
-        maxZoom={2}
-        cy={cy => {
-          if (this.graphControl !== cy) {
-            this.graphControl = cy;
-            this.graphControl.dblclick();
-            this.graphControl.on("select", "node", this.onNodeSelected);
-            this.graphControl.on("unselect", "node", this.onNodeUnselected);
-            this.graphControl.on("select", "edge", this.onEdgeSelected);
-            this.graphControl.on("click", this.onControlClicked);
-            this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
-            this.graphControl.on("mouseover", this.onNodeHover);
-          }
-        }} />
+      <div style={{ position: "relative", height: "100%" }}>
+        <CytoscapeComponent elements={[]}
+          className="graph-control"
+          stylesheet={graphStyles}
+          maxZoom={2}
+          cy={cy => {
+            if (this.graphControl !== cy) {
+              this.graphControl = cy;
+              this.graphControl.navigator({ ...navigationOptions, container: "#model-graph-viewer-nav" });
+              this.graphControl.dblclick();
+              this.graphControl.on("select", "node", this.onNodeSelected);
+              this.graphControl.on("unselect", "node", this.onNodeUnselected);
+              this.graphControl.on("select", "edge", this.onEdgeSelected);
+              this.graphControl.on("click", this.onControlClicked);
+              this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
+              this.graphControl.on("mouseover", this.onNodeHover);
+              this.graphControl.on("mouseout", this.onNodeUnhover);
+              this.graphControl.on("mousedown", this.onNodeUnhover);
+              this.graphControl.on("zoom", this.onGraphZoom);
+            }
+          }} />
+        <div className="navigator-container">
+          <div id="model-graph-viewer-nav" className="graph-navigator" />
+        </div>
+      </div>
     );
   }
 
