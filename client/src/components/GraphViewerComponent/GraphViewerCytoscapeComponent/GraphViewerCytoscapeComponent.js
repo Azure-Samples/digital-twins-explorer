@@ -13,8 +13,9 @@ import klay from "cytoscape-klay";
 import dblclick from "cytoscape-dblclick";
 import contextMenus from "cytoscape-context-menus";
 import popper from "cytoscape-popper";
+import navigator from "cytoscape-navigator";
 
-import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions } from "./config";
+import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
 import { getUniqueRelationshipId } from "../../../utils/utilities";
 import { settingsService } from "../../../services/SettingsService";
 
@@ -28,6 +29,7 @@ cytoscape.use(fcose);
 cytoscape.use(dblclick);
 cytoscape.use(contextMenus);
 cytoscape.use(popper);
+cytoscape.use(navigator);
 
 export const GraphViewerCytoscapeLayouts = {
   "Cola": colaOptions,
@@ -703,25 +705,31 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   render() {
     return (
-      <CytoscapeComponent elements={[]}
-        className="graph-control"
-        stylesheet={graphStyles}
-        maxZoom={2}
-        cy={cy => {
-          if (this.graphControl !== cy) {
-            this.graphControl = cy;
-            this.graphControl.dblclick();
-            this.graphControl.on("mouseover", this.onNodeHover);
-            this.graphControl.on("select", "node", this.onNodeSelected);
-            this.graphControl.on("unselect", "node", this.onNodeUnselected);
-            this.graphControl.on("select", "edge", this.onEdgeSelected);
-            this.graphControl.on("click", this.onControlClicked);
-            this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
-            this.graphControl.on("cxttap", "node", this.onNodeRightClick);
-            this.graphControl.on("mouseout", this.onNodeUnhover);
-            this.graphControl.on("mousedown", this.onNodeUnhover);
-          }
-        }} />
+      <div style={{ position: "relative", height: "100%" }}>
+        <CytoscapeComponent elements={[]}
+          className="graph-control"
+          stylesheet={graphStyles}
+          maxZoom={2}
+          cy={cy => {
+            if (this.graphControl !== cy) {
+              this.graphControl = cy;
+              this.graphControl.navigator({ ...navigationOptions, container: "#graph-viewer-nav" });
+              this.graphControl.dblclick();
+              this.graphControl.on("mouseover", this.onNodeHover);
+              this.graphControl.on("select", "node", this.onNodeSelected);
+              this.graphControl.on("unselect", "node", this.onNodeUnselected);
+              this.graphControl.on("select", "edge", this.onEdgeSelected);
+              this.graphControl.on("click", this.onControlClicked);
+              this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
+              this.graphControl.on("cxttap", "node", this.onNodeRightClick);
+              this.graphControl.on("mouseout", this.onNodeUnhover);
+              this.graphControl.on("mousedown", this.onNodeUnhover);
+            }
+          }} />
+        <div className="navigator-container">
+          <div id="graph-viewer-nav" className="graph-navigator" />
+        </div>
+      </div>
     );
   }
 
