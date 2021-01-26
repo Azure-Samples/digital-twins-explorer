@@ -52,7 +52,7 @@
     max-height: 155px;
     padding: 12px 15px;
     overflow-y: scroll;
-
+    user-select: text;
     p {
       color: $outlineColor4;
       font-family: 'Courier New', Courier, monospace;

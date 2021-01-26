@@ -234,3 +234,50 @@ code[class*="language-"], pre[class*="language-"] {
     color: lightgreen;
   }
 }
+
+#cy-popper {
+  background-color: $backgroundColor2;
+  box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  color: white;
+  border: 1px solid $backgroundColor4;
+  div {
+    padding: 8px;
+    border-bottom: 1px solid rgb(78, 76, 82);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  >div {
+    p {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h4, p, ul {
+    margin: 0;
+    padding: 0;
+  }
+  h4 {
+    color: $textColorLight2;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  p {
+    color: $textColorLight1;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  ul {
+    list-style: none;
+    max-height: 50px;
+    overflow: auto;
+
+    li {
+      padding: 2px 8px 2px 4px;
+      font-size: 13px;
+    }
+  }
+}
