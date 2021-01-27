@@ -48,6 +48,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.layout = "Klay";
     this.isSelectingOnOverlay = false;
     this.isFetchingTwinData = false;
+    this.canRenderPopper = false;
     this.contextMenuIsOpen = false;
     this.contextMenuItems = [
       {
@@ -560,6 +561,13 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const { definedProperties, definedRelationships } = this.getContents(properties, relationships);
     const div = document.createElement("div");
     div.setAttribute("id", "cy-popper");
+    div.addEventListener("mouseenter", () => {
+      this.canRenderPopper = true;
+    });
+    div.addEventListener("mouseleave", () => {
+      this.canRenderPopper = false;
+      this.removePopper();
+    });
     div.innerHTML = `
       <div>
         <h4>DTID:</h4>
@@ -599,28 +607,49 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     return div;
   };
 
-  onNodeHover = async ({ target: node }) => {
-    this.onNodeUnhover();
+  onNodeHover = ({ target: node }) => {
+    this.removePopper();
     const { category, label, modelId } = node.data();
-    if (category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
-      this.isFetchingTwinData = true;
-      const twinData = await this.props.onNodeMouseEnter(modelId);
-      if (twinData) {
-        const { displayName, description, properties, relationships } = twinData;
-        node.popper({
-          content: () => {
-            const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
-            document.body.appendChild(contentDiv);
-            return contentDiv;
-          },
-          popper: {}
-        });
-      }
-      this.isFetchingTwinData = false;
+    if (node !== this.graphControl && category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
+      this.canRenderPopper = true;
+      this.hoverTimeout = setTimeout(async () => {
+        this.isFetchingTwinData = true;
+        const twinData = await this.props.onNodeMouseEnter(modelId);
+        if (twinData) {
+          const { displayName, description, properties, relationships } = twinData;
+          if (this.canRenderPopper) {
+            node.popper({
+              content: () => {
+                const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
+                document.body.appendChild(contentDiv);
+                return contentDiv;
+              },
+              popper: {}
+            });
+          }
+        }
+        this.isFetchingTwinData = false;
+      }, 1000);
     }
   }
 
   onNodeUnhover = () => {
+    if (this.isFetchingTwinData) {
+      this.canRenderPopper = false;
+    }
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    this.canRenderPopper = false;
+    this.unhoverTimeout = setTimeout(() => {
+      if (!this.canRenderPopper) {
+        this.removePopper();
+      }
+    }, 200);
+  }
+
+  removePopper = () => {
     const activePopper = document.querySelector("#cy-popper");
     if (activePopper) {
       activePopper.parentNode.removeChild(activePopper);
