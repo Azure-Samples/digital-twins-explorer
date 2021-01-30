@@ -355,6 +355,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     return settingsService.getModelImage(modelId);
   }
 
+  clearOverlay = () => {
+    this.clearSelection();
+    this.unselectSelectedNodes();
+  }
+
   clearSelection = () => {
     const cy = this.graphControl;
     cy.nodes().forEach(cyNode => {
@@ -664,14 +669,12 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           this.selectNodes(this.props.overlayItems);
           this.isSelectingOnOverlay = false;
         } else {
-          this.clearSelection();
-          this.unselectSelectedNodes();
+          this.clearOverlay();
           this.props.disableOverlay();
         }
       } else {
-        this.clearSelection();
+        this.clearOverlay();
         this.contextMenu.hideMenuItem("add-relationship");
-        this.unselectSelectedNodes();
         this.contextMenuIsOpen = false;
       }
     }

@@ -56,7 +56,14 @@ export class GraphViewerComponent extends React.Component {
   }
 
   componentDidMount() {
-    eventService.subscribeQuery(({ query, overlayResults }) => this.getData(query, overlayResults));
+    eventService.subscribeQuery(query => this.getData(query));
+    eventService.subscribeOverlayQueryResults(overlayResults => {
+      if (this.state.overlayResults && !overlayResults) {
+        this.disableOverlay();
+        this.cyRef.current.clearOverlay();
+      }
+      this.setState({ overlayResults });
+    });
     eventService.subscribeDeleteTwin(id => {
       if (id) {
         this.onTwinDelete(id);
@@ -100,13 +107,13 @@ export class GraphViewerComponent extends React.Component {
     }
   }
 
-  async getData(query, overlayResults) {
-    const { isLoading, selectedNode } = this.state;
+  async getData(query) {
+    const { isLoading, selectedNode, overlayResults } = this.state;
     if (!query || isLoading) {
       return;
     }
 
-    this.setState({ query, overlayResults });
+    this.setState({ query });
     this.canceled = false;
 
     try {

@@ -50,7 +50,7 @@ export class QueryComponent extends Component {
   executeQuery = event => {
     event.preventDefault();
     print(`Requested query: ${this.state.selectedQuery}`);
-    eventService.publishQuery(this.state.selectedQuery, this.state.isOverlayResultsChecked);
+    eventService.publishQuery(this.state.selectedQuery);
   }
 
   saveQueryButtonClicked = () => {
@@ -132,6 +132,7 @@ export class QueryComponent extends Component {
 
   onOverlayResultsChange = (e, checked) => {
     this.setState({ isOverlayResultsChecked: !!checked });
+    eventService.publishOverlayQueryResults(!!checked);
   };
 
   render() {
