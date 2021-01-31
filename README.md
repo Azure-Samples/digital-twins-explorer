@@ -129,10 +129,12 @@ To upload a model, click on the *Upload a model* button and select one more JSON
 
 For each model, you can:
 1. **Delete**: remove the definition from your ADT environment.
+1. **Upload Model Image**: upload a custom twin image to be displayed in the graph view.
+    >**NOTE:** To bulk upload model images, you can click the **Upload Model Images** icon in the nav bar in the model view panel. The name of your image file should match the model ID however replace ":" with "_" and ";" with "-". 
 1. **View**: see the raw JSON definition of the model.
 1. **Create a new twin**: create a new instance of the model as a twin in the ADT environment. No properties are set as part of this process (aside from name).
 
-The models shown in the example screenshot are available in the `examples` folder in this repository (`client/examples`). 
+Sample models are available in the `examples` folder in this repository (`client/examples`). 
 
 ### Creating Twins and Relationships
 
