@@ -163,10 +163,8 @@ export class ModelViewerComponent extends Component {
           .join(".")
           .toLowerCase();
         const matchedModels = models.filter(model => {
-          const formattedModelName = model.id.toLowerCase().split(":")
-            .join("_")
-            .split(";")
-            .join("-");
+          const formattedModelName = model.id.toLowerCase().replace(/:/g, "_")
+            .replace(/;/g, "-");
           return formattedModelName === fileNameWithoutExtension;
         });
         if (matchedModels.length > 0) {
