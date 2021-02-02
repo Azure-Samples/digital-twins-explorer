@@ -343,3 +343,5 @@ When running in the cloud, Azure Functions hosts three services to support the f
 1. Proxy: this proxies requests through the ADT service (much in the same way as the proxy used when running locally).
 1. SignalR: this allows clients to retrieve credentials to access the SignalR service for live telemetry updates. It also validates that the endpoint and route required to stream information from the ADT service to the ADT Explorer app is in place. If the managed service identity for the Function is configured correctly (i.e. has write permissions on the resource group and can administer the ADT service), then it can create these itself.
 1. EventGrid: this receives messages from the Event Grid to broadcasts them to any listening clients using SignalR. The messages are sent from ADT to the function via ADT endpoint and route.
+
+> NOTE: If you have hosting the application somewhere other than Azure Functions. Then we recommend you add the Content Security Policy to you environment as defined in the `proxies.json` file.
