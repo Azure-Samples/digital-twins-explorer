@@ -20,11 +20,10 @@ import { eventService } from "../../services/EventService";
 import { print } from "../../services/LoggingService";
 import { BatchService } from "../../services/BatchService";
 import { settingsService } from "../../services/SettingsService";
-import { REL_TYPE_OUTGOING } from "../../services/Constants";
+import { REL_TYPE_OUTGOING, DETAIL_MIN_WIDTH } from "../../services/Constants";
 import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
-
 export class GraphViewerComponent extends React.Component {
 
   constructor(props) {
@@ -42,7 +41,8 @@ export class GraphViewerComponent extends React.Component {
       overlayItems: [],
       filterIsOpen: false,
       propertyInspectorIsOpen: true,
-      canShowAllRelationships: false
+      canShowAllRelationships: false,
+      modelDetailWidth: DETAIL_MIN_WIDTH
     };
     this.view = React.createRef();
     this.create = React.createRef();
@@ -53,6 +53,8 @@ export class GraphViewerComponent extends React.Component {
     this.commandRef = React.createRef();
     this.canceled = false;
     this.modelService = new ModelService();
+    this.resizeStartX = 0;
+    this.resizeEndX = 0;
   }
 
   componentDidMount() {
@@ -452,6 +454,30 @@ export class GraphViewerComponent extends React.Component {
     });
   }
 
+  handleMouseMove = e => {
+    this.resizeEndX = this.resizeStartX - e.screenX;
+    if (this.resizeEndX >= DETAIL_MIN_WIDTH) {
+      this.setState({
+        modelDetailWidth: DETAIL_MIN_WIDTH + ((this.resizeEndX * 100) / window.innerWidth)
+      });
+    }
+  };
+
+  handleMouseUp = e => {
+    e.preventDefault();
+    window.removeEventListener("mousemove", this.handleMouseMove);
+    window.removeEventListener("mouseup", this.handleMouseUp);
+  };
+
+  handleMouseDown = e => {
+    e.preventDefault();
+    if (this.resizeStartX === 0) {
+      this.resizeStartX = e.screenX;
+    }
+    window.addEventListener("mousemove", this.handleMouseMove);
+    window.addEventListener("mouseup", this.handleMouseUp);
+  };
+
   render() {
     const {
       selectedNode,
@@ -467,7 +493,8 @@ export class GraphViewerComponent extends React.Component {
       filterIsOpen,
       propertyInspectorIsOpen,
       overlayResults,
-      overlayItems
+      overlayItems,
+      modelDetailWidth
     } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
@@ -525,7 +552,7 @@ export class GraphViewerComponent extends React.Component {
           </div>
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
-        <div className="pi-wrap">
+        <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${modelDetailWidth}%` : 0}}>
           <div className="pi-toggle">
             <Icon
               className="toggle-icon"
@@ -536,6 +563,11 @@ export class GraphViewerComponent extends React.Component {
               title="Toggle property inspector" />
           </div>
           <PropertyInspectorComponent />
+          {propertyInspectorIsOpen && (
+            <div
+              className="dragable"
+              onMouseDown={this.handleMouseDown} />
+          )}
         </div>
       </div>
     );

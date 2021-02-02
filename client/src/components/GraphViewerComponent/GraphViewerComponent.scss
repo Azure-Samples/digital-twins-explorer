@@ -27,6 +27,21 @@
   &.pi-open {
     .pi-wrap {
       width: 24%;
+
+      .dragable {
+        width: 2px;
+        height: 100%;
+        position: absolute;
+        left: -2px;
+        top: 0;
+        background-color: $backgroundColor2;
+        transition: background-color 200ms ease;
+
+        &:hover {
+          cursor: col-resize;
+          background-color: #3f3f3f;
+        }
+      }
     }
   }
   &.pi-closed {
