@@ -22,16 +22,16 @@ const inferSchema = vertex => {
   if (!schemaEdge) {
     return null;
   }
-
   if (schemaEdge.toVertex.isType("dtmi:dtdl:class:Object;2")) {
+    const fields = [ ...schemaEdge.toVertex.getOutgoing("dtmi:dtdl:property:fields;2")
+      .map(edge => ({
+        name: getPropertyName(edge.toVertex),
+        schema: inferSchema(edge.toVertex)
+      }))
+      .filter(edge => !!edge.schema) ];
     return {
       type: "Object",
-      fields: [ ...schemaEdge.toVertex.getOutgoing("dtmi:dtdl:property:fields;2")
-        .map(edge => ({
-          name: getPropertyName(edge.toVertex),
-          schema: inferSchema(edge.toVertex)
-        }))
-        .filter(edge => !!edge.schema) ]
+      fields
     };
   }
 
@@ -177,9 +177,18 @@ export class ModelService {
   getPropertyDefaultValue(schema, current) {
     const isCurrentUndefined = typeof current === "undefined";
     if (typeof schema === "object") {
+      if (!isCurrentUndefined) {
+        return current;
+      }
       const schemaType = schema.type ?? schema["@type"];
       const enumValues = schema.values ?? schema.enumValues;
+      const objectProperties = {};
       switch (schemaType) {
+        case "Object":
+          for (const field of schema.fields) {
+            objectProperties[field.name] = this.getPropertyDefaultValue(field.schema);
+          }
+          return objectProperties;
         case "Enum":
           return enumValues.length > 0 ? enumValues[0].value ?? enumValues[0].enumValue : this.getPropertyDefaultValue(schema.valueSchema, current);
         case "Map":
@@ -206,6 +215,36 @@ export class ModelService {
         return isCurrentUndefined ? false : current;
       default:
         return isCurrentUndefined ? "" : current;
+    }
+  }
+
+  validateTwinPatch(properties, delta) {
+    let errors = "";
+    for (const d of delta) {
+      const parts = d.path.split("/").filter(x => x);
+      let match = properties;
+      for (const p of parts) {
+        match = match[p];
+        if (!match) {
+          break;
+        }
+      }
+
+      if (match && match.schema) {
+        switch (match.schema.type) {
+          case "Enum":
+            if (!match.schema.values.some(y => y.value === d.value)) {
+              const validValues = match.schema.values.map(y => y.value);
+              errors += `Invalid value "${d.value}" for "${d.path}". Valid values are: "${validValues}".\n`;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    if (errors !== "") {
+      throw new Error(errors);
     }
   }
 

@@ -199,18 +199,25 @@ export class PropertyInspectorComponent extends Component {
     if (changed) {
       const deltaFromDefaults = compare(this.original, this.updated);
       const deltaFromOriginal = compare(selection, this.updated);
-      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x => deltaFromDefaults.some(y => y.path === x.path)));
-      this.setState({ patch: delta });
-
-      const patch = JSON.stringify(delta, null, 2);
-      print("*** PI Changes:", "info");
-      print(patch, "info");
-      if (patch.length > 0) {
-        await this.patchTwin(delta);
+      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x =>
+        deltaFromDefaults.some(y => y.path === x.path)
+          || deltaFromDefaults.some(y => y.path.startsWith(`${x.path}/`))));
+      const modelService = new ModelService();
+      try {
+        modelService.validateTwinPatch(this.properties, delta);
+        this.setState({ patch: delta });
+        const patch = JSON.stringify(delta, null, 2);
+        print("*** PI Changes:", "info");
+        print(patch, "info");
+        if (patch.length > 0) {
+          await this.patchTwin(delta);
+        }
+        this.showModal();
+        this.setState({ changed: false });
+      } catch (exc) {
+        exc.customMessage = "Error in patching twin";
+        eventService.publishError(exc);
       }
-
-      this.showModal();
-      this.setState({ changed: false });
     }
   }
 
