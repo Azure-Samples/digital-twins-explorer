@@ -8,7 +8,7 @@
       },
       "backendUri": "https://%SITE_STORAGE_ACCOUNT_NAME%.blob.core.windows.net/%SITE_CONTAINER_NAME%/index.html?%SITE_CONTAINER_SAS%",
       "responseOverrides": {
-        "response.headers.Content-Security-Policy": "default-src 'self' data: 'unsafe-inline' 'unsafe-eval'; font-src https://spoprod-a.akamaihd.net https://static2.sharepointonline.com; frame-ancestors 'none'" 
+        "response.headers.Content-Security-Policy": "default-src 'self' data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' *.service.signalr.net; font-src https://spoprod-a.akamaihd.net https://static2.sharepointonline.com; frame-ancestors 'none';" 
       }
     },
     "web-static": {
