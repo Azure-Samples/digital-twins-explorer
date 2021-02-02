@@ -26,7 +26,6 @@
     "jsonld-graph": "^3.0.10",
     "jsonlint": "^1.6.3",
     "msal": "^1.2.1",
-    "node-sass": "^4.14.1",
     "office-ui-fabric-react": "^7.117.4",
     "prismjs": "^1.23.0",
     "react": "^16.13.1",
@@ -37,6 +36,7 @@
     "react-excel-renderer": "^1.1.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.3",
+    "sass": "^1.32.4",
     "system": "^2.0.1",
     "typescript": "^3.7.5",
     "uuid": "^7.0.1"
