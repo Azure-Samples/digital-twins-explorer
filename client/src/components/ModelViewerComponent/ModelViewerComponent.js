@@ -118,15 +118,18 @@ export class ModelViewerComponent extends Component {
     }
 
     this.setState({ isLoading: false });
-    this.retrieveModels();
+    await this.retrieveModels();
+    eventService.publishModelsUpdate();
     this.uploadModelRef.current.value = "";
   }
 
   addModels = async list => {
+    let success = true;
+    let sortedModels = [];
     try {
       const modelService = new ModelService();
       const sortedModelsId = await modelService.getModelIdsForUpload(list);
-      const sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
+      sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
       const chunks = this.chunkModelsList(sortedModels, 250);
       chunks.forEach(async chunk => {
         const res = await apiService.addModels(chunk);
@@ -134,8 +137,13 @@ export class ModelViewerComponent extends Component {
         print(JSON.stringify(res, null, 2), "info");
       });
     } catch (exc) {
+      success = false;
       exc.customMessage = "Upload error";
       eventService.publishError(exc);
+    } finally {
+      if (success) {
+        eventService.publishCreateModel(sortedModels);
+      }
     }
   }
 

@@ -5,15 +5,6 @@
 
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
-import cytoscape from "cytoscape";
-import fcose from "cytoscape-fcose";
-import cola from "cytoscape-cola";
-import dagre from "cytoscape-dagre";
-import klay from "cytoscape-klay";
-import dblclick from "cytoscape-dblclick";
-import contextMenus from "cytoscape-context-menus";
-import popper from "cytoscape-popper";
-import navigator from "cytoscape-navigator";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
 import { getUniqueRelationshipId } from "../../../utils/utilities";
@@ -21,15 +12,6 @@ import { settingsService } from "../../../services/SettingsService";
 
 import "./GraphViewerCytoscapeComponent.scss";
 import "cytoscape-context-menus/cytoscape-context-menus.css";
-
-cytoscape.use(klay);
-cytoscape.use(dagre);
-cytoscape.use(cola);
-cytoscape.use(fcose);
-cytoscape.use(dblclick);
-cytoscape.use(contextMenus);
-cytoscape.use(popper);
-cytoscape.use(navigator);
 
 export const GraphViewerCytoscapeLayouts = {
   "Cola": colaOptions,
@@ -737,7 +719,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   render() {
     return (
-      <div style={{ position: "relative", height: "100%" }}>
+      <div className="cytoscape-wrap">
         <CytoscapeComponent elements={[]}
           className="graph-control"
           stylesheet={graphStyles}

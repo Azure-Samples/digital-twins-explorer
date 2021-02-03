@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-@import './theme/theme.scss';
+@import "./theme/theme.scss";
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1e1e1e;
@@ -46,16 +46,19 @@ body {
   opacity: 1; /* Firefox */
 }
 
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
- color: grey !important;
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: grey !important;
 }
 
-::-ms-input-placeholder { /* Microsoft Edge */
- color: grey !important;
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: grey !important;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 html,
@@ -156,7 +159,6 @@ body {
     color: $textColorLight1;
     font-size: 11px;
   }
-
 }
 
 .error-page {
@@ -164,6 +166,30 @@ body {
   font-size: 18px;
   font-family: $fontFamilyMain;
   padding: 30px;
+}
+
+.configuration-input {
+  font-size: 12px;
+  font-weight: 200;
+  margin-bottom: 10px;
+  font-family: $fontFamilyMain;
+  color: $textColorLight2;
+  label {
+    color: $textColorLight2;
+    font-weight: 400;
+  }
+  .ms-Toggle-background {
+    border-color: transparent;
+    background: $textColorLight2;
+    .ms-Toggle-thumb {
+      background: white;
+    }
+  }
+  &.is-checked {
+    .ms-Toggle-background {
+      background: $inputOutlineColor;
+    }
+  }
 }
 
 :not(pre) > code[class*="language-"], pre[class*="language-"] {

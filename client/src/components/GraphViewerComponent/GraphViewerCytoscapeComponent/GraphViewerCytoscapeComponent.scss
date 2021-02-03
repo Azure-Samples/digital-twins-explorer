@@ -9,6 +9,29 @@
   grid-row: 2;
 }
 
+.cytoscape-wrap {
+  position: relative;
+  height: 100%;
+  .navigator-container {
+    position: absolute;
+    top: -35px;
+    left: 15px;
+    background: $backgroundColor2;
+    height: 120px;
+    width: 155px;
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid $backgroundColor4;
+    .graph-navigator {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: $backgroundColor3;
+    }
+  }
+}
+
 #header-1, #header-2 {
   padding-left: 12px !important;
   padding-bottom: 10px !important;
@@ -49,24 +72,5 @@
   &:hover {
     background: $backgroundColor1 !important;
     color: $textColorLight1 !important;
-  }
-}
-
-.navigator-container {
-  position: absolute;
-  top: -35px;
-  left: 15px;
-  background: $backgroundColor2;
-  height: 120px;
-  width: 155px;
-  padding: 6px;
-  border-radius: 5px;
-  border: 1px solid $backgroundColor4;
-  .graph-navigator {
-    position: relative;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: $backgroundColor3;
   }
 }

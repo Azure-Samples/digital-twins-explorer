@@ -96,9 +96,9 @@ export class ModelService {
 
   async getRelationships(sourceModelId, targetModelId) {
     await this.initialize();
-    const sourceModel = this._getModel(sourceModelId);
+    const sourceModel = this.getModel(sourceModelId);
     if (targetModelId) {
-      const targetModel = this._getModel(targetModelId);
+      const targetModel = this.getModel(targetModelId);
       return sourceModel
         .relationships
         .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
@@ -109,23 +109,23 @@ export class ModelService {
 
   async getModelById(sourceModelId) {
     await this.initialize();
-    return this._getModel(sourceModelId);
+    return this.getModel(sourceModelId);
   }
 
   async getProperties(sourceModelId) {
     await this.initialize();
-    const sourceModel = this._getModel(sourceModelId);
+    const sourceModel = this.getModel(sourceModelId);
     return this._getChildComponentProperties(sourceModel);
   }
 
   async getTelemetries(sourceModelId) {
     await this.initialize();
-    return this._getModel(sourceModelId).telemetries;
+    return this.getModel(sourceModelId).telemetries;
   }
 
   async getBases(modelId) {
     await this.initialize();
-    const sourceModel = this._getModel(modelId);
+    const sourceModel = this.getModel(modelId);
     return sourceModel.bases;
   }
 
@@ -157,7 +157,7 @@ export class ModelService {
 
   async createPayload(modelId) {
     await this.initialize();
-    const model = this._getModel(modelId);
+    const model = this.getModel(modelId);
     const payload = {
       $metadata: {
         $model: modelId
@@ -218,6 +218,64 @@ export class ModelService {
     }
   }
 
+  async getAllModels() {
+    await this.initialize();
+    const models = this.modelGraph.getVertices(x => x.isType("dtmi:dtdl:class:Interface;2")).items();
+    return models.map(model => {
+      const contents = {
+        id: model.id,
+        displayName: model.getAttributeValue("dtmi:dtdl:property:displayName;2"),
+        properties: [],
+        relationships: [],
+        telemetries: [],
+        bases: [],
+        components: []
+      };
+      this._mapModel(model, contents);
+      return contents;
+    });
+  }
+
+  getModel(modelId) {
+    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [] };
+    const model = this.modelGraph.getVertex(modelId);
+    if (model) {
+      this._mapModel(model, contents);
+    }
+
+    return contents;
+  }
+
+  getModels = async modelIds => {
+    await this.initialize();
+    return modelIds.map(id => {
+      const model = this.modelGraph.getVertex(id);
+      const contents = {
+        id: model.id,
+        displayName: model.getAttributeValue("dtmi:dtdl:property:displayName;2"),
+        properties: [],
+        relationships: [],
+        telemetries: [],
+        bases: [],
+        components: []
+      };
+      this._mapModel(model, contents);
+      return contents;
+    });
+  }
+
+  addModels = async models => {
+    await this.initialize();
+    await this.modelGraph.load(models);
+  }
+
+  removeModel = modelId => {
+    const model = this.modelGraph.getVertex(modelId);
+    if (model) {
+      this.modelGraph.removeVertex(model);
+    }
+  }
+
   validateTwinPatch(properties, delta) {
     let errors = "";
     for (const d of delta) {
@@ -266,16 +324,6 @@ export class ModelService {
     sortedModels.push(vertice.id);
   }
 
-  _getModel(modelId) {
-    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [], displayName: "", description: "" };
-    const model = this.modelGraph.getVertex(modelId);
-    if (model) {
-      this._mapModel(model, contents);
-    }
-
-    return contents;
-  }
-
   _mapModel(vertex, contents) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
 
@@ -302,14 +350,18 @@ export class ModelService {
         }
 
         if (x.toVertex.isType("dtmi:dtdl:class:Relationship;2")) {
+          const outgoing = x.toVertex.getOutgoing("dtmi:dtdl:property:properties;2");
+          const properties = outgoing.items().map(v => getPropertyName(v.toVertex));
+
           safeAdd(contents.relationships, {
             name: getPropertyName(x.toVertex),
-            target: inferTarget(x.toVertex)
+            target: inferTarget(x.toVertex),
+            properties
           });
         }
 
         if (x.toVertex.isType("dtmi:dtdl:class:Component;2")) {
-          const component = this._getModel(inferSchema(x.toVertex));
+          const component = this.getModel(inferSchema(x.toVertex));
           component.name = getPropertyName(x.toVertex);
           component.schema = inferSchema(x.toVertex);
           safeAdd(contents.components, component);
