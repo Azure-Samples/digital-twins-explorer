@@ -327,7 +327,9 @@ export class ModelService {
   _mapModel(vertex, contents) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
 
-    contents.displayName = getModelDisplayName(vertex);
+    if (!contents.displayName) {
+      contents.displayName = getModelDisplayName(vertex);
+    }
     contents.description = getModelDescription(vertex);
 
     vertex
