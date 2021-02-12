@@ -705,14 +705,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   zoomIn() {
     let zoomLevel = this.graphControl.zoom();
-    zoomLevel += 0.5;
+    zoomLevel += 0.15;
     this.graphControl.zoom(zoomLevel);
   }
 
   zoomOut() {
     let zoomLevel = this.graphControl.zoom();
-    if (zoomLevel > 0.5) {
-      zoomLevel -= 0.5;
+    if (zoomLevel > 0.3) {
+      zoomLevel -= 0.15;
       this.graphControl.zoom(zoomLevel);
     }
   }
