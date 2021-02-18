@@ -13,8 +13,7 @@ import { ModelService } from "../../services/ModelService";
 import "./ModelGraphViewerComponent.scss";
 import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
 import { Icon } from "office-ui-fabric-react";
-
-const detailMinWidth = 22;
+import { DETAIL_MIN_WIDTH } from "../../services/Constants";
 
 export class ModelGraphViewerComponent extends React.Component {
 
@@ -30,7 +29,7 @@ export class ModelGraphViewerComponent extends React.Component {
       showComponents: true,
       highlightingTerms: [],
       filteringTerms: [],
-      modelDetailWidth: detailMinWidth
+      modelDetailWidth: DETAIL_MIN_WIDTH
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -427,9 +426,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   handleMouseMove = e => {
     this.resizeEndX = this.resizeStartX - e.screenX;
-    if (this.resizeEndX >= detailMinWidth) {
+    if (this.resizeEndX >= DETAIL_MIN_WIDTH) {
       this.setState({
-        modelDetailWidth: detailMinWidth + ((this.resizeEndX * 100) / window.innerWidth)
+        modelDetailWidth: DETAIL_MIN_WIDTH + ((this.resizeEndX * 100) / window.innerWidth)
       });
     }
   };

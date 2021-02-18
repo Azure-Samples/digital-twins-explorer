@@ -42,7 +42,7 @@ export class GraphViewerComponent extends React.Component {
       filterIsOpen: false,
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false,
-      modelDetailWidth: DETAIL_MIN_WIDTH
+      propInspectorDetailWidth: DETAIL_MIN_WIDTH
     };
     this.view = React.createRef();
     this.create = React.createRef();
@@ -458,7 +458,7 @@ export class GraphViewerComponent extends React.Component {
     this.resizeEndX = this.resizeStartX - e.screenX;
     if (this.resizeEndX >= DETAIL_MIN_WIDTH) {
       this.setState({
-        modelDetailWidth: DETAIL_MIN_WIDTH + ((this.resizeEndX * 100) / window.innerWidth)
+        propInspectorDetailWidth: DETAIL_MIN_WIDTH + ((this.resizeEndX * 100) / window.innerWidth)
       });
     }
   };
@@ -494,7 +494,7 @@ export class GraphViewerComponent extends React.Component {
       propertyInspectorIsOpen,
       overlayResults,
       overlayItems,
-      modelDetailWidth
+      propInspectorDetailWidth
     } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
@@ -552,7 +552,7 @@ export class GraphViewerComponent extends React.Component {
           </div>
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
-        <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${modelDetailWidth}%` : 0}}>
+        <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${propInspectorDetailWidth}%` : 0}}>
           <div className="pi-toggle">
             <Icon
               className="toggle-icon"
