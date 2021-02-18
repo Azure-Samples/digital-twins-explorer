@@ -111,10 +111,9 @@ body {
 
 .work-area {
   grid-row: 3;
-  padding: 2px;
-  height: calc(100vh - 48px);
+  padding-top: 4px;
+  height: calc(100vh - 52px);
   color: white;
-  background-color: #2d2d2d;
 }
 
 .json-markup-string {

@@ -51,7 +51,8 @@ class App extends Component {
   goldenLayoutConfig = {
     dimensions: {
       borderWidth: 3,
-      minItemWidth: 285
+      minItemWidth: 285,
+      headerHeight: 24
     },
     settings: {
       showPopoutIcon: false,
