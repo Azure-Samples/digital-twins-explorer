@@ -14,6 +14,30 @@
     margin-top: 0;
   }
 
+  .configuration-input {
+    font-size: 12px;
+    font-weight: 200;
+    margin-bottom: 10px;
+    font-family: $fontFamilyMain;
+    color: $textColorLight2;
+    label {
+      color: $textColorLight2;
+      font-weight: 400;
+    }
+    .ms-Toggle-background {
+      border-color: transparent;
+      background: $textColorLight2;
+      .ms-Toggle-thumb {
+        background: white;
+      }
+    }
+    &.is-checked {
+      .ms-Toggle-background {
+        background: $buttonColor;
+      }
+    }
+  }
+
   .btn-group {
     margin-top: 15px;
   }
