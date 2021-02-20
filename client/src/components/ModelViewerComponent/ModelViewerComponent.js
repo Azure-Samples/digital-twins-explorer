@@ -16,6 +16,9 @@ import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { settingsService } from "../../services/SettingsService";
+// JACDAC imports
+import { serviceSpecifications, deviceSpecifications, imageDeviceOf } from "jacdac-ts/dist/jacdac-jdom"
+import { serviceToDTDL, deviceToDTDL } from "jacdac-ts/dist/jacdac-azure-iot"
 
 import "./ModelViewerComponent.scss";
 
@@ -128,6 +131,57 @@ export class ModelViewerComponent extends Component {
     this.uploadModelRef.current.value = "";
   }
 
+  /**
+   * Uploads all known JACDAC for services and devices
+   */
+  handleJACDACUpload = async evt => {
+    this.setState({ isLoading: true });
+
+    try {
+      const devices = deviceSpecifications();
+
+      // import DTDL
+      const list =
+        [
+          ...serviceSpecifications().map(serviceToDTDL),
+          ...devices.map(deviceToDTDL)
+        ];
+      let uploads = [];
+      for (const model of list) {
+        const existingModel = await apiService.getModelById(model["@id"])
+        if (!existingModel) {
+          uploads.push(model);
+        }
+      }
+      if (uploads.length > 0) {
+        const res = await apiService.addModels(uploads);
+        print("*** Upload result:", "info");
+        print(JSON.stringify(res, null, 2), "info");
+      }
+
+      // import images
+      const deviceImages = devices.map(device => ({
+        device,
+        dtdl: deviceToDTDL(device),
+        imageUrl: imageDeviceOf(device)
+      }))
+        .filter(di => !!di.imageUrl)
+      for (const di of deviceImages) {
+        const id = di.dtdl["@id"]
+        settingsService.setModelImage(id, di.imageUrl);
+        eventService.publishModelIconUpdate(id);
+        print(`*** Model image uploaded for ${id}`, "info");
+      }
+
+    } catch (exc) {
+      exc.customMessage = "Upload error";
+      eventService.publishError(exc);
+    }
+
+    this.setState({ isLoading: false });
+    this.retrieveModels();
+  }
+
   handleUploadOfModelImages = async evt => {
     const files = evt.target.files;
     this.setState({ isLoading: true });
@@ -229,7 +283,9 @@ export class ModelViewerComponent extends Component {
               buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
-              onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
+              onUploadJACDACModelsClicked={() => this.handleJACDACUpload()}
+              onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()}
+            />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"

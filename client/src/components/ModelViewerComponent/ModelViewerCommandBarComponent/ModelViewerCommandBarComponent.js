@@ -39,6 +39,14 @@ export class ModelViewerCommandBarComponent extends Component {
       className: this.buttonClass
     },
     {
+      key: "uploadJACDACMOdels",
+      text: "Upload JACDAC Models",
+      iconProps: { iconName: "CloudUpload" },
+      onClick: () => this.props.onUploadJACDACModelsClicked(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
+    {
       key: "deleteModels",
       text: "Delete All Models",
       ariaLabel: "delete all models",
