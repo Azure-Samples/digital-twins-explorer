@@ -7,7 +7,7 @@ import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
 import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
-import { apiService } from "../../services/ApiService";
+import { rbacService} from "../../services/RBACService";
 
 import "./ErrorMessage.scss";
 
@@ -54,7 +54,7 @@ export class ErrorMessageComponent extends Component {
     this.setState(
       {showAuthSpinner: true,
         showFixAuth: false});
-    const requestParams = await apiService.addReaderRBAC();
+    const requestParams = await rbacService.addReaderRBAC();
     this.setState(
       {showAuthSpinner: false,
         showAuthStatus: requestParams});
