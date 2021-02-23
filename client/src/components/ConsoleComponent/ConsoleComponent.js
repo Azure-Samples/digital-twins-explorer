@@ -102,16 +102,15 @@ export class ConsoleComponent extends Component {
     }
   }
 
-  deleteAllTwins = async args => {
-    if (args) {
-      try {
-        await apiService.deleteAllTwins(args);
-        this.pushToStdout(`*** Deleted twins with ids: ${args}`);
-      } catch (exc) {
-        this.pushToStdout(`*** Error deleting twins: ${exc}`);
-      }
-    } else {
-      this.pushToStdout("*** Not enough params");
+  deleteAllTwins = async () => {
+    try {
+      const allTwins = await apiService.getAllTwins();
+      const ids = allTwins ? allTwins.map(twin => twin.$dtId) : [];
+      await apiService.deleteAllTwins(ids);
+      eventService.publishClearData();
+      this.pushToStdout(`*** Deleted all twins.`);
+    } catch (exc) {
+      this.pushToStdout(`*** Error deleting twins: ${exc}`);
     }
   }
 
@@ -383,9 +382,9 @@ export class ConsoleComponent extends Component {
     },
     delalltwins: {
       description: "delete all digital twins",
-      usage: "delalltwins <twinId:string>",
-      fn: (...args) => {
-        this.deleteAllTwins(args);
+      usage: "delalltwins",
+      fn: () => {
+        this.deleteAllTwins();
       }
     },
     getrelationships: {
