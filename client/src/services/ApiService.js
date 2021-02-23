@@ -103,8 +103,7 @@ class ApiService {
 
   async addTwin(twinId, payload) {
     await this.initialize();
-
-    return await this.client.upsertDigitalTwin(twinId, payload);
+    return await this.client.upsertDigitalTwin(twinId, JSON.stringify(payload));
   }
 
   async updateTwin(twinId, patch) {
