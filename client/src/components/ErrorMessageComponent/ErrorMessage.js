@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, CUSTOM_NOT_FOUND_ERROR_MESSAGE, CUSTOM_AZURE_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { rbacService} from "../../services/RBACService";
 
@@ -20,7 +20,8 @@ export class ErrorMessageComponent extends Component {
       errorMessage: "",
       showFixAuth: false,
       showAuthSpinner: false,
-      showAuthStatus: 0
+      showAuthStatus: 0,
+      showAuthResponse: false
     };
   }
 
@@ -28,10 +29,11 @@ export class ErrorMessageComponent extends Component {
     eventService.subscribeError(exc => {
       let message = "";
       let auth = "";
-      // Service does not return an error code - only a name
-      if (exc && exc.name === "RestError" && !exc.code) {
+      if (exc && exc.name === "RestError" && exc.statusCode === 403) {
         message = CUSTOM_AUTH_ERROR_MESSAGE;
         auth = true;
+      } else if (exc && exc.name === "RestError" && exc.statusCode === 404) {
+        message = CUSTOM_NOT_FOUND_ERROR_MESSAGE;
       } else {
         message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
@@ -57,17 +59,20 @@ export class ErrorMessageComponent extends Component {
     const requestParams = await rbacService.addReaderRBAC();
     this.setState(
       {showAuthSpinner: false,
+        showAuthResponse: true,
         showAuthStatus: requestParams});
   }
 
   render() {
-    const { showModal, errorMessage, showFixAuth, showAuthSpinner, showAuthStatus} = this.state;
+    const { showModal, errorMessage, showFixAuth, showAuthSpinner, showAuthStatus, showAuthResponse} = this.state;
     let authComponent = "";
     if (showFixAuth) {
       authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
     } else if (showAuthSpinner) {
       authComponent = <Spinner />;
-    } else if (showAuthStatus !== 0) {
+    } else if (showAuthResponse && showAuthStatus === false){
+      authComponent = <p style={{margin: 7}}>{CUSTOM_AZURE_ERROR_MESSAGE}</p>
+    } else if (showAuthResponse && showAuthStatus !== 0) {
       authComponent = <p style={{margin: 7}}>{AUTH_NOT_FOUND_MESSAGE}</p>;
       for (const response of showAuthStatus) {
         if (response) {

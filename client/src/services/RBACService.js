@@ -75,26 +75,32 @@ class RBACService {
   }
 
   async addReaderRBAC() {
-    // Get our current twins instance from settings
-    const { appAdtUrl } = await configService.getConfig();
-    const requestParams = {
-      "appName": new URL(appAdtUrl).host.split(".")[0]
-    };
+    try {
+      // Get our current twins instance from settings
+      const { appAdtUrl } = await configService.getConfig();
+      const requestParams = {
+        "appName": new URL(appAdtUrl).host.split(".")[0]
+      };
 
-    // Get the user's principal ID
-    const me = await this.getIdentity("v1.0/me");
-    requestParams.userId = me.id;
+      // Get the user's principal ID
+      const me = await this.getIdentity("v1.0/me");
+      requestParams.userId = me.id;
 
-    // Get the user's logged in subscriptions
-    const subscriptions = await this.getRBAC("subscriptions?api-version=2020-01-01");
-    requestParams.subscriptions = subscriptions;
+      // Get the user's logged in subscriptions
+      const subscriptions = await this.getRBAC("subscriptions?api-version=2020-01-01");
+      requestParams.subscriptions = subscriptions;
 
-    // Loop through our subscriptions to get the twins instance
-    const subscriptionRequests = [];
-    for (const x of requestParams.subscriptions.value) {
-      subscriptionRequests.push(this.postTwinsAccess(requestParams.appName, x.id, requestParams.userId));
+      // Loop through our subscriptions to get the twins instance
+      const subscriptionRequests = [];
+      for (const x of requestParams.subscriptions.value) {
+        subscriptionRequests.push(this.postTwinsAccess(requestParams.appName, x.id, requestParams.userId));
+      }
+      return Promise.all(subscriptionRequests);
     }
-    return Promise.all(subscriptionRequests);
+    catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
 }
