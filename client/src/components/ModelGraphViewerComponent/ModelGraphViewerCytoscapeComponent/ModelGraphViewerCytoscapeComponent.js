@@ -242,7 +242,12 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       cy.$id(cyNode.id()).toggleClass("opaque", true);
     });
     nodes.forEach(node => {
-      const selectedNode = cy.nodes().filter(n => n.id() === node.id);
+      const selectedNode = cy.nodes().filter(n => {
+        if (node) {
+          return n.id() === node.id;
+        }
+        return null;
+      });
       cy.$id(selectedNode.id()).toggleClass("opaque", false);
       const connectedEdges = selectedNode.connectedEdges();
       connectedEdges.forEach(edge => {
