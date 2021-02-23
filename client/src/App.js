@@ -84,7 +84,7 @@ class App extends Component {
             height: 100,
             content: [
               {
-                title: "MODEL VIEW",
+                title: "MODELS",
                 isClosable: false,
                 width: 15,
                 type: "react-component",
@@ -98,7 +98,7 @@ class App extends Component {
                 width: 85,
                 content: [
                   {
-                    title: "GRAPH VIEW",
+                    title: "TWIN GRAPH",
                     type: "react-component",
                     isClosable: false,
                     component: "graph",
@@ -110,7 +110,7 @@ class App extends Component {
                     }
                   },
                   {
-                    title: "MODEL VIEW",
+                    title: "MODEL GRAPH",
                     type: "react-component",
                     isClosable: false,
                     component: "modelGraphViewer",
