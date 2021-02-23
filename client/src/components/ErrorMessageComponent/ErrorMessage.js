@@ -69,9 +69,9 @@ export class ErrorMessageComponent extends Component {
       authComponent = <Spinner />;
     } else if (showAuthStatus !== 0) {
       authComponent = <p style={{margin: 7}}>{AUTH_NOT_FOUND_MESSAGE}</p>;
-      for (const i in showAuthStatus) {
-        if (showAuthStatus[i]) {
-          switch (showAuthStatus[i].status) {
+      for (const response of showAuthStatus) {
+        if (response) {
+          switch (response.status) {
             case 201:
               authComponent = <p style={{color: "green", "textAlign": "left", width: 400, margin: 0}}>{AUTH_SUCCESS_MESSAGE}</p>;
               break;
@@ -82,7 +82,7 @@ export class ErrorMessageComponent extends Component {
               authComponent = <p style={{margin: 7}}>{AUTH_CONFLICT_MESSAGE}</p>;
               break;
             default:
-              authComponent = <p>{showAuthStatus[i].statusText}</p>;
+              authComponent = <p>{response.statusText}</p>;
           }
         }
       }

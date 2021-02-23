@@ -62,9 +62,9 @@ class RBACService {
     // Check if our twin is in the list of all twins in that subscription
     let ARMId = null;
     if ("value" in result && result.value !== false) {
-      for (const value in result.value) {
-        if (result.value[value].name.toLowerCase() === appName.toLowerCase()) {
-          ARMId = result.value[value].id;
+      for (const value of result.value) {
+        if (value.name.toLowerCase() === appName.toLowerCase()) {
+          ARMId = value.id;
         }
       }
     }
