@@ -1,22 +1,34 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from "react";
+import React, { Component } from "react";
 import { DefaultButton } from "office-ui-fabric-react";
-import jsonMarkup from "json-markup";
-
+import Prism from "prismjs";
 import ModalComponent from "../../ModalComponent/ModalComponent";
 
-export const PropertyInspectorPatchInformationComponent = ({ isVisible, patch, onCloseModal }) => {
-  const getMarkup = p => ({ __html: jsonMarkup(p || []) });
+export class PropertyInspectorPatchInformationComponent extends Component {
 
-  return (
-    <ModalComponent isVisible={isVisible} className="pi-patch-modal">
-      <h2 className="heading-2">Patch Information</h2>
-      <pre dangerouslySetInnerHTML={getMarkup(patch)} />
-      <div className="btn-group">
-        <DefaultButton className="modal-button close-button" onClick={onCloseModal}>Close</DefaultButton>
-      </div>
-    </ModalComponent>
-  );
-};
+  componentDidUpdate(prevProps) {
+    if (prevProps.isVisible !== this.props.isVisible && this.props.isVisible) {
+      Prism.highlightAll();
+    }
+  }
+
+  render() {
+    const { isVisible, patch, onCloseModal } = this.props;
+    return (
+      <ModalComponent isVisible={isVisible} className="pi-patch-modal">
+        <h2 className="heading-2">Patch Information</h2>
+        <pre>
+          <code className="language-json">
+            {JSON.stringify(patch, null, 1)}
+          </code>
+        </pre>
+        <div className="btn-group">
+          <DefaultButton className="modal-button close-button" onClick={onCloseModal}>Close</DefaultButton>
+        </div>
+      </ModalComponent>
+    );
+  }
+
+}

@@ -3,6 +3,10 @@
 
 @import "../../../theme/theme.scss";
 
+.commands-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
 .gv-commandbar {
   .ms-OverflowSet-item {
     button:nth-child(2) {
@@ -16,6 +20,29 @@
   .ms-CommandBar-primaryCommand {
     justify-content: flex-end;
   }
+  
+}
+
+.button-group {
+  .ms-OverflowSet {
+    .ms-OverflowSet-item {
+      color: red;
+      &:first-child {
+        button {
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          border-right: 1px solid $backgroundColor1;
+        }
+      }
+      &:last-child {
+        button {
+          border-top-right-radius: 5px;
+          border-bottom-right-radius: 5px;
+          border-left: 1px solid $backgroundColor1;
+        }
+      }
+    }
+  }
 }
 
 .expansion-level-option {
@@ -23,10 +50,27 @@
   color: $textColorLight2;
   align-items: center;
   margin-left: 12px;
-  margin-right: 8px;
+  background: $backgroundColor2;
+  border-radius: 5px;
+  min-width: 0;
+  height: 30px;
+  width: 70px;
+  justify-content: center;
   i {
     font-size: 16px;
-    color: $inputOutlineColor;
+    color: $textColorLight2;
+  }
+  &:hover {
+    color: $textColorLight1;
+  }
+  color: $textColorLight2;
+  .ms-TextField-fieldGroup {
+    border-color: transparent;
+    input {
+      padding-left: 3px;
+      width: 28px;
+      background: $backgroundColor1;
+    }
   }
 }
 

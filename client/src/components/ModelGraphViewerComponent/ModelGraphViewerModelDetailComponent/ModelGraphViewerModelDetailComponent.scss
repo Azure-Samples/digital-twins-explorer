@@ -1,0 +1,27 @@
+@import "../../../theme/theme.scss";
+
+.model-detail-prism {
+    max-width: 100%;
+    height: calc(100% - 30px);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    pre {
+        max-width: 100%;
+        flex: 1;
+        margin-bottom: 0;
+        margin-top: 15px;
+        background: $backgroundColor1;
+        text-shadow: none;
+        color: $textColorLight1;
+    }
+    code {
+        max-width: 100%;
+        text-shadow: none;
+        color: $textColorLight1;
+    }
+    .detail-title {
+        color: #888888;
+        text-transform: uppercase;
+    }
+}

@@ -4,9 +4,20 @@
 import React, { Component } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Stack } from "office-ui-fabric-react/lib/";
+import cytoscape from "cytoscape";
+import fcose from "cytoscape-fcose";
+import cola from "cytoscape-cola";
+import dagre from "cytoscape-dagre";
+import klay from "cytoscape-klay";
+import d3Force from "cytoscape-d3-force";
+import dblclick from "cytoscape-dblclick";
+import popper from "cytoscape-popper";
+import navigator from "cytoscape-navigator";
+import contextMenus from "cytoscape-context-menus";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
+import { ModelGraphViewerComponent } from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
 import { ModelViewerComponent } from "./components/ModelViewerComponent/ModelViewerComponent";
 import { PropertyInspectorComponent } from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
@@ -21,6 +32,19 @@ import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 import Messages from "./messages/messages";
 import { eventService } from "./services/EventService";
 import logo from "./assets/logo192.png";
+
+import "prismjs/components/prism-json";
+import "prismjs/themes/prism.css";
+
+cytoscape.use(klay);
+cytoscape.use(dagre);
+cytoscape.use(cola);
+cytoscape.use(fcose);
+cytoscape.use(d3Force);
+cytoscape.use(dblclick);
+cytoscape.use(popper);
+cytoscape.use(navigator);
+cytoscape.use(contextMenus);
 
 class App extends Component {
 
@@ -71,7 +95,7 @@ class App extends Component {
               },
               {
                 type: "stack",
-                width: 65,
+                width: 85,
                 content: [
                   {
                     title: "GRAPH VIEW",
@@ -84,19 +108,20 @@ class App extends Component {
                     setting: {
                       showCloseIcon: false
                     }
+                  },
+                  {
+                    title: "MODEL VIEW",
+                    type: "react-component",
+                    isClosable: false,
+                    component: "modelGraphViewer",
+                    props: {
+                      className: "graph-component"
+                    },
+                    setting: {
+                      showCloseIcon: false
+                    }
                   }
                 ]
-              },
-              {
-                title: "PROPERTY EXPLORER",
-                isClosable: false,
-                id: "gl-property-inspector",
-                width: 20,
-                type: "react-component",
-                component: "propInspector",
-                setting: {
-                  showCloseIcon: false
-                }
               }
             ]
           }
@@ -227,6 +252,7 @@ class App extends Component {
               onTabCreated={this.onGoldenLayoutTabCreated}
               registerComponents={gLayout => {
                 gLayout.registerComponent("graph", GraphViewerComponent);
+                gLayout.registerComponent("modelGraphViewer", ModelGraphViewerComponent);
                 gLayout.registerComponent("modelViewer", ModelViewerComponent);
                 gLayout.registerComponent("propInspector", PropertyInspectorComponent);
                 gLayout.registerComponent("outputComponent", OutputComponent);

@@ -16,89 +16,6 @@ export const colors = [
   "27d0df", "a04a9b"
 ];
 
-export const graphStyles = [ // the stylesheet for the graph
-  {
-    selector: "node",
-    style: {
-      "width": "20px",
-      "height": "20px",
-      "background-color": "#666",
-      "label": "data(id)",
-      "border-color": "#ccc",
-      "border-width": 2,
-      "color": "#ccc",
-      "font-size": "10px",
-      "font-family": "Segoe UI, sans-serif",
-      "font-weight": 600,
-      "text-wrap": "ellipsis",
-      "text-max-width": "60px",
-      "background-fit": "contain",
-      "background-repeat": "no-repeat",
-      "background-clip": "none"
-    }
-  },
-  {
-    selector: ":selected",
-    css: {
-      "border-color": "#900",
-      "line-color": "#900",
-      "target-arrow-color": "#900"
-    }
-  },
-  {
-    selector: "edge",
-    style: {
-      "curve-style": "bezier",
-      "width": 1,
-      "line-color": "#ccc",
-      "target-arrow-color": "#ccc",
-      "target-arrow-shape": "triangle",
-      "arrow-scale": 0.5,
-      //"mid-target-arrow-color": "#ccc",
-      //"mid-target-arrow-shape": "triangle",
-      "label": "data(label)",
-      "color": "#777",
-      "font-size": "8px",
-      "font-family": "Segoe UI, sans-serif",
-      "font-weight": 200,
-      "text-rotation": "autorotate",
-      "text-wrap": "ellipsis",
-      "text-max-width": "60px",
-      "text-margin-y": "-7px"
-    }
-  },
-  {
-    selector: "edge:selected",
-    style: {
-      "border-color": "#900",
-      "line-color": "#900",
-      "target-arrow-color": "#900",
-      "width": 3
-    }
-  },
-  {
-    selector: "edge.highlighted",
-    style: {
-      "border-color": "#e9e6e6",
-      "line-color": "#e9e6e6",
-      "target-arrow-color": "#e9e6e6",
-      "width": 2
-    }
-  },
-  {
-    selector: ".hide",
-    style: {
-      "display": "none"
-    }
-  },
-  {
-    selector: ".opaque",
-    style: {
-      "opacity": "0.4"
-    }
-  }
-]
-
 export const dagreOptions = {
   name: "dagre",
   // dagre algo options, uses default value on undefined
@@ -107,8 +24,12 @@ export const dagreOptions = {
   rankSep: undefined, // the separation between each rank in the layout
   rankDir: undefined, // "TB" for top to bottom flow, "LR" for left to right,
   ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values: "network-simplex", "tight-tree" or "longest-path"
-  minLen: function () { return 1; }, // number of ranks to keep between the source and target of the edge
-  edgeWeight: function () { return 1; }, // higher weight edges are generally made shorter and straighter than lower weight edges
+  minLen: function () {
+    return 1;
+  }, // number of ranks to keep between the source and target of the edge
+  edgeWeight: function () {
+    return 1;
+  }, // higher weight edges are generally made shorter and straighter than lower weight edges
 
   // general layout options
   fit: true, // whether to fit to viewport
@@ -116,13 +37,17 @@ export const dagreOptions = {
   spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
   nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
   animate: false, // whether to transition the node positions
-  animateFilter: function () { return true; }, // whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
+  animateFilter: function () {
+    return true;
+  }, // whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
   animationDuration: 500, // duration of animation in ms if enabled
   animationEasing: undefined, // easing of animation if enabled
   boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-  transform: function (node, pos) { return pos; }, // a function that applies a transform to the final node position
-  ready: function () { }, // on layoutready
-  stop: function () { } // on layoutstop
+  transform: function (node, pos) {
+    return pos;
+  }, // a function that applies a transform to the final node position
+  ready: function () {}, // on layoutready
+  stop: function () {}, // on layoutstop
 };
 
 export const colaOptions = {
@@ -134,18 +59,20 @@ export const colaOptions = {
   fit: true, // on every layout reposition of nodes, fit the viewport
   padding: 30, // padding around the simulation
   boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-  nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
+  nodeDimensionsIncludeLabels: true, // whether labels should be included in determining the space used by a node
 
   // layout event callbacks
-  ready: function () { }, // on layoutready
-  stop: function () { }, // on layoutstop
+  ready: function () {}, // on layoutready
+  stop: function () {}, // on layoutstop
 
   // positioning options
   randomize: false, // use random node positions at beginning of layout
   avoidOverlap: true, // if true, prevents overlap of node bounding boxes
   handleDisconnected: true, // if true, avoids disconnected components from overlapping
   convergenceThreshold: 0.01, // when the alpha value (system energy) falls below this value, the layout stops
-  nodeSpacing: function () { return 10; }, // extra spacing around nodes
+  nodeSpacing: function () {
+    return 20;
+  }, // extra spacing around nodes
   flow: undefined, // use DAG/tree flow layout if specified, e.g. { axis: "y", minSeparation: 30 }
   alignment: undefined, // relative alignment constraints on nodes, e.g. function( node ){ return { x: 0, y: 1 } }
   gapInequalities: undefined, // list of inequality constraints for the gap between the nodes, e.g. [{"axis":"y", "left":node1, "right":node2, "gap":25}]
@@ -162,7 +89,7 @@ export const colaOptions = {
   allConstIter: undefined, // initial layout iterations with all constraints including non-overlap
 
   // infinite layout options
-  infinite: false // overrides all other options for a forces-all-the-time mode
+  infinite: false, // overrides all other options for a forces-all-the-time mode
 };
 
 export const fcoseOptions = {
@@ -233,8 +160,8 @@ export const fcoseOptions = {
   initialEnergyOnIncremental: 0.3,
 
   /* layout event callbacks */
-  ready: () => { }, // on layoutready
-  stop: () => { } // on layoutstop
+  ready: () => {}, // on layoutready
+  stop: () => {}, // on layoutstop
 };
 
 export const coseOptions = {
@@ -247,7 +174,9 @@ export const coseOptions = {
   // A function that determines whether the node should be animated
   // All nodes animated by default on animate enabled
   // Non-animated nodes are positioned immediately when the layout starts
-  animateFilter: function () { return true; },
+  animateFilter: function () {
+    return true;
+  },
   // The layout animates only after this many milliseconds for animate:true
   // (prevents flashing on fast runs)
   animationThreshold: 250,
@@ -266,13 +195,19 @@ export const coseOptions = {
   // Extra spacing between components in non-compound graphs
   componentSpacing: 100,
   // Node repulsion (non overlapping) multiplier
-  nodeRepulsion: function () { return 2048; },
+  nodeRepulsion: function () {
+    return 2048;
+  },
   // Node repulsion (overlapping) multiplier
   nodeOverlap: 4,
   // Ideal edge (non nested) length
-  idealEdgeLength: function () { return 100; },
+  idealEdgeLength: function () {
+    return 100;
+  },
   // Divisor to compute edge forces
-  edgeElasticity: function () { return 50; },
+  edgeElasticity: function () {
+    return 50;
+  },
   // Nesting factor (multiplier) to compute ideal edge length for nested edges
   nestingFactor: 1.2,
   // Gravity force (constant)
@@ -284,8 +219,8 @@ export const coseOptions = {
   // Cooling factor (how the temperature is reduced between consecutive iterations
   coolingFactor: 0.99,
   // Lower temperature threshold (below this point the layout will end)
-  minTemp: 1.0
-}
+  minTemp: 1.0,
+};
 
 export const klayOptions = {
   name: "klay",
@@ -293,10 +228,14 @@ export const klayOptions = {
   fit: true, // Whether to fit
   padding: 20, // Padding on fit
   animate: true, // Whether to transition the node positions
-  animateFilter: function () { return true; }, // Whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
+  animateFilter: function () {
+    return true;
+  }, // Whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
   animationDuration: 500, // Duration of animation in ms if enabled
   animationEasing: undefined, // Easing of animation if enabled
-  transform: function (node, pos) { return pos; }, // A function that applies a transform to the final node position
+  transform: function (node, pos) {
+    return pos;
+  }, // A function that applies a transform to the final node position
   ready: undefined, // Callback on layoutready
   stop: undefined, // Callback on layoutstop
   klay: {
@@ -307,10 +246,10 @@ export const klayOptions = {
     compactComponents: false, // Tries to further compact components (disconnected sub-graphs).
     crossingMinimization: "LAYER_SWEEP", // Strategy for crossing minimization.
     /* LAYER_SWEEP The layer sweep algorithm iterates multiple times over the layers, trying to find node orderings that minimize the number of crossings. The algorithm uses randomization to increase the odds of finding a good result. To improve its results, consider increasing the Thoroughness option, which influences the number of iterations done. The Randomization seed also influences results.
-    INTERACTIVE Orders the nodes of each layer by comparing their positions before the layout algorithm was started. The idea is that the relative order of nodes as it was before layout was applied is not changed. This of course requires valid positions for all nodes to have been set on the input graph before calling the layout algorithm. The interactive layer sweep algorithm uses the Interactive Reference Point option to determine which reference point of nodes are used to compare positions. */
+      INTERACTIVE Orders the nodes of each layer by comparing their positions before the layout algorithm was started. The idea is that the relative order of nodes as it was before layout was applied is not changed. This of course requires valid positions for all nodes to have been set on the input graph before calling the layout algorithm. The interactive layer sweep algorithm uses the Interactive Reference Point option to determine which reference point of nodes are used to compare positions. */
     cycleBreaking: "GREEDY", // Strategy for cycle breaking. Cycle breaking looks for cycles in the graph and determines which edges to reverse to break the cycles. Reversed edges will end up pointing to the opposite direction of regular edges (that is, reversed edges will point left if edges usually point right).
     /* GREEDY This algorithm reverses edges greedily. The algorithm tries to avoid edges that have the Priority property set.
-    INTERACTIVE The interactive algorithm tries to reverse edges that already pointed leftwards in the input graph. This requires node and port coordinates to have been set to sensible values.*/
+      INTERACTIVE The interactive algorithm tries to reverse edges that already pointed leftwards in the input graph. This requires node and port coordinates to have been set to sensible values.*/
     direction: "DOWN", // Overall direction of edges: horizontal (right / left) or vertical (down / up)
     /* UNDEFINED, RIGHT, LEFT, DOWN, UP */
     edgeRouting: "SPLINES", // Defines how edges are routed (POLYLINE, ORTHOGONAL, SPLINES)
@@ -318,11 +257,11 @@ export const klayOptions = {
     feedbackEdges: false, // Whether feedback edges should be highlighted by routing around the nodes.
     fixedAlignment: "BALANCED", // Tells the BK node placer to use a certain alignment instead of taking the optimal result.  This option should usually be left alone.
     /* NONE Chooses the smallest layout from the four possible candidates.
-    LEFTUP Chooses the left-up candidate from the four possible candidates.
-    RIGHTUP Chooses the right-up candidate from the four possible candidates.
-    LEFTDOWN Chooses the left-down candidate from the four possible candidates.
-    RIGHTDOWN Chooses the right-down candidate from the four possible candidates.
-    BALANCED Creates a balanced layout from the four possible candidates. */
+      LEFTUP Chooses the left-up candidate from the four possible candidates.
+      RIGHTUP Chooses the right-up candidate from the four possible candidates.
+      LEFTDOWN Chooses the left-down candidate from the four possible candidates.
+      RIGHTDOWN Chooses the right-down candidate from the four possible candidates.
+      BALANCED Creates a balanced layout from the four possible candidates. */
     inLayerSpacingFactor: 1.0, // Factor by which the usual spacing is multiplied to determine the in-layer spacing between objects.
     layoutHierarchy: false, // Whether the selected layouter should consider the full hierarchy
     linearSegmentsDeflectionDampening: 0.3, // Dampens the movement of nodes to keep the diagram from getting too large.
@@ -330,20 +269,32 @@ export const klayOptions = {
     mergeHierarchyCrossingEdges: true, // If hierarchical layout is active, hierarchy-crossing edges use as few hierarchical ports as possible.
     nodeLayering: "NETWORK_SIMPLEX", // Strategy for node layering.
     /* NETWORK_SIMPLEX This algorithm tries to minimize the length of edges. This is the most computationally intensive algorithm. The number of iterations after which it aborts if it hasn"t found a result yet can be set with the Maximal Iterations option.
-    LONGEST_PATH A very simple algorithm that distributes nodes along their longest path to a sink node.
-    INTERACTIVE Distributes the nodes into layers by comparing their positions before the layout algorithm was started. The idea is that the relative horizontal order of nodes as it was before layout was applied is not changed. This of course requires valid positions for all nodes to have been set on the input graph before calling the layout algorithm. The interactive node layering algorithm uses the Interactive Reference Point option to determine which reference point of nodes are used to compare positions. */
+      LONGEST_PATH A very simple algorithm that distributes nodes along their longest path to a sink node.
+      INTERACTIVE Distributes the nodes into layers by comparing their positions before the layout algorithm was started. The idea is that the relative horizontal order of nodes as it was before layout was applied is not changed. This of course requires valid positions for all nodes to have been set on the input graph before calling the layout algorithm. The interactive node layering algorithm uses the Interactive Reference Point option to determine which reference point of nodes are used to compare positions. */
     nodePlacement: "BRANDES_KOEPF", // Strategy for Node Placement
     /* BRANDES_KOEPF Minimizes the number of edge bends at the expense of diagram size: diagrams drawn with this algorithm are usually higher than diagrams drawn with other algorithms.
-    LINEAR_SEGMENTS Computes a balanced placement.
-    INTERACTIVE Tries to keep the preset y coordinates of nodes from the original layout. For dummy nodes, a guess is made to infer their coordinates. Requires the other interactive phase implementations to have run as well.
-    SIMPLE Minimizes the area at the expense of... well, pretty much everything else. */
+      LINEAR_SEGMENTS Computes a balanced placement.
+      INTERACTIVE Tries to keep the preset y coordinates of nodes from the original layout. For dummy nodes, a guess is made to infer their coordinates. Requires the other interactive phase implementations to have run as well.
+      SIMPLE Minimizes the area at the expense of... well, pretty much everything else. */
     randomizationSeed: 1, // Seed used for pseudo-random number generators to control the layout algorithm; 0 means a new seed is generated
     routeSelfLoopInside: false, // Whether a self-loop is routed around or inside its node.
     separateConnectedComponents: true, // Whether each connected component should be processed separately
     spacing: 20, // Overall setting for the minimal amount of space to be left between objects
-    thoroughness: 7 // How much effort should be spent to produce a nice layout..
+    thoroughness: 7, // How much effort should be spent to produce a nice layout..
   },
-  priority: function () { return null; }, // Edges with a non-nil value are skipped when greedy edge cycle breaking is enabled
+  priority: function () {
+    return null;
+  }, // Edges with a non-nil value are skipped when greedy edge cycle breaking is enabled
+};
+
+export const d3ForceOptions = {
+  name: "d3-force",
+  animate: false,
+  fit: true,
+  linkId: (data) => data.id,
+  linkDistance: 200,
+  manyBodyStrength: -500,
+  manyBodyDistanceMin: 10,
 };
 
 export const navigationOptions = {

@@ -4,26 +4,68 @@
 @import "../../theme/theme.scss";
 
 .message-container {
-  width: 750px;
+  width: 760px;
 
   &.wide {
-    width: 750px;
+    width: 760px;
   }
 
   h2 {
     color: $textColorLight1;
+    font-size: 28px;
     font-weight: 400;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     margin-top: 0;
+    display: flex;
+    align-items: center;
+    
+    span {
+      border: 2px solid red;
+      border-radius: 50%;
+      box-sizing: border-box;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-size: 18px;
+      color: red;
+      text-align: center;
+    }
   }
 
   p {
-    color: red;
+    font-size: 16px;
+    color: $textColorLight1;
+    margin: 0;
+    margin-bottom: 22px;
     word-break: break-word;
+
+    a {
+      color: $textColorLight3;
+    }
+  }
+
+  .error-description {
+    background-color: black;
+    max-height: 155px;
+    padding: 12px 15px;
+    overflow-y: scroll;
+    user-select: text;
+    p {
+      color: $outlineColor4;
+      font-family: 'Courier New', Courier, monospace;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   .btn-group {
-    text-align: right;
+    margin-top: 24px;
+    justify-content: flex-end;
   }
 
   .modal-button {
@@ -36,5 +78,9 @@
       background: $buttonColor;
       margin-right: 0;
     }
+  }
+
+  pre {
+    user-select: text;
   }
 }

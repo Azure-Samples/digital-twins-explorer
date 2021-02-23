@@ -60,7 +60,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
     this.farItems[this.farItems.length - 1].disabled = !changed;
 
     return (
-      <div>
+      <div className="pi-command-bar">
+        <div className="pi-title">Properties</div>
         <CommandBar
           farItems={this.farItems}
           ariaLabel="Use left and right arrow keys to navigate between commands" />

@@ -24,15 +24,15 @@ export class ConsoleComponent extends Component {
       try {
         const twin = await apiService.getTwinById(arg1);
         const properties = await new ModelService().getProperties(twin.$metadata.$model);
-        const prop = Object.keys(properties).filter(p => p === arg3);
+        const prop = properties[arg3];
 
-        if (prop <= 0) {
+        if (!prop) {
           this.pushToStdout("*** Property doesn\"t exist!");
           return;
         }
 
         let newArg4 = arg4;
-        switch (prop[0].schema) {
+        switch (prop.schema) {
           case "dtmi:dtdl:instance:Schema:integer;2":
             newArg4 = parseInt(arg4, 10);
             break;

@@ -3,12 +3,132 @@
 
 @import "../../theme/theme.scss";
 
+.gvc-wrap {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  .pi-wrap {
+    position: relative;
+    .pi-toggle {
+      position: absolute;
+      top: 15px;
+      left: -30px;
+      height: 30px;
+      width: 30px;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $backgroundColor2;
+      cursor: pointer;
+    }
+  }
+  &.pi-open {
+    .pi-wrap {
+      width: 24%;
+
+      .dragable {
+        width: 2px;
+        height: 100%;
+        position: absolute;
+        left: -2px;
+        top: 0;
+        background-color: $backgroundColor2;
+        transition: background-color 200ms ease;
+
+        &:hover {
+          cursor: col-resize;
+          background-color: #3f3f3f;
+        }
+      }
+    }
+  }
+  &.pi-closed {
+    .pi-wrap {
+      width: 0;
+    }
+  }
+}
 .gc-grid {
   display: flex;
   flex-direction: column;
   font-size: 12px;
   height: 100%;
   overflow: hidden;
+  flex: 1;
+  position: relative;
+  .controls_buttonGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    background-color: $backgroundColor2;
+    border-radius: 5px;
+    i {
+      font-size: 14px;
+      color: $textColorLight2;
+    }
+  }
+
+  .controls_singleButton {
+    background-color: $backgroundColor2;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    i {
+      font-size: 18px;
+      color: $textColorLight2;
+    }
+  }
+
+  .filter_button {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    font-size: 18px;
+  }
+
+  .control-loadButtons {
+    height: 30px;
+    font-weight: 200;
+    padding: 0;
+  }
+
+  &.open {
+    .gc-filter {
+      .gc-filter-contents {
+        height: 200px;
+      }
+    }
+
+    .gc-wrap {
+      height: calc(100% - 250px);
+    }
+  }
+}
+
+.gc-wrap {
+  transition: height 0.2s ease-out;
+  flex: 1;
+  height: calc(100% - 58px);
+  position: relative;
+}
+
+.gc-filter {
+  flex: 0;
+  position: relative;
+  background-color: $backgroundColor2;
+  .gc-controls {
+    position: absolute;
+    top: -174px;
+    left: 20px;
+  }
+
+  .gc-filter-contents {
+    height: 8px;
+    transition: height 0.2s ease-out;
+    > div {
+      padding: 10px;
+    }
+  }
 }
 
 .gc-toolbar {
@@ -18,6 +138,7 @@
   max-width: 100%;
   background-color: $backgroundColor3;
   padding: 15px;
+  padding-right: 40px;
 }
 
 .gc-toolbarButtons {
@@ -42,13 +163,8 @@
 
 .ms-CommandBarItem-link {
   background: transparent;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: transparent;
   }
-}
-
-.gc-wrap {
-  flex: 1;
-  height: calc(100% - 50px);
-  position: relative;
 }

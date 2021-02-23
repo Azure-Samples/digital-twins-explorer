@@ -15,11 +15,19 @@ class EventService {
   }
 
   publishQuery(query) {
-    this._emit("query", { query });
+    this._emit("query", query);
   }
 
   subscribeQuery(callback) {
     this._on("query", callback);
+  }
+
+  publishOverlayQueryResults(overlayResults) {
+    this._emit("overlay", overlayResults);
+  }
+
+  subscribeOverlayQueryResults(callback) {
+    this._on("overlay", callback);
   }
 
   publishLog(data, type) {
@@ -172,6 +180,14 @@ class EventService {
 
   subscribeModelIconUpdate(callback) {
     this._on("modeliconupdate", callback);
+  }
+
+  publishModelsUpdate(modelId) {
+    this._emit("modelsupdate", modelId);
+  }
+
+  subscribeModelsUpdate(callback) {
+    this._on("modelsupdate", callback);
   }
 
   _emit = (name, payload) => this._action({ type: "emit", name, payload })

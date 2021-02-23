@@ -39,6 +39,7 @@ export class ModelViewerDeleteComponent extends Component {
     try {
       await apiService.deleteModel(item.key);
       this.props.onDelete(item.key);
+      eventService.publishDeleteModel(item.key);
     } catch (exc) {
       exc.customMessage = "Error with deleting instance";
       eventService.publishError(exc);

@@ -5,7 +5,8 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE, CUSTOM_NOT_FOUND_ERROR_MESSAGE, CUSTOM_AZURE_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, MORE_INFORMATION_LINK, CUSTOM_NOT_FOUND_ERROR_MESSAGE, CUSTOM_AZURE_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, 
+        AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { rbacService} from "../../services/RBACService";
 
@@ -21,7 +22,8 @@ export class ErrorMessageComponent extends Component {
       showFixAuth: false,
       showAuthSpinner: false,
       showAuthStatus: 0,
-      showAuthResponse: false
+      showAuthResponse: false,
+      stackErrorMessage: ""
     };
   }
 
@@ -35,6 +37,7 @@ export class ErrorMessageComponent extends Component {
       } else if (exc && exc.name === "RestError" && exc.statusCode === 404) {
         message = CUSTOM_NOT_FOUND_ERROR_MESSAGE;
       } else {
+        errorMessage = exc.customMessage ? `${exc.customMessage}` : `${exc.code}`;
         message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
 
@@ -43,7 +46,8 @@ export class ErrorMessageComponent extends Component {
       this.setState({
         errorMessage: message,
         showModal: true,
-        showFixAuth: auth
+        showFixAuth: auth,
+        stackErrorMessage: exc.stack.replace(/\n/g, "<br>").replace(/ /gi, "&nbsp")
       });
     });
   }
@@ -64,7 +68,7 @@ export class ErrorMessageComponent extends Component {
   }
 
   render() {
-    const { showModal, errorMessage, showFixAuth, showAuthSpinner, showAuthStatus, showAuthResponse} = this.state;
+    const { showModal, errorMessage, stackErrorMessage, showFixAuth, showAuthSpinner, showAuthStatus, showAuthResponse} = this.state;
     let authComponent = "";
     if (showFixAuth) {
       authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
@@ -97,8 +101,12 @@ export class ErrorMessageComponent extends Component {
         isVisible={showModal}
         className="error-message">
         <div className="message-container">
-          <h2 className="heading-2">Error</h2>
+          <h2 className="heading-2"><span>!</span>Error</h2>
           <p>{errorMessage}</p>
+          <p>Find more infomation on how to resolve issues like this here: <a href={MORE_INFORMATION_LINK} target="_blank" rel="noopener noreferrer">{MORE_INFORMATION_LINK}</a></p>
+          <div className="error-description">
+            <p dangerouslySetInnerHTML={{ __html: stackErrorMessage }} />
+          </div>
           <div className="btn-group">
             <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
             {authComponent}

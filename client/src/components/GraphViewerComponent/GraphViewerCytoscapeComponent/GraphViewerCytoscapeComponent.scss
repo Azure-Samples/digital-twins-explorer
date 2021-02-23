@@ -8,3 +8,70 @@
   background-color: $backgroundColor3;
   grid-row: 2;
 }
+
+.cytoscape-wrap {
+  position: relative;
+  height: 100%;
+  .navigator-container {
+    position: absolute;
+    top: -35px;
+    left: 15px;
+    background: $backgroundColor2;
+    height: 120px;
+    width: 155px;
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid $backgroundColor4;
+    .graph-navigator {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: $backgroundColor3;
+      z-index: 0;
+    }
+  }
+}
+
+#header-1, #header-2 {
+  padding-left: 12px !important;
+  padding-bottom: 10px !important;
+  // font-family: "Segoe UI" !important;
+  font-size: 16px !important;
+  color: $textColorLight2 !important;
+  font-weight: bold;
+  cursor: default;
+  &:hover {
+    color: $textColorLight2 !important;
+    background: $backgroundColor2 !important;
+  }
+}
+
+#header-2 {
+  padding-top: 12px !important;
+  margin-top: 12px !important;
+  border-top: 1px solid $textColorLight2 !important;
+}
+
+.custom-context-menu {
+  background: $backgroundColor2;
+  border: 0px solid transparent !important;
+  border-radius: 5px !important;
+  outline: none;
+  min-width: 200px !important;
+  padding: 12px 0 !important;
+}
+
+.custom-menu-item {
+  background: $backgroundColor2 !important;
+  border: 0px solid transparent !important;
+  padding-left: 12px !important;
+  outline: none;
+  color: $textColorLight1 !important;
+  font-family: $fontFamilyMain !important;
+  font-size: 16px !important;
+  &:hover {
+    background: $backgroundColor1 !important;
+    color: $textColorLight1 !important;
+  }
+}

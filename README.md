@@ -47,6 +47,7 @@ Node.js 10+
 1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
 1. Select the **Download ZIP** button to download a .zip file of this sample code to your machine. Unzip the **Azure_Digital_Twins__ADT__explorer.zip** folder, and extract the files.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
+    >**IMPORTANT!** Due to a dependency on the `npm-force-resolutions` package to mitigate an underlying security issue you will not be able to install under any path that contains a space. For more information, see this GitHub [issue](https://github.com/rogeriochaves/npm-force-resolutions/issues/17).
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
     >  * Linux/Mac (Bash): `PORT=8080 npm run start`
@@ -128,10 +129,12 @@ To upload a model, click on the *Upload a model* button and select one more JSON
 
 For each model, you can:
 1. **Delete**: remove the definition from your ADT environment.
+1. **Upload Model Image**: upload a custom twin image to be displayed in the graph view.
+    >**NOTE:** To bulk upload model images, you can click the **Upload Model Images** icon in the nav bar in the model view panel. The name of your image file should match the model ID however replace ":" with "_" and ";" with "-". 
 1. **View**: see the raw JSON definition of the model.
 1. **Create a new twin**: create a new instance of the model as a twin in the ADT environment. No properties are set as part of this process (aside from name).
 
-The models shown in the example screenshot are available in the `examples` folder in this repository (`client/examples`). 
+Sample models are available in the `examples` folder in this repository (`client/examples`). 
 
 ### Creating Twins and Relationships
 
@@ -335,3 +338,5 @@ When running in the cloud, Azure Functions hosts three services to support the f
 1. Proxy: this proxies requests through the ADT service (much in the same way as the proxy used when running locally).
 1. SignalR: this allows clients to retrieve credentials to access the SignalR service for live telemetry updates. It also validates that the endpoint and route required to stream information from the ADT service to the ADT Explorer app is in place. If the managed service identity for the Function is configured correctly (i.e. has write permissions on the resource group and can administer the ADT service), then it can create these itself.
 1. EventGrid: this receives messages from the Event Grid to broadcasts them to any listening clients using SignalR. The messages are sent from ADT to the function via ADT endpoint and route.
+
+> NOTE: If you have hosting the application somewhere other than Azure Functions. Then we recommend you add the Content Security Policy to you environment as defined in the `proxies.json` file.
