@@ -140,7 +140,7 @@ export class QueryComponent extends Component {
       <>
         <div className="qc-grid">
           <div className="qc-queryBox">
-            <DefaultButton className="query-button" onClick={this.runCloudShell}>
+            <DefaultButton className="cloud-shell-button" onClick={this.runCloudShell}>
               Launch Cloud Shell
             </DefaultButton>
           </div>
