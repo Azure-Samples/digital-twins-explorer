@@ -78,7 +78,7 @@ class RBACService {
     // Get our current twins instance from settings
     const { appAdtUrl } = await configService.getConfig();
     const requestParams = {
-      "appName": appAdtUrl.split(".api.")[0].substring(8)
+      "appName": new URL(appAdtUrl).host.split(".")[0]
     };
 
     // Get the user's principal ID
