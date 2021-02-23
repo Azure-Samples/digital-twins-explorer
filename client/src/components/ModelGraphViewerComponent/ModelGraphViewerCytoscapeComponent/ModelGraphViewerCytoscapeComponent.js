@@ -30,6 +30,36 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.isHidingLabels = false;
     this.hiddenTextRuler = React.createRef();
     this.canRenderPopper = false;
+    this.contextMenuIsOpen = false;
+    this.contextMenuItems = [
+      {
+        id: "show-destination",
+        content: "Show destination",
+        selector: "edge",
+        onClickFunction: this.onShowDestination
+      },
+      {
+        id: "show-source",
+        content: "Show source",
+        selector: "edge",
+        onClickFunction: this.onShowSource
+      },
+      {
+        id: "scale-to-rel",
+        content: "Scale to relationship",
+        selector: "edge",
+        onClickFunction: this.onScaleToRel
+      }
+    ];
+  }
+
+  componentDidMount() {
+    const cy = this.graphControl;
+    this.contextMenu = cy.contextMenus({
+      menuItems: this.contextMenuItems,
+      menuItemClasses: [ "custom-menu-item" ],
+      contextMenuClasses: [ "custom-context-menu" ]
+    });
   }
 
   addNodes(nodes) {
@@ -481,6 +511,29 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     return cutText;
   }
 
+  onEdgeRightClick = () => {
+    this.contextMenuIsOpen = true;
+    this.onNodeUnhover();
+  }
+
+  onShowDestination = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$id(target.target().id()));
+  }
+
+  onShowSource = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$id(target.source().id()));
+  }
+
+  onScaleToRel = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$(`[id = "${target.source().id()}"], [id = "${target.target().id()}"]`));
+  }
+
   render() {
     return (
       <div style={{ position: "relative", height: "100%" }}>
@@ -502,6 +555,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("mouseout", this.onNodeUnhover);
               this.graphControl.on("mousedown", this.onNodeUnhover);
               this.graphControl.on("zoom", this.onGraphZoom);
+              this.graphControl.on("cxttap", "edge", this.onEdgeRightClick);
             }
           }} />
         <div className="navigator-container">
