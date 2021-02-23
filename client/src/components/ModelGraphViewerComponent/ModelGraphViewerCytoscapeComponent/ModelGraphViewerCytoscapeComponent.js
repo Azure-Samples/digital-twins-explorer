@@ -151,7 +151,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     return settingsService.getModelImage(modelId);
   }
 
-  doLayout() {
+  doLayout(progressCallback) {
     const cy = this.graphControl;
 
     cy.batch(() => {
@@ -171,7 +171,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     });
 
     return new Promise(resolve => {
-      const layout = cy.layout(ModelGraphViewerCytoscapeLayouts[this.layout]);
+      const options = ModelGraphViewerCytoscapeLayouts[this.layout];
+      if (progressCallback && options.tick) {
+        options.tick = progressCallback;
+      }
+      const layout = cy.layout(options);
       layout.on("layoutstop", () => resolve());
       layout.run();
     });

@@ -34,7 +34,6 @@ export class ModelGraphViewerComponent extends React.Component {
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
     this.modelDetail = React.createRef();
-    this.canceled = false;
     this.props.glContainer.on("show", this.initialize);
     this.isInitialized = false;
     this.modelService = new ModelService();
@@ -68,8 +67,15 @@ export class ModelGraphViewerComponent extends React.Component {
     });
   }
 
+  updateProgress(newProgress) {
+    const { progress } = this.state;
+    if (newProgress >= 0 && newProgress > progress) {
+      this.setState({ isLoading: newProgress < 100, progress: newProgress >= 100 ? 0 : newProgress });
+    }
+  }
+
   async retrieveModels() {
-    this.setState({ isLoading: true });
+    this.updateProgress(0);
 
     let list = [];
     try {
@@ -86,13 +92,13 @@ export class ModelGraphViewerComponent extends React.Component {
     this.cyRef.current.addRelationships(this.relationships, "related");
     this.cyRef.current.addRelationships(this.componentRelationships, "component");
     this.cyRef.current.addRelationships(this.extendRelationships, "extends");
-    await this.cyRef.current.doLayout();
-    this.setState({ isLoading: false });
+    await this.cyRef.current.doLayout(this.progressCallback);
+    this.updateProgress(100);
   }
 
   addModels = async models => {
     if (this.isInitialized) {
-      this.setState({ isLoading: true });
+      this.updateProgress(0);
       await this.modelService.addModels(models);
 
       const mapped = await this.modelService.getModels(models.map(m => m["@id"]));
@@ -110,8 +116,9 @@ export class ModelGraphViewerComponent extends React.Component {
       this.cyRef.current.addRelationships(relationships, "related");
       this.cyRef.current.addRelationships(componentRelationships, "component");
       this.cyRef.current.addRelationships(extendRelationships, "extends");
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
       this.setState({ isLoading: false });
+      this.updateProgress(100);
     }
   }
 
@@ -174,7 +181,7 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onLayoutChanged = layout => {
     this.cyRef.current.setLayout(layout);
-    this.cyRef.current.doLayout();
+    this.cyRef.current.doLayout(this.progressCallback);
   };
 
   toggleFilter = () => {
@@ -194,43 +201,50 @@ export class ModelGraphViewerComponent extends React.Component {
     this.cyRef.current.zoomToFit();
   }
 
+  progressCallback = progress => {
+    this.updateProgress(progress * 100);
+  }
+
   onRelationshipsToggleChange = async () => {
     const { showRelationships } = this.state;
-    this.setState({ isLoading: true });
+    this.updateProgress(0);
     if (showRelationships) {
       this.cyRef.current.removeRelationships(this.relationships);
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     } else {
       this.cyRef.current.addRelationships(this.relationships, "related");
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     }
     this.setState({ showRelationships: !showRelationships, isLoading: false });
+    this.updateProgress(100);
   }
 
   onInheritancesToggleChange = async () => {
     const { showInheritances } = this.state;
-    this.setState({ isLoading: true });
+    this.updateProgress(0);
     if (showInheritances) {
       this.cyRef.current.removeRelationships(this.extendRelationships);
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     } else {
       this.cyRef.current.addRelationships(this.extendRelationships, "extends");
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     }
     this.setState({ showInheritances: !showInheritances, isLoading: false });
+    this.updateProgress(100);
   }
 
   onComponentsToggleChange = async () => {
     const { showComponents } = this.state;
-    this.setState({ isLoading: true });
+    this.updateProgress(0);
     if (showComponents) {
       this.cyRef.current.removeRelationships(this.componentRelationships);
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     } else {
       this.cyRef.current.addRelationships(this.componentRelationships, "component");
-      await this.cyRef.current.doLayout();
+      await this.cyRef.current.doLayout(this.progressCallback);
     }
     this.setState({ showComponents: !showComponents, isLoading: false });
+    this.updateProgress(100);
   }
 
   onNodeMouseEnter = async modelId => {
@@ -486,8 +500,7 @@ export class ModelGraphViewerComponent extends React.Component {
           </div>
           {isLoading && (
             <LoaderComponent
-              message={`${Math.round(progress)}%`}
-              cancel={() => (this.canceled = true)} />
+              message={`${Math.round(progress)}%`} />
           )}
         </div>
         <div className="model-detail" style={{width: modelDetailIsOpen ? `${modelDetailWidth}%` : 0}}>

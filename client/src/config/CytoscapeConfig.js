@@ -295,6 +295,7 @@ export const d3ForceOptions = {
   linkDistance: 200,
   manyBodyStrength: -500,
   manyBodyDistanceMin: 10,
+  tick: () => {}
 };
 
 export const navigationOptions = {
