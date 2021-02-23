@@ -13,6 +13,8 @@ import "./QueryComponent.scss";
 import { SaveQueryDialogComponent } from "./SaveQueryDialogComponent/SaveQueryDialogComponent";
 import { ConfirmQueryDialogComponent } from "./ConfirmQueryDialogComponent/ConfirmQueryDialogComponent";
 
+const defaultQuery = "SELECT * FROM digitaltwins";
+
 export class QueryComponent extends Component {
 
   queryOptions = [
@@ -24,7 +26,7 @@ export class QueryComponent extends Component {
     super(props);
     this.state = {
       queries: [],
-      selectedQuery: "SELECT * FROM digitaltwins",
+      selectedQuery: defaultQuery,
       selectedQueryKey: null,
       queryKeyToBeRemoved: "",
       showSaveQueryModal: false,
@@ -37,6 +39,25 @@ export class QueryComponent extends Component {
 
   componentDidMount() {
     this.setState({ queries: settingsService.queries });
+    eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  componentWillUnmount() {
+    eventService.unsubscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  clearAfterEnvironmentChange = () => {
+    this.setState({
+      queries: [],
+      selectedQuery: defaultQuery,
+      selectedQueryKey: null,
+      queryKeyToBeRemoved: "",
+      showSaveQueryModal: false,
+      showConfirmDeleteModal: false,
+      showConfirmOverwriteModal: false,
+      newQueryName: "",
+      isOverlayResultsChecked: false
+    });
   }
 
   onChange = evt => {

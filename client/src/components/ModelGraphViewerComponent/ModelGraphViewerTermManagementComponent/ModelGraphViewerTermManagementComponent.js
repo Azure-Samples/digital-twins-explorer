@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { eventService } from "../../../services/EventService";
 import { IconButton, Label, TextField, Checkbox } from "office-ui-fabric-react";
 
 const addIconStyle = {
@@ -47,6 +48,21 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
         ariaLabel: "match display name"
       }
     ];
+  }
+
+  componentDidMount() {
+    eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  componentWillUnmount() {
+    eventService.unsubscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  clearAfterEnvironmentChange = () => {
+    this.setState({
+      filterTerm: "",
+      matchTerms: []
+    });
   }
 
   onTermChanged = (_, text) => this.setState({ filterTerm: text });

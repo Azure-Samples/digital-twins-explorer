@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { eventService } from "../../../services/EventService";
 import { IconButton, Label, TextField, Toggle, Checkbox } from "office-ui-fabric-react";
 
 const addIconStyle = {
@@ -22,6 +23,23 @@ export default class GraphViewerFilteringHighlightComponent extends Component {
       matchDisplayName: true,
       matchTerms: []
     };
+  }
+
+  componentDidMount() {
+    eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  componentWillUnmount() {
+    eventService.unsubscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  clearAfterEnvironmentChange = () => {
+    this.setState({
+      filterTerm: "",
+      matchDtmi: true,
+      matchDisplayName: true,
+      matchTerms: []
+    });
   }
 
   onTermChanged = (_, text) => this.setState({ filterTerm: text });
