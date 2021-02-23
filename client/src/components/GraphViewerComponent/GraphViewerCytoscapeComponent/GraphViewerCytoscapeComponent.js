@@ -495,9 +495,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         }
       });
     }
-    if (this.selectedNodes.length === 0) {
-      this.clearSelection();
-    }
   }
 
   onEdgeSelected = e => {
