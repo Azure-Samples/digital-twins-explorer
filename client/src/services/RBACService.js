@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { print } from "./LoggingService";
 import { configService } from "./ConfigService";
 import { TWIN_DATA_OWNER_RBAC_ID } from "./Constants";
 
@@ -96,9 +97,8 @@ class RBACService {
         subscriptionRequests.push(this.postTwinsAccess(requestParams.appName, x.id, requestParams.userId));
       }
       return Promise.all(subscriptionRequests);
-    }
-    catch (e) {
-      console.error(e);
+    } catch (e) {
+      print(e, "error");
       return false;
     }
   }

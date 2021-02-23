@@ -5,8 +5,8 @@ import React, { Component } from "react";
 import { DefaultButton, Spinner } from "office-ui-fabric-react";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
-import { CUSTOM_AUTH_ERROR_MESSAGE, MORE_INFORMATION_LINK, CUSTOM_NOT_FOUND_ERROR_MESSAGE, CUSTOM_AZURE_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE, 
-        AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
+import { CUSTOM_AUTH_ERROR_MESSAGE, MORE_INFORMATION_LINK, CUSTOM_NOT_FOUND_ERROR_MESSAGE, CUSTOM_AZURE_ERROR_MESSAGE, AUTH_SUCCESS_MESSAGE,
+  AUTH_CONFLICT_MESSAGE, AUTH_FORBIDDEN_MESSAGE, AUTH_NOT_FOUND_MESSAGE } from "../../services/Constants";
 import { print } from "../../services/LoggingService";
 import { rbacService} from "../../services/RBACService";
 
@@ -37,8 +37,7 @@ export class ErrorMessageComponent extends Component {
       } else if (exc && exc.name === "RestError" && exc.statusCode === 404) {
         message = CUSTOM_NOT_FOUND_ERROR_MESSAGE;
       } else {
-        errorMessage = exc.customMessage ? `${exc.customMessage}` : `${exc.code}`;
-        message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
+        message = exc.customMessage ? `${exc.customMessage}` : `${exc.code}`;
       }
 
       print(message, "error");
@@ -74,8 +73,8 @@ export class ErrorMessageComponent extends Component {
       authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
     } else if (showAuthSpinner) {
       authComponent = <Spinner />;
-    } else if (showAuthResponse && showAuthStatus === false){
-      authComponent = <p style={{margin: 7}}>{CUSTOM_AZURE_ERROR_MESSAGE}</p>
+    } else if (showAuthResponse && showAuthStatus === false) {
+      authComponent = <p style={{margin: 7}}>{CUSTOM_AZURE_ERROR_MESSAGE}</p>;
     } else if (showAuthResponse && showAuthStatus !== 0) {
       authComponent = <p style={{margin: 7}}>{AUTH_NOT_FOUND_MESSAGE}</p>;
       for (const response of showAuthStatus) {
