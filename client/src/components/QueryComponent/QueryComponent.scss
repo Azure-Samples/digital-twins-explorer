@@ -172,6 +172,7 @@
 }
 
 .query-save-button,
+.cloud-shell-button,
 .query-button {
   border: none;
   border-radius: none;
@@ -217,6 +218,10 @@
       background: $backgroundColor4;
       margin-right: 0;
     }
+  }
+  .cloud-shell-button {
+    width: 140px;
+    margin-right: 10px;
   }
 }
 
