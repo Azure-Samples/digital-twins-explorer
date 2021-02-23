@@ -101,6 +101,11 @@ export class QueryComponent extends Component {
     this.setState({ showConfirmDeleteModal: false, queryKeyToBeRemoved: "" });
   }
 
+  runCloudShell = event => {
+    event.preventDefault();
+    window.open('https://shell.azure.com');
+  }
+
   onRemoveQueryClick = item => {
     this.setState({ showConfirmDeleteModal: true, queryKeyToBeRemoved: item.key });
   }
@@ -134,6 +139,11 @@ export class QueryComponent extends Component {
     return (
       <>
         <div className="qc-grid">
+          <div className="qc-queryBox">
+            <DefaultButton className="query-button" onClick={this.runCloudShell}>
+              Launch Cloud Shell
+            </DefaultButton>
+          </div>
           <div className="qc-queryBox">
             <div className="qc-label">
               <Dropdown
