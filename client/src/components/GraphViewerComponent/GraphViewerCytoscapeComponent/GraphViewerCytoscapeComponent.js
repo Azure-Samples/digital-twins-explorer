@@ -285,7 +285,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           source: x.$sourceId,
           target: x.$targetId,
           label: x.$relationshipName,
-          id: getUniqueRelationshipId(x)
+          id: getUniqueRelationshipId(x),
+          relationshipId: x.$relationshipId
         }
       }))
       .filter(x => this.graphControl.$id(x.id).length === 0);

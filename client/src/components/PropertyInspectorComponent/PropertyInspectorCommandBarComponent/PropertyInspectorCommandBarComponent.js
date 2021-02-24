@@ -55,9 +55,9 @@ export class PropertyInspectorCommandBarComponent extends Component {
   ]
 
   render() {
-    const { changed, selection } = this.props;
-    this.farItems.forEach(x => x.disabled = !selection);
-    this.farItems[this.farItems.length - 1].disabled = !changed;
+    const { changed, selection, selectionType } = this.props;
+    this.farItems.forEach(x => x.disabled = !selection || selectionType !== "twin");
+    this.farItems[this.farItems.length - 1].disabled = !changed || selectionType !== "twin";
 
     return (
       <div className="pi-command-bar">

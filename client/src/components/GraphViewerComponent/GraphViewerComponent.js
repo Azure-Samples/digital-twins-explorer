@@ -126,7 +126,7 @@ export class GraphViewerComponent extends React.Component {
       if (selectedNode) {
         const selected = allTwins.find(t => t.$dtId === selectedNode.id);
         if (selected) {
-          eventService.publishSelection(selected);
+          eventService.publishSelection({ selection: selected, selectionType: "twin" });
         } else {
           eventService.publishSelection();
         }
@@ -243,8 +243,10 @@ export class GraphViewerComponent extends React.Component {
     }
   }
 
-  onEdgeClicked = e => {
+  onEdgeClicked = async e => {
     this.setState({ selectedEdge: e });
+    const relationship = await apiService.getRelationship(e.source, e.relationshipId);
+    eventService.publishSelection({ selection: relationship, selectionType: "relationship" });
   }
 
   onNodeClicked = async e => {
@@ -257,7 +259,7 @@ export class GraphViewerComponent extends React.Component {
         // Get latest
         const { selectedNode } = this.state;
         if (data && selectedNode.id === e.selectedNode.id) {
-          eventService.publishSelection(data);
+          eventService.publishSelection({ selection: data, selectionType: "twin" });
         }
       } catch (exc) {
         print(`*** Error fetching data for twin: ${exc}`, "error");
