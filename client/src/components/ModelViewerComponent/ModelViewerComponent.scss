@@ -47,7 +47,7 @@
 
 .mv_listItem {
   margin-bottom: 7px;
-  padding: 7px 0 7px 8px;
+  padding: 8px 8px 12px 8px;
   background-color: $backgroundColor8;
   line-height: 1.7;
   > .ms-Stack {
@@ -63,19 +63,15 @@
 
 .mv_listItemName_unselected {
   color: $textColorLight1;
-  font-size: 12px;
-  font-weight: 400;
 }
 
 .mv_listItemName_selected {
   color: $textColorDark1;
   background-color: $backgroundColor7;
-  font-size: 12px;
-  font-weight: 600;
 }
 
 .mv_listItemName {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-overflow: ellipsis;
   -webkit-line-clamp: 1;
@@ -84,7 +80,7 @@
 }
 
 .mv_listItemKey {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: $textColorLight2;
   text-overflow: ellipsis;
@@ -128,16 +124,11 @@
 
 .mv-filter input {
   font-family: $fontFamilyMain;
-  font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
   background-color: #353535;
-  color: #a3a3a3;
+  color: $textColorLight1;
   border-width: 0px;
   flex: 1 1;
-
-  &::placeholder {
-    font-size: 12px;
-  }
 }
 
 .mv-fileInput {

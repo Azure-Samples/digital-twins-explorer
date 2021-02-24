@@ -51,7 +51,8 @@ class App extends Component {
   goldenLayoutConfig = {
     dimensions: {
       borderWidth: 3,
-      minItemWidth: 285
+      minItemWidth: 285,
+      headerHeight: 24
     },
     settings: {
       showPopoutIcon: false,
@@ -237,8 +238,8 @@ class App extends Component {
             <div className="header">
               <Stack horizontal className="top-bar">
                 <div>
-                  <img src={logo} width={16} height={16} alt="" />
-                  <span className="top-bar-title">AZURE DIGITAL TWINS EXPLORER</span>
+                  <img src={logo} width={20} height={20} alt="" />
+                  <span className="top-bar-title">Azure Digital Twins Explorer</span>
                 </div>
                 <AppCommandBar optionalComponents={this.optionalComponents}
                   optionalComponentsState={optionalComponentsState}

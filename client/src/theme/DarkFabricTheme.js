@@ -5,7 +5,7 @@ import { createTheme } from "office-ui-fabric-react/lib/";
 
 export const darkFabricTheme = createTheme({
   palette: {
-    themePrimary: "#0078d4",
+    themePrimary: "#60aaff",
     themeLighterAlt: "#eff6fc",
     themeLighter: "#deecf9",
     themeLight: "#c7e0f4",
