@@ -95,7 +95,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
         {!!incomingRelationships
           && incomingRelationships.length > 0 && (
           <div className="relationship-type">
-            <h3>Incomming</h3>
+            <h3>Incoming</h3>
             <div className="relationships">
               <pre>
                 <code className="language-json">
