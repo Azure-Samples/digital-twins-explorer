@@ -185,12 +185,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   hideSelectedTwins = ({ target: node }) => {
     const cy = this.graphControl;
     if (this.selectedNodes.length > 0) {
-      this.clearSelection();
       this.selectedNodes.forEach(x => {
         cy.$id(x.id).toggleClass("hide", true);
       });
       cy.$(":selected").unselect();
-      this.selectedNodes = [];
+      this.clearSelection();
     } else if (node && node.id()) {
       cy.$id(node.id()).toggleClass("hide", true);
     }

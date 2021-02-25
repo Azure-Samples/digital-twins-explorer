@@ -93,7 +93,9 @@ export class GraphViewerComponent extends React.Component {
 
   clearData() {
     eventService.publishSelection();
-    this.cyRef.current.clearTwins();
+    if (this.cyRef.current) {
+      this.cyRef.current.clearTwins();
+    }
   }
 
   updateProgress(newProgress) {
