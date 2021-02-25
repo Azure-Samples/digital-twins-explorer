@@ -75,6 +75,11 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   async retrieveModels() {
+    const { isLoading } = this.state;
+    if (isLoading) {
+      return;
+    }
+
     this.updateProgress(0);
 
     let list = [];
