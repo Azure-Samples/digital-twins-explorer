@@ -346,11 +346,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const cy = this.graphControl;
     cy.nodes().forEach(cyNode => {
       cy.$id(cyNode.id()).toggleClass("opaque", false);
-      cy.$id(cyNode.id()).toggleClass("highlight", false);
+      cy.$id(cyNode.id()).toggleClass("highlighted", false);
     });
     cy.edges().forEach(cyEdge => {
       cy.$id(cyEdge.id()).toggleClass("opaque", false);
-      cy.$id(cyEdge.id()).toggleClass("highlight", false);
+      cy.$id(cyEdge.id()).toggleClass("highlighted", false);
     });
     this.selectedNodes = [];
   }
@@ -493,6 +493,16 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           });
         }
+      });
+    }
+  }
+
+  selectEdges = rels => {
+    if (rels.length > 0) {
+      const cy = this.graphControl;
+      rels.forEach(rel => {
+        cy.$id(getUniqueRelationshipId(rel)).toggleClass("highlighted", true);
+        cy.$id(getUniqueRelationshipId(rel)).toggleClass("opaque", false);
       });
     }
   }
@@ -648,7 +658,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       this.props.onControlClicked(e);
       if (this.props.overlayResults) {
         if (this.isSelectingOnOverlay) {
-          this.selectNodes(this.props.overlayItems);
+          this.selectNodes(this.props.overlayItems.twins);
+          this.selectEdges(this.props.overlayItems.relationships);
           this.isSelectingOnOverlay = false;
         } else {
           this.clearOverlay();

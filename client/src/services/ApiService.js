@@ -11,13 +11,19 @@ import { settingsService } from "./SettingsService";
 
 const getAllTwinsQuery = "SELECT * FROM digitaltwins";
 
-const getTwinsFromQueryResponse = response => {
+const getDataFromQueryResponse = response => {
   const list = [ ...response ];
-  const twins = [];
+  const data = {
+    twins: [],
+    relationships: []
+  };
   for (let i = 0; i < list.length; i++) {
     const current = list[i];
-    if (current.$dtId) {
-      twins.push(current);
+    if (current.$dtId && !data.twins.some(t => t.$dtId === current.$dtId)) {
+      data.twins.push(current);
+      continue;
+    } else if (current.$relationshipId) {
+      data.relationships.push(current);
       continue;
     }
 
@@ -30,10 +36,8 @@ const getTwinsFromQueryResponse = response => {
       }
     }
   }
-
-  return twins;
+  return data;
 };
-
 class CustomHttpClient {
 
   constructor() {
@@ -79,7 +83,17 @@ class ApiService {
     for await (const page of this.client.queryTwins(query).byPage()) {
       print(`Ran query for twins, page ${count++}:`, "info");
       print(JSON.stringify(page, null, 2), "info");
-      await callback(getTwinsFromQueryResponse(page.value));
+      await callback(getDataFromQueryResponse(page.value).twins);
+    }
+  }
+
+  async queryOverlay(query, callback) {
+    await this.initialize();
+    let count = 1;
+    for await (const page of this.client.queryTwins(query).byPage()) {
+      print(`Ran query for overlay, page ${count++}:`, "info");
+      print(JSON.stringify(page, null, 2), "info");
+      await callback(getDataFromQueryResponse(page.value));
     }
   }
 

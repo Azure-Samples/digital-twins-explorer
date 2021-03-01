@@ -38,7 +38,7 @@ export class GraphViewerComponent extends React.Component {
       hideMode: "hide-selected",
       canShowAll: false,
       overlayResults: false,
-      overlayItems: [],
+      overlayItems: {},
       filterIsOpen: false,
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false,
@@ -133,7 +133,9 @@ export class GraphViewerComponent extends React.Component {
           eventService.publishSelection();
         }
       } else if (overlayResults) {
-        this.cyRef.current.selectNodes(allTwins.filter(t => t.selected).map(t => t.$dtId));
+        const { overlayItems: { twins, relationships } } = this.state;
+        this.cyRef.current.selectNodes(twins);
+        this.cyRef.current.selectEdges(relationships);
       }
     } catch (exc) {
       if (exc.errorCode !== "user_cancelled") {
@@ -151,19 +153,24 @@ export class GraphViewerComponent extends React.Component {
     const existingTwins = this.cyRef.current.getTwins();
     this.updateProgress(5);
 
-    await apiService.queryTwinsPaged(query, async twins => {
-      if (overlayResults) {
-        extraTwins = twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
+    if (overlayResults) {
+      await apiService.queryOverlay(query, async data => {
+        extraTwins = data.twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
         this.cyRef.current.addTwins(extraTwins);
-      } else {
+        await this.cyRef.current.doLayout();
+        data.twins.forEach(x => allTwins.push({ ...x, selected: true }));
+        this.setState({ overlayItems: { ...data, twins: data.twins.map(t => t.$dtId) }});
+        this.updateProgress();
+      });
+    } else {
+      await apiService.queryTwinsPaged(query, async twins => {
         await this.cyRef.current.clearTwins();
         this.cyRef.current.addTwins(twins);
-      }
-      await this.cyRef.current.doLayout();
-      twins.forEach(x => allTwins.push(overlayResults ? { ...x, selected: true } : x));
-      this.setState({ overlayItems: twins.map(t => t.$dtId) });
-      this.updateProgress();
-    });
+        await this.cyRef.current.doLayout();
+        twins.forEach(x => allTwins.push(x));
+        this.updateProgress();
+      });
+    }
     this.updateProgress(25);
 
     if (overlayResults && extraTwins.length > 0) {
@@ -387,7 +394,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   disableOverlay = () => {
-    this.setState({ overlayResults: false, overlayItems: [] });
+    this.setState({ overlayResults: false, overlayItems: {} });
   }
 
   onConfirmTwinDelete = ({ target: node }) => {
