@@ -248,7 +248,7 @@ export class GraphViewerComponent extends React.Component {
   onEdgeClicked = async e => {
     this.setState({ selectedEdge: e });
     const relationship = await apiService.getRelationship(e.source, e.relationshipId);
-    eventService.publishSelection({ selection: relationship, selectionType: "relationship" });
+    eventService.publishSelection({ selection: relationship.body, selectionType: "relationship" });
   }
 
   onNodeClicked = async e => {
