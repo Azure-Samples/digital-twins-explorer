@@ -473,7 +473,12 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   filterNodes = nodes => {
     const cy = this.graphControl;
     cy.nodes().forEach(cyNode => {
-      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => node.id === cyNode.id()));
+      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => {
+        if (node) {
+          return node.id === cyNode.id();
+        }
+        return null;
+      }));
     });
   }
 

@@ -340,7 +340,10 @@ export class ModelGraphViewerComponent extends React.Component {
     const nodeRels = this.relationships.filter(rel => rel.sourceId === node.id);
     if (nodeRels.length > 0) {
       nodeRels.forEach(rel => {
-        outgoingRels.push(this.allNodes.find(n => n.id === rel.targetId));
+        const relNode = this.allNodes.find(n => n.id === rel.targetId);
+        if (relNode) {
+          outgoingRels.push(this.allNodes.find(n => n.id === rel.targetId));
+        }
       });
     }
     return outgoingRels;
