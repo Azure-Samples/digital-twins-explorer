@@ -244,12 +244,6 @@ export class ModelViewerComponent extends Component {
 
   onDelete = item => this.deleteRef.current.open(item)
 
-  updateModelList = itemKey => {
-    this.originalItems.splice(this.originalItems.findIndex(i => i.key === itemKey), 1);
-    const items = this.originalItems;
-    this.setState({ items, filterText: "" });
-  }
-
   render() {
     const { items, isLoading, filterText } = this.state;
     return (
@@ -289,7 +283,7 @@ export class ModelViewerComponent extends Component {
         </div>
         <ModelViewerViewComponent ref={this.viewRef} />
         <ModelViewerCreateComponent ref={this.createRef} />
-        <ModelViewerDeleteComponent ref={this.deleteRef} onDelete={this.updateModelList} />
+        <ModelViewerDeleteComponent ref={this.deleteRef} />
         <ModelViewerUpdateModelImageComponent
           ref={this.updateModelImageRef}
           onDelete={this.onDeleteModelImage}
