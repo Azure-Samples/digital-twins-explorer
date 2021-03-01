@@ -39,7 +39,7 @@ export class ErrorMessageComponent extends Component {
 
       this.setState({
         errorMessage,
-        stackErrorMessage: exc.stack.replace(/\n/g, "<br>").replace(/ /gi, "&nbsp"),
+        stackErrorMessage: exc.stack ? exc.stack.replace(/\n/g, "<br>").replace(/ /gi, "&nbsp") : null,
         showModal: true
       });
     });
@@ -59,9 +59,11 @@ export class ErrorMessageComponent extends Component {
           <h2 className="heading-2"><span>!</span>Error</h2>
           <p>{errorMessage}</p>
           <p>Find more infomation on how to resolve issues like this here: <a href={MORE_INFORMATION_LINK} target="_blank" rel="noopener noreferrer">{MORE_INFORMATION_LINK}</a></p>
-          <div className="error-description">
-            <p dangerouslySetInnerHTML={{ __html: stackErrorMessage }} />
-          </div>
+          {stackErrorMessage && (
+            <div className="error-description">
+              <p dangerouslySetInnerHTML={{ __html: stackErrorMessage }} />
+            </div>
+          )}
           <div className="btn-group">
             <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
           </div>

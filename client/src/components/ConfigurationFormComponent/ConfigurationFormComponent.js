@@ -82,20 +82,24 @@ export class ConfigurationFormComponent extends Component {
 
   validateConfig = config => {
     if (!config.appAdtUrl) {
-      eventService.publishError("All fields are required.");
+      eventService.publishError({
+        customMessage: "All fields are required."
+      });
       return false;
     }
 
     if (!config.appAdtUrl.startsWith("https")) {
-      eventService.publishError("ADT URL must start with ‘https’.");
+      eventService.publishError({
+        customMessage: "ADT URL must start with ‘https’."
+      });
       return false;
     }
 
     const regexp = /^(https):\/\/[\w-]+.api.[\w-.]+.[\w-.]+digitaltwins[\w-.]+/gm;
     if (!regexp.test(config.appAdtUrl)) {
-      eventService.publishError(
-        "ADT URL must match the format 'https://<name>.api.<dc>.<domain>'."
-      );
+      eventService.publishError({
+        customMessage: "ADT URL must match the format 'https://<name>.api.<dc>.<domain>'."
+      });
       return false;
     }
 
