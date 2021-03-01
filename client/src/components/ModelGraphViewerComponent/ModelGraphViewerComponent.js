@@ -42,6 +42,9 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   initialize = async () => {
+    if (this.isInitialized) {
+      return;
+    }
     this.isInitialized = true;
     await this.retrieveModels();
   }
