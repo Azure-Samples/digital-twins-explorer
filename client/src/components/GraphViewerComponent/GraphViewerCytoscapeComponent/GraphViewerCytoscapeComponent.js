@@ -656,10 +656,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
-      if (this.props.overlayResults) {
+      const { isHighlighting, highlightFilteredNodes, overlayResults, overlayItems } = this.props;
+      if (overlayResults) {
         if (this.isSelectingOnOverlay) {
-          this.selectNodes(this.props.overlayItems.twins);
-          this.selectEdges(this.props.overlayItems.relationships);
+          this.selectNodes(overlayItems.twins);
+          this.selectEdges(overlayItems.relationships);
           this.isSelectingOnOverlay = false;
         } else {
           this.clearOverlay();
@@ -669,6 +670,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         this.clearOverlay();
         this.contextMenu.hideMenuItem("add-relationship");
         this.contextMenuIsOpen = false;
+      }
+      if (isHighlighting && highlightFilteredNodes) {
+        highlightFilteredNodes();
+      } else {
+        this.clearHighlighting();
       }
     }
   }
@@ -726,6 +732,41 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       zoomLevel -= 0.15;
       this.graphControl.zoom(zoomLevel);
     }
+  }
+
+  highlightNodes(nodes) {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", true);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("opaque", true);
+    });
+    nodes.forEach(node => {
+      const selectedNode = cy.nodes().filter(n => n.id() === node.$dtId);
+      cy.$id(selectedNode.id()).toggleClass("opaque", false);
+      const connectedEdges = selectedNode.connectedEdges();
+      connectedEdges.forEach(edge => {
+        cy.$id(edge.data().id).toggleClass("highlighted", true);
+        cy.$id(edge.data().id).toggleClass("opaque", false);
+      });
+    });
+  }
+
+  filterNodes = nodes => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => node.$dtId === cyNode.id()));
+    });
+  }
+
+  clearHighlighting = () => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", false);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("highlighted", false);
+      cy.$id(cyNode.id()).toggleClass("opaque", false);
+    });
   }
 
   render() {

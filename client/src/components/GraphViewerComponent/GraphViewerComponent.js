@@ -42,7 +42,9 @@ export class GraphViewerComponent extends React.Component {
       filterIsOpen: false,
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false,
-      propInspectorDetailWidth: DETAIL_MIN_WIDTH
+      propInspectorDetailWidth: DETAIL_MIN_WIDTH,
+      highlightingTerms: [],
+      filteringTerms: []
     };
     this.view = React.createRef();
     this.create = React.createRef();
@@ -55,11 +57,14 @@ export class GraphViewerComponent extends React.Component {
     this.modelService = new ModelService();
     this.resizeStartX = 0;
     this.resizeEndX = 0;
+    this.allNodes = [];
+    this.relationships = [];
   }
 
   componentDidMount() {
     eventService.subscribeQuery(query => this.getData(query));
     eventService.subscribeOverlayQueryResults(overlayResults => {
+      this.resetFiltering();
       if (this.state.overlayResults && !overlayResults) {
         this.disableOverlay();
         this.cyRef.current.clearOverlay();
@@ -93,6 +98,7 @@ export class GraphViewerComponent extends React.Component {
 
   clearData() {
     eventService.publishSelection();
+    this.allNodes = [];
     if (this.cyRef.current) {
       this.cyRef.current.clearTwins();
     }
@@ -117,16 +123,20 @@ export class GraphViewerComponent extends React.Component {
       return;
     }
 
+    this.resetFiltering();
+
     this.setState({ query });
     this.canceled = false;
 
     try {
-      this.cyRef.current.clearSelection();
-      const allTwins = await this.getTwinsData(query, overlayResults);
-      await this.getRelationshipsData(allTwins, 30, false, !overlayResults, REL_TYPE_OUTGOING);
+      if (this.cyRef.current) {
+        this.cyRef.current.clearSelection();
+      }
+      this.allNodes = await this.getTwinsData(query, overlayResults);
+      await this.getRelationshipsData(this.allNodes, 30, false, !overlayResults, REL_TYPE_OUTGOING);
 
       if (selectedNode) {
-        const selected = allTwins.find(t => t.$dtId === selectedNode.id);
+        const selected = this.allNodes.find(t => t.$dtId === selectedNode.id);
         if (selected) {
           eventService.publishSelection({ selection: selected, selectionType: "twin" });
         } else {
@@ -186,7 +196,7 @@ export class GraphViewerComponent extends React.Component {
     relTypeLoading = REL_TYPE_OUTGOING, expansionLevel = 1) {
     this.updateProgress(baseline);
 
-    const allRels = [];
+    this.relationships = [];
     const existingRels = clearExisting ? this.cyRef.current.getRelationships() : [];
 
     const allTwins = [ ...twins ];
@@ -227,7 +237,7 @@ export class GraphViewerComponent extends React.Component {
                 }
 
                 this.cyRef.current.addRelationships(presentRels);
-                presentRels.forEach(x => allRels.push(x));
+                presentRels.forEach(x => this.relationships.push(x));
                 if (!rels.nextLink) {
                   resolve();
                 }
@@ -247,7 +257,7 @@ export class GraphViewerComponent extends React.Component {
     }
 
     if (clearExisting) {
-      const removeRels = existingRels.filter(x => allRels.every(y => getUniqueRelationshipId(y) !== x));
+      const removeRels = existingRels.filter(x => this.relationships.every(y => getUniqueRelationshipId(y) !== x));
       this.cyRef.current.removeRelationships(removeRels);
     }
   }
@@ -489,54 +499,172 @@ export class GraphViewerComponent extends React.Component {
     window.addEventListener("mouseup", this.handleMouseUp);
   };
 
-  render() {
+
+  onUpdateFilteringTerm = term => {
+    const { filteringTerms } = this.state;
+    filteringTerms[filteringTerms.map(t => t.text).indexOf(term.text)] = term;
+    this.setState({ filteringTerms }, () => {
+      this.filterNodes();
+    });
+  }
+
+  onUpdateHighlightingTerm = term => {
+    const { highlightingTerms } = this.state;
+    highlightingTerms[highlightingTerms.map(t => t.text).indexOf(term.text)] = term;
+    this.setState({ highlightingTerms }, () => {
+      this.highlightNodes();
+    });
+  }
+
+  onAddFilteringTerm = term => {
+    const { filteringTerms } = this.state;
+    filteringTerms.push(term);
+    this.setState({ filteringTerms }, () => {
+      this.filterNodes();
+    });
+  }
+
+  onRemoveFilteringTerm = term => {
+    const { filteringTerms } = this.state;
+    filteringTerms.splice(filteringTerms.map(t => t.text).indexOf(term.text), 1);
+    this.setState({ filteringTerms }, () => {
+      this.filterNodes();
+    });
+  }
+
+  onAddHighlightingTerm = term => {
+    const { highlightingTerms } = this.state;
+    highlightingTerms.push(term);
+    this.setState({ highlightingTerms }, () => {
+      this.highlightNodes();
+    });
+  }
+
+  onRemoveHighlightingTerm = term => {
+    const { highlightingTerms } = this.state;
+    highlightingTerms.splice(highlightingTerms.map(t => t.text).indexOf(term.text), 1);
+    this.setState({ highlightingTerms }, () => {
+      this.highlightNodes();
+    });
+  }
+
+  highlightNodes = () => {
+    const { highlightingTerms } = this.state;
+    this.cyRef.current.clearHighlighting();
+    const termsHighlightingId = highlightingTerms.filter(term => term.match$dtId);
+    const highlightedNodes = this.getFilteredNodes(termsHighlightingId);
+    if (highlightedNodes.length > 0) {
+      this.cyRef.current.highlightNodes(highlightedNodes);
+    }
+  }
+
+  filterNodes = () => {
+    const { filteringTerms } = this.state;
+    const termsFilteringId = filteringTerms.filter(term => term.match$dtId);
+    const filteredNodes = this.getFilteredNodes(termsFilteringId);
+    this.cyRef.current.showAllNodes();
+    if (filteredNodes.length > 0) {
+      this.cyRef.current.filterNodes(filteredNodes);
+    }
+  }
+
+  getFilteredNodes = termsFilteringId => {
+    let outgoingRels = [];
+    let filteredNodes = this.allNodes.filter(node => {
+      const matchesId = termsFilteringId.some(term => {
+        const matches = node.$dtId.toLowerCase().includes(term.text.toLowerCase());
+        if (matches) {
+          if (term.addOutgoingRelationships) {
+            outgoingRels = [ ...new Set([ ...outgoingRels, ...this.getNodeOutgoingRelationships(node) ]) ];
+          }
+        }
+        return matches;
+      });
+      return matchesId;
+    });
+    if (outgoingRels.length > 0) {
+      filteredNodes = [ ...new Set([ ...filteredNodes, ...outgoingRels ]) ];
+    }
+    return filteredNodes;
+  }
+
+  getNodeOutgoingRelationships = node => {
+    const outgoingRels = [];
+    const nodeRels = this.relationships.filter(rel => rel.$sourceId === node.$dtId);
+    if (nodeRels.length > 0) {
+      nodeRels.forEach(rel => {
+        outgoingRels.push(this.allNodes.find(n => n.$dtId === rel.$targetId));
+      });
+    }
+    return outgoingRels;
+  }
+
+  renderCommandBar = () => {
     const {
       selectedNode,
       selectedNodes,
       selectedEdge,
-      isLoading,
       query,
-      progress,
       layout,
       hideMode,
       canShowAll,
-      canShowAllRelationships,
+      canShowAllRelationships
+    } = this.state;
+    return (
+      <>
+        <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
+          selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
+          layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
+          onRelationshipCreate={this.onRelationshipCreate}
+          onShowAllRelationships={this.onShowAllRelationships}
+          onTwinDelete={this.onTwinDelete}
+          onHideOthers={this.onHideOthers}
+          onHideNonChildren={this.onHideNonChildren}
+          onHide={this.onHide}
+          onHideWithChildren={this.onHideWithChildren}
+          onTriggerHide={this.onTriggerHide}
+          onShowAll={this.onShowAll}
+          canShowAll={canShowAll}
+          canShowAllRelationships={canShowAllRelationships}
+          onLayoutClicked={() => this.cyRef.current.doLayout()}
+          onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
+          onCenterClicked={() => this.cyRef.current.center()}
+          onLayoutChanged={this.onLayoutChanged}
+          onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
+        <GraphViewerRelationshipCreateComponent ref={this.create}
+          selectedNode={selectedNode} selectedNodes={selectedNodes}
+          onCreate={this.onRelationshipCreate} />
+        <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
+        <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
+          onDelete={this.onTwinDelete} onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
+        <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
+      </>
+    );
+  }
+
+  resetFiltering = () => {
+    this.cyRef.current.showAllNodes();
+    this.cyRef.current.clearHighlighting();
+    this.setState({ highlightingTerms: [], filteringTerms: [] });
+  }
+
+  render() {
+    const {
+      isLoading,
+      progress,
       filterIsOpen,
       propertyInspectorIsOpen,
       overlayResults,
       overlayItems,
-      propInspectorDetailWidth
+      propInspectorDetailWidth,
+      highlightingTerms,
+      filteringTerms
     } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
         <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
           <div className="gc-toolbar">
-            <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
-              selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
-              layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
-              onRelationshipCreate={this.onRelationshipCreate}
-              onShowAllRelationships={this.onShowAllRelationships}
-              onTwinDelete={this.onTwinDelete}
-              onHideOthers={this.onHideOthers}
-              onHideNonChildren={this.onHideNonChildren}
-              onHide={this.onHide}
-              onHideWithChildren={this.onHideWithChildren}
-              onTriggerHide={this.onTriggerHide}
-              onShowAll={this.onShowAll}
-              canShowAll={canShowAll}
-              canShowAllRelationships={canShowAllRelationships}
-              onLayoutClicked={() => this.cyRef.current.doLayout()}
-              onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
-              onCenterClicked={() => this.cyRef.current.center()}
-              onLayoutChanged={this.onLayoutChanged}
-              onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
-            <GraphViewerRelationshipCreateComponent ref={this.create}
-              selectedNode={selectedNode} selectedNodes={selectedNodes}
-              onCreate={this.onRelationshipCreate} />
-            <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
-            <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
-              onDelete={this.onTwinDelete} onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
-            <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
+            {this.renderCommandBar()}
           </div>
           <div className="gc-wrap">
             <GraphViewerCytoscapeComponent ref={this.cyRef}
@@ -556,10 +684,21 @@ export class GraphViewerComponent extends React.Component {
               onGetRelationships={this.onGetRelationships}
               onConfirmTwinDelete={this.onConfirmTwinDelete}
               onConfirmRelationshipDelete={this.onConfirmRelationshipDelete}
+              isHighlighting={highlightingTerms && highlightingTerms.length > 0}
+              highlightFilteredNodes={this.highlightNodes}
               onNodeMouseEnter={this.onNodeMouseEnter} />
           </div>
           <div className="gc-filter">
-            <GraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} onCenter={this.onCenter} />
+            <GraphViewerFilteringComponent toggleFilter={this.toggleFilter} onZoomIn={this.onZoomIn} onZoomOut={this.onZoomOut} onZoomToFit={this.onZoomToFit} onCenter={this.onCenter}
+              onAddHighlightingTerm={this.onAddHighlightingTerm}
+              onRemoveHighlightingTerm={this.onRemoveHighlightingTerm}
+              onAddFilteringTerm={this.onAddFilteringTerm}
+              onRemoveFilteringTerm={this.onRemoveFilteringTerm}
+              onUpdateFilteringTerm={this.onUpdateFilteringTerm}
+              onUpdateHighlightingTerm={this.onUpdateHighlightingTerm}
+              resetFiltering={this.resetFiltering}
+              highlightingTerms={highlightingTerms}
+              filteringTerms={filteringTerms} />
           </div>
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
