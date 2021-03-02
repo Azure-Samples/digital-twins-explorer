@@ -404,7 +404,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   disableOverlay = () => {
-    this.setState({ overlayResults: false, overlayItems: {} });
+    this.setState({ overlayItems: {} });
   }
 
   onConfirmTwinDelete = ({ target: node }) => {
