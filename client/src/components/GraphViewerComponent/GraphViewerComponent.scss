@@ -169,6 +169,49 @@
   }
 }
 
+.alert-no-display{
+  box-sizing: border-box;
+  background-color: #fff;
+  width: 70%;
+  position: absolute;
+  left: 15%;
+  bottom: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.alert--info{
+  height: 33px;
+  min-width: 33px;
+  background-color: #2070BA;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 9px;
+  font-size: 18px;
+}
+
+.alert--message{
+  color: #000;
+  margin-right: 25px;
+
+  a {
+    color: #0471b9;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.alert--close{
+  color: #000;
+  font-size: 14px;
+  cursor: pointer;
+  padding-right: 14px;
+}
 .filter-input {
   width: 25%;
   max-width: 300px;

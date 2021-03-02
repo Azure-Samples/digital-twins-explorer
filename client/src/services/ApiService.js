@@ -15,7 +15,8 @@ const getDataFromQueryResponse = response => {
   const list = [ ...response ];
   const data = {
     twins: [],
-    relationships: []
+    relationships: [],
+    other: []
   };
   for (let i = 0; i < list.length; i++) {
     const current = list[i];
@@ -25,6 +26,8 @@ const getDataFromQueryResponse = response => {
     } else if (current.$relationshipId) {
       data.relationships.push(current);
       continue;
+    } else {
+      data.other.push(current);
     }
 
     for (const k of Object.keys(current)) {
@@ -76,22 +79,12 @@ class ApiService {
     this.client = new DigitalTwinsClient(appAdtUrl, nullTokenCredentials, { httpClient });
   }
 
-  async queryTwinsPaged(query, callback) {
+  async query(query, callback) {
     await this.initialize();
 
     let count = 1;
     for await (const page of this.client.queryTwins(query).byPage()) {
       print(`Ran query for twins, page ${count++}:`, "info");
-      print(JSON.stringify(page, null, 2), "info");
-      await callback(getDataFromQueryResponse(page.value).twins);
-    }
-  }
-
-  async queryOverlay(query, callback) {
-    await this.initialize();
-    let count = 1;
-    for await (const page of this.client.queryTwins(query).byPage()) {
-      print(`Ran query for overlay, page ${count++}:`, "info");
       print(JSON.stringify(page, null, 2), "info");
       await callback(getDataFromQueryResponse(page.value));
     }
@@ -99,7 +92,7 @@ class ApiService {
 
   async queryTwins(query) {
     const list = [];
-    await this.queryTwinsPaged(query, items => items.forEach(x => list.push(x)));
+    await this.queryTwinsPaged(query, ({ twins }) => twins.forEach(x => list.push(x)));
 
     return list;
   }

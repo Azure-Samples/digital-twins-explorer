@@ -150,6 +150,22 @@ class EventService {
     this._on("closecomponent", callback);
   }
 
+  publishOpenOptionalComponent(component) {
+    this._emit("opencomponent", component);
+  }
+
+  subscribeOpenOptionalComponent(callback) {
+    this._on("opencomponent", callback);
+  }
+
+  publishComponentClosed(component) {
+    this._emit("componentclosed", component);
+  }
+
+  subscribeComponentClosed(callback) {
+    this._on("componentclosed", callback);
+  }
+
   publishImport(evt) {
     this._emit("import", evt);
   }
