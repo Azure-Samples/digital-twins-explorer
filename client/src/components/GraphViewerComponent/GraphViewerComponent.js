@@ -177,12 +177,17 @@ export class GraphViewerComponent extends React.Component {
 
     if (overlayResults) {
       await apiService.query(query, async data => {
-        extraTwins = data.twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
-        this.cyRef.current.addTwins(extraTwins);
-        await this.cyRef.current.doLayout();
-        data.twins.forEach(x => allTwins.push({ ...x, selected: true }));
-        this.setState({ overlayItems: { ...data, twins: data.twins.map(t => t.$dtId) }});
-        this.updateProgress();
+        if (data.twins.length > 0 || data.relationships.length > 0) {
+          this.setState({ couldNotDisplay: false });
+          extraTwins = data.twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
+          this.cyRef.current.addTwins(extraTwins);
+          await this.cyRef.current.doLayout();
+          data.twins.forEach(x => allTwins.push({ ...x, selected: true }));
+          this.setState({ overlayItems: { ...data, twins: data.twins.map(t => t.$dtId) }});
+          this.updateProgress();
+        } else {
+          this.setState({ couldNotDisplay: true });
+        }
       });
     } else {
       await apiService.query(query, async data => {

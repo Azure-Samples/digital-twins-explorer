@@ -471,15 +471,19 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  dimGraphElements = () => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("opaque", true);
+    cy.edges().toggleClass("highlighted", false);
+    cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", true));
+    cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
+  }
+
   selectNodes = nodeIds => {
     this.dimGraphElements();
     if (nodeIds && nodeIds.length > 0) {
       const cy = this.graphControl;
       this.selectedNodes = [];
-      cy.edges().toggleClass("opaque", true);
-      cy.edges().toggleClass("highlighted", false);
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", true));
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
       nodeIds.forEach(id => {
         const node = cy.elements(`node[id="${id}"]`);
         if (node) {
