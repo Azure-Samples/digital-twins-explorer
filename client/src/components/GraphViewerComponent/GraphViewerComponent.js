@@ -152,7 +152,8 @@ export class GraphViewerComponent extends React.Component {
           } else {
             eventService.publishSelection();
           }
-        } else if (overlayResults) {
+        }
+        if (overlayResults) {
           const { overlayItems: { twins, relationships } } = this.state;
           this.cyRef.current.selectNodes(twins);
           this.cyRef.current.selectEdges(relationships);
@@ -356,13 +357,17 @@ export class GraphViewerComponent extends React.Component {
   onHideWithChildren = () => this.setState({ hideMode: "hide-with-children", canShowAll: true });
 
   onShowAll = () => {
-    this.cyRef.current.showAllNodes();
-    this.setState({ canShowAll: false });
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllNodes();
+      this.setState({ canShowAll: false });
+    }
   };
 
   onShowAllRelationships = () => {
-    this.cyRef.current.showAllEdges();
-    this.setState({ canShowAllRelationships: false });
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllEdges();
+      this.setState({ canShowAllRelationships: false });
+    }
   };
 
   onHideRelationship = () => {
@@ -578,9 +583,11 @@ export class GraphViewerComponent extends React.Component {
     const { filteringTerms } = this.state;
     const termsFilteringId = filteringTerms.filter(term => term.match$dtId);
     const filteredNodes = this.getFilteredNodes(termsFilteringId);
-    this.cyRef.current.showAllNodes();
-    if (filteredNodes.length > 0) {
-      this.cyRef.current.filterNodes(filteredNodes);
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllNodes();
+      if (filteredNodes.length > 0) {
+        this.cyRef.current.filterNodes(filteredNodes);
+      }
     }
   }
 
@@ -659,8 +666,10 @@ export class GraphViewerComponent extends React.Component {
   }
 
   resetFiltering = () => {
-    this.cyRef.current.showAllNodes();
-    this.cyRef.current.clearHighlighting();
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllNodes();
+      this.cyRef.current.clearHighlighting();
+    }
     this.setState({ highlightingTerms: [], filteringTerms: [] });
   }
 

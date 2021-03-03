@@ -371,9 +371,11 @@ export class ModelGraphViewerComponent extends React.Component {
     const termsFilteringId = filteringTerms.filter(term => term.matchDtmi);
     const termsFilteringDisplayName = filteringTerms.filter(term => term.matchDisplayName);
     const filteredNodes = this.getFilteredNodes(termsFilteringId, termsFilteringDisplayName);
-    this.cyRef.current.showAllNodes();
-    if (filteredNodes.length > 0) {
-      this.cyRef.current.filterNodes(filteredNodes);
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllNodes();
+      if (filteredNodes.length > 0) {
+        this.cyRef.current.filterNodes(filteredNodes);
+      }
     }
   }
 
@@ -427,8 +429,10 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   resetFiltering = () => {
-    this.cyRef.current.showAllNodes();
-    this.cyRef.current.clearHighlighting();
+    if (this.cyRef.current) {
+      this.cyRef.current.showAllNodes();
+      this.cyRef.current.clearHighlighting();
+    }
   }
 
   toggleModelDetail = () => {

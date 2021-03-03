@@ -472,6 +472,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   selectNodes = nodeIds => {
+    this.dimGraphElements();
     if (nodeIds && nodeIds.length > 0) {
       const cy = this.graphControl;
       this.selectedNodes = [];
