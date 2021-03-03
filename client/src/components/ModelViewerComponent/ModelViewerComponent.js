@@ -127,15 +127,24 @@ export class ModelViewerComponent extends Component {
     let success = true;
     let sortedModels = [];
     try {
+      const { items } = this.state;
       const modelService = new ModelService();
       const sortedModelsId = await modelService.getModelIdsForUpload(list);
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
-      const chunks = this.chunkModelsList(sortedModels, 250);
-      chunks.forEach(async chunk => {
-        const res = await apiService.addModels(chunk);
-        print("*** Upload result:", "info");
-        print(JSON.stringify(res, null, 2), "info");
-      });
+      sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
+      if (sortedModels.length > 0) {
+        const chunks = this.chunkModelsList(sortedModels, 250);
+        chunks.forEach(async chunk => {
+          try {
+            const res = await apiService.addModels(chunk);
+            print("*** Upload result:", "info");
+            print(JSON.stringify(res, null, 2), "info");
+          } catch (exc) {
+            exc.customMessage = "Error adding models";
+            eventService.publishError(exc);
+          }
+        });
+      }
     } catch (exc) {
       success = false;
       exc.customMessage = "Upload error";
@@ -239,12 +248,6 @@ export class ModelViewerComponent extends Component {
 
   onDelete = item => this.deleteRef.current.open(item)
 
-  updateModelList = itemKey => {
-    this.originalItems.splice(this.originalItems.findIndex(i => i.key === itemKey), 1);
-    const items = this.originalItems;
-    this.setState({ items, filterText: "" });
-  }
-
   render() {
     const { items, isLoading, filterText } = this.state;
     return (
@@ -284,7 +287,7 @@ export class ModelViewerComponent extends Component {
         </div>
         <ModelViewerViewComponent ref={this.viewRef} />
         <ModelViewerCreateComponent ref={this.createRef} />
-        <ModelViewerDeleteComponent ref={this.deleteRef} onDelete={this.updateModelList} />
+        <ModelViewerDeleteComponent ref={this.deleteRef} />
         <ModelViewerUpdateModelImageComponent
           ref={this.updateModelImageRef}
           onDelete={this.onDeleteModelImage}

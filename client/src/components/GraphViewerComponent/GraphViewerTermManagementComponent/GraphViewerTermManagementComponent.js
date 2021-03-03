@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { eventService } from "../../../services/EventService";
 import { IconButton, Label, TextField, Checkbox } from "office-ui-fabric-react";
 
 const addIconStyle = {
@@ -13,100 +12,65 @@ const addIconStyle = {
   cursor: "pointer"
 };
 
-export default class ModelGraphViewerTermManagementComponent extends Component {
+export default class GraphViewerTermManagementComponent extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      filterTerm: "",
-      matchTerms: []
+      filterTerm: ""
     };
     this.menuItems = [
-      {
-        key: "addSuperTypes",
-        text: "Add Supertype",
-        ariaLabel: "add supertype"
-      },
-      {
-        key: "addSubTypes",
-        text: "Add Subtypes",
-        ariaLabel: "add subtypes"
-      },
       {
         key: "addOutgoingRelationships",
         text: "Add Outgoing Relationships",
         ariaLabel: "add outgoing relationships"
       },
       {
-        key: "matchDtmi",
-        text: "Match DTMI",
-        ariaLabel: "match dtmi"
-      },
-      {
-        key: "matchDisplayName",
-        text: "Match Display Name",
-        ariaLabel: "match display name"
+        key: "match$dtId",
+        text: "Match $dtId",
+        ariaLabel: "match $dtId"
       }
     ];
-  }
-
-  componentDidMount() {
-    eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
-  }
-
-  componentWillUnmount() {
-    eventService.unsubscribeEnvironmentChange(this.clearAfterEnvironmentChange);
-  }
-
-  clearAfterEnvironmentChange = () => {
-    this.setState({
-      filterTerm: "",
-      matchTerms: []
-    });
   }
 
   onTermChanged = (_, text) => this.setState({ filterTerm: text });
 
   removeTerm = term => {
-    const { matchTerms } = this.state;
     const { onRemoveFilteringTerm } = this.props;
-    matchTerms.splice(matchTerms.map(t => t.text).indexOf(term.text), 1);
-    this.setState({ matchTerms });
     if (onRemoveFilteringTerm) {
       onRemoveFilteringTerm(term);
     }
   };
 
   addTerm = () => {
-    const { filterTerm, matchTerms } = this.state;
-    const { onAddFilteringTerm } = this.props;
-    if (filterTerm && !matchTerms.some(t => t.text === filterTerm)) {
+    const { filterTerm } = this.state;
+    const { terms, onAddFilteringTerm } = this.props;
+    if (filterTerm && !terms.some(t => t.text === filterTerm)) {
       const term = {
         text: filterTerm,
         menuIsOpen: false,
-        matchDtmi: true,
-        matchDisplayName: true,
-        addSuperTypes: true,
-        addSubTypes: true,
+        match$dtId: true,
         addOutgoingRelationships: true
       };
       if (onAddFilteringTerm) {
         onAddFilteringTerm(term);
       }
-      matchTerms.push(term);
-      this.setState({ matchTerms, filterTerm: "" });
+      this.setState({ filterTerm: "" });
     }
   };
 
   toggleTermOptions = term => {
-    const { matchTerms } = this.state;
+    const { terms, onUpdateTerm } = this.props;
+    const newTerms = [ ...terms ];
     if (!term.menuIsOpen) {
-      matchTerms.forEach(t => {
+      newTerms.forEach(t => {
         t.menuIsOpen = false;
       });
     }
-    matchTerms[matchTerms.map(t => t.text).indexOf(term.text)].menuIsOpen = !term.menuIsOpen;
-    this.setState({ matchTerms });
+    newTerms[newTerms.map(t => t.text).indexOf(term.text)].menuIsOpen = !term.menuIsOpen;
+    newTerms.forEach(t => {
+      onUpdateTerm(t);
+    });
   }
 
   handleKeyDown = e => {
@@ -116,9 +80,9 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
   }
 
   toggleCheckbox = (term, key) => {
-    const { matchTerms } = this.state;
-    const { onUpdateTerm } = this.props;
-    matchTerms.forEach(t => {
+    const { terms, onUpdateTerm } = this.props;
+    const newTerms = [ ...terms ];
+    newTerms.forEach(t => {
       if (t.text === term.text) {
         t[key] = !t[key];
         if (onUpdateTerm) {
@@ -126,15 +90,15 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
         }
       }
     });
-    this.setState({ matchTerms });
   }
 
   render() {
-    const { matchTerms, filterTerm } = this.state;
+    const { filterTerm } = this.state;
+    const { terms } = this.props;
     return (
       <Label className="highlight-section">
         <div className="filter-input">
-          <div className="mgv-filter-wrap">
+          <div className="gv-filter-wrap">
             <TextField
               className="mgv-filter"
               onChange={this.onTermChanged}
@@ -149,7 +113,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
           </div>
         </div>
         <div className="filter-terms">
-          {matchTerms.map(term => (
+          {terms.map(term => (
             <div className="filter-term" key={term.text}>
               <div className="term-bar">
                 <span>{term.text}</span>

@@ -130,6 +130,7 @@ export const graphStyles = [
 ];
 
 export const modelWithImageStyle = {
+  width: "78px",
   "background-height": "9px",
   "background-width": "9px",
   "background-fit": "none",

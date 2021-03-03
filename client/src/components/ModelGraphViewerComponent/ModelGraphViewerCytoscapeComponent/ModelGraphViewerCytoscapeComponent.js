@@ -30,6 +30,36 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.isHidingLabels = false;
     this.hiddenTextRuler = React.createRef();
     this.canRenderPopper = false;
+    this.contextMenuIsOpen = false;
+    this.contextMenuItems = [
+      {
+        id: "show-destination",
+        content: "Show destination",
+        selector: "edge",
+        onClickFunction: this.onShowDestination
+      },
+      {
+        id: "show-source",
+        content: "Show source",
+        selector: "edge",
+        onClickFunction: this.onShowSource
+      },
+      {
+        id: "scale-to-rel",
+        content: "Scale to relationship",
+        selector: "edge",
+        onClickFunction: this.onScaleToRel
+      }
+    ];
+  }
+
+  componentDidMount() {
+    const cy = this.graphControl;
+    this.contextMenu = cy.contextMenus({
+      menuItems: this.contextMenuItems,
+      menuItemClasses: [ "custom-menu-item" ],
+      contextMenuClasses: [ "custom-context-menu" ]
+    });
   }
 
   addNodes(nodes) {
@@ -121,7 +151,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     return settingsService.getModelImage(modelId);
   }
 
-  doLayout() {
+  doLayout(progressCallback) {
     const cy = this.graphControl;
 
     cy.batch(() => {
@@ -141,7 +171,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     });
 
     return new Promise(resolve => {
-      const layout = cy.layout(ModelGraphViewerCytoscapeLayouts[this.layout]);
+      const options = ModelGraphViewerCytoscapeLayouts[this.layout];
+      if (progressCallback && options.tick) {
+        options.tick = progressCallback;
+      }
+      const layout = cy.layout(options);
       layout.on("layoutstop", () => resolve());
       layout.run();
     });
@@ -242,7 +276,12 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       cy.$id(cyNode.id()).toggleClass("opaque", true);
     });
     nodes.forEach(node => {
-      const selectedNode = cy.nodes().filter(n => n.id() === node.id);
+      const selectedNode = cy.nodes().filter(n => {
+        if (node) {
+          return n.id() === node.id;
+        }
+        return null;
+      });
       cy.$id(selectedNode.id()).toggleClass("opaque", false);
       const connectedEdges = selectedNode.connectedEdges();
       connectedEdges.forEach(edge => {
@@ -433,8 +472,9 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   filterNodes = nodes => {
     const cy = this.graphControl;
+    const cleanNodes = nodes.filter(n => n && n.id);
     cy.nodes().forEach(cyNode => {
-      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => node.id === cyNode.id()));
+      cy.$id(cyNode.id()).toggleClass("hide", !cleanNodes.some(node => node.id === cyNode.id()));
     });
   }
 
@@ -476,6 +516,29 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     return cutText;
   }
 
+  onEdgeRightClick = () => {
+    this.contextMenuIsOpen = true;
+    this.onNodeUnhover();
+  }
+
+  onShowDestination = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$id(target.target().id()));
+  }
+
+  onShowSource = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$id(target.source().id()));
+  }
+
+  onScaleToRel = e => {
+    const target = e.target || e.cyTarget;
+    const cy = this.graphControl;
+    cy.fit(cy.$(`[id = "${target.source().id()}"], [id = "${target.target().id()}"]`));
+  }
+
   render() {
     return (
       <div style={{ position: "relative", height: "100%" }}>
@@ -497,6 +560,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("mouseout", this.onNodeUnhover);
               this.graphControl.on("mousedown", this.onNodeUnhover);
               this.graphControl.on("zoom", this.onGraphZoom);
+              this.graphControl.on("cxttap", "edge", this.onEdgeRightClick);
             }
           }} />
         <div className="navigator-container">

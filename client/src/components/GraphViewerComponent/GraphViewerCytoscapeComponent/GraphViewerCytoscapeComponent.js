@@ -185,12 +185,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   hideSelectedTwins = ({ target: node }) => {
     const cy = this.graphControl;
     if (this.selectedNodes.length > 0) {
-      this.clearSelection();
       this.selectedNodes.forEach(x => {
         cy.$id(x.id).toggleClass("hide", true);
       });
       cy.$(":selected").unselect();
-      this.selectedNodes = [];
+      this.clearSelection();
     } else if (node && node.id()) {
       cy.$id(node.id()).toggleClass("hide", true);
     }
@@ -285,7 +284,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           source: x.$sourceId,
           target: x.$targetId,
           label: x.$relationshipName,
-          id: getUniqueRelationshipId(x)
+          id: getUniqueRelationshipId(x),
+          relationshipId: x.$relationshipId
         }
       }))
       .filter(x => this.graphControl.$id(x.id).length === 0);
@@ -346,11 +346,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     const cy = this.graphControl;
     cy.nodes().forEach(cyNode => {
       cy.$id(cyNode.id()).toggleClass("opaque", false);
-      cy.$id(cyNode.id()).toggleClass("highlight", false);
+      cy.$id(cyNode.id()).toggleClass("highlighted", false);
     });
     cy.edges().forEach(cyEdge => {
       cy.$id(cyEdge.id()).toggleClass("opaque", false);
-      cy.$id(cyEdge.id()).toggleClass("highlight", false);
+      cy.$id(cyEdge.id()).toggleClass("highlighted", false);
     });
     this.selectedNodes = [];
   }
@@ -471,14 +471,19 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  dimGraphElements = () => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("opaque", true);
+    cy.edges().toggleClass("highlighted", false);
+    cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", true));
+    cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
+  }
+
   selectNodes = nodeIds => {
-    if (nodeIds.length > 0) {
+    this.dimGraphElements();
+    if (nodeIds && nodeIds.length > 0) {
       const cy = this.graphControl;
       this.selectedNodes = [];
-      cy.edges().toggleClass("opaque", true);
-      cy.edges().toggleClass("highlighted", false);
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("opaque", true));
-      cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
       nodeIds.forEach(id => {
         const node = cy.elements(`node[id="${id}"]`);
         if (node) {
@@ -493,6 +498,16 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           });
         }
+      });
+    }
+  }
+
+  selectEdges = rels => {
+    if (rels && rels.length > 0) {
+      const cy = this.graphControl;
+      rels.forEach(rel => {
+        cy.$id(getUniqueRelationshipId(rel)).toggleClass("highlighted", true);
+        cy.$id(getUniqueRelationshipId(rel)).toggleClass("opaque", false);
       });
     }
   }
@@ -646,9 +661,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
-      if (this.props.overlayResults) {
+      const { isHighlighting, highlightFilteredNodes, overlayResults, overlayItems } = this.props;
+      if (overlayResults) {
         if (this.isSelectingOnOverlay) {
-          this.selectNodes(this.props.overlayItems);
+          this.selectNodes(overlayItems.twins);
+          this.selectEdges(overlayItems.relationships);
           this.isSelectingOnOverlay = false;
         } else {
           this.clearOverlay();
@@ -658,6 +675,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         this.clearOverlay();
         this.contextMenu.hideMenuItem("add-relationship");
         this.contextMenuIsOpen = false;
+      }
+      if (isHighlighting && highlightFilteredNodes) {
+        highlightFilteredNodes();
+      } else {
+        this.clearHighlighting();
       }
     }
   }
@@ -715,6 +737,41 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       zoomLevel -= 0.15;
       this.graphControl.zoom(zoomLevel);
     }
+  }
+
+  highlightNodes(nodes) {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", true);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("opaque", true);
+    });
+    nodes.forEach(node => {
+      const selectedNode = cy.nodes().filter(n => n.id() === node.$dtId);
+      cy.$id(selectedNode.id()).toggleClass("opaque", false);
+      const connectedEdges = selectedNode.connectedEdges();
+      connectedEdges.forEach(edge => {
+        cy.$id(edge.data().id).toggleClass("highlighted", true);
+        cy.$id(edge.data().id).toggleClass("opaque", false);
+      });
+    });
+  }
+
+  filterNodes = nodes => {
+    const cy = this.graphControl;
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("hide", !nodes.some(node => node.$dtId === cyNode.id()));
+    });
+  }
+
+  clearHighlighting = () => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", false);
+    cy.nodes().forEach(cyNode => {
+      cy.$id(cyNode.id()).toggleClass("highlighted", false);
+      cy.$id(cyNode.id()).toggleClass("opaque", false);
+    });
   }
 
   render() {

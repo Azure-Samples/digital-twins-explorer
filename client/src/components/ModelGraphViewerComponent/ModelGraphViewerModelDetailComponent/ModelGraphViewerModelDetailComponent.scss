@@ -5,7 +5,7 @@
     height: calc(100% - 30px);
     display: flex;
     flex-direction: column;
-    padding: 15px;
+    padding: 10px;
     pre {
         max-width: 100%;
         flex: 1;
@@ -21,6 +21,7 @@
         color: $textColorLight1;
     }
     .detail-title {
+        font-size: 10px;
         color: #888888;
         text-transform: uppercase;
     }

@@ -150,6 +150,22 @@ class EventService {
     this._on("closecomponent", callback);
   }
 
+  publishOpenOptionalComponent(component) {
+    this._emit("opencomponent", component);
+  }
+
+  subscribeOpenOptionalComponent(callback) {
+    this._on("opencomponent", callback);
+  }
+
+  publishComponentClosed(component) {
+    this._emit("componentclosed", component);
+  }
+
+  subscribeComponentClosed(callback) {
+    this._on("componentclosed", callback);
+  }
+
   publishImport(evt) {
     this._emit("import", evt);
   }
@@ -190,11 +206,23 @@ class EventService {
     this._on("modelsupdate", callback);
   }
 
-  _emit = (name, payload) => this._action({ type: "emit", name, payload })
+  publishEnvironmentChange() {
+    this._emit("environmentChanged");
+  }
 
-  _off = (name, payload) => this._action({ type: "off", name, payload })
+  subscribeEnvironmentChange(callback) {
+    this._on("environmentChanged", callback);
+  }
 
-  _on = (name, payload) => this._action({ type: "on", name, payload })
+  unsubscribeEnvironmentChange(callback) {
+    this._off("environmentChanged", callback);
+  }
+
+  _emit = (name, payload) => this._action({ type: "emit", name, payload });
+
+  _off = (name, payload) => this._action({ type: "off", name, payload });
+
+  _on = (name, payload) => this._action({ type: "on", name, payload });
 
   _action({ type, name, payload }) {
     if (this.eventHub) {
