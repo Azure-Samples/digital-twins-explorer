@@ -85,22 +85,25 @@ export class ModelGraphViewerComponent extends React.Component {
 
     this.updateProgress(0);
 
-    let list = [];
-    try {
-      list = await this.modelService.getAllModels();
-    } catch (exc) {
-      exc.customMessage = "Error fetching models";
-      eventService.publishError(exc);
+    if (this.cyRef.current) {
+      let list = [];
+      try {
+        list = await this.modelService.getAllModels();
+      } catch (exc) {
+        exc.customMessage = "Error fetching models";
+        eventService.publishError(exc);
+      }
+      this.allNodes = this.getNodes(list);
+      this.componentRelationships = this.getComponentRelationships(list);
+      this.extendRelationships = this.getExtendRelationships(list);
+      this.relationships = this.getRelationships(list);
+      this.cyRef.current.addNodes(this.allNodes);
+      this.cyRef.current.addRelationships(this.relationships, "related");
+      this.cyRef.current.addRelationships(this.componentRelationships, "component");
+      this.cyRef.current.addRelationships(this.extendRelationships, "extends");
+      await this.cyRef.current.doLayout(this.progressCallback);
     }
-    this.allNodes = this.getNodes(list);
-    this.componentRelationships = this.getComponentRelationships(list);
-    this.extendRelationships = this.getExtendRelationships(list);
-    this.relationships = this.getRelationships(list);
-    this.cyRef.current.addNodes(this.allNodes);
-    this.cyRef.current.addRelationships(this.relationships, "related");
-    this.cyRef.current.addRelationships(this.componentRelationships, "component");
-    this.cyRef.current.addRelationships(this.extendRelationships, "extends");
-    await this.cyRef.current.doLayout(this.progressCallback);
+
     this.updateProgress(100);
   }
 

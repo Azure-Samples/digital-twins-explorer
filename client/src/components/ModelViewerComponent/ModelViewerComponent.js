@@ -127,20 +127,24 @@ export class ModelViewerComponent extends Component {
     let success = true;
     let sortedModels = [];
     try {
+      const { items } = this.state;
       const modelService = new ModelService();
       const sortedModelsId = await modelService.getModelIdsForUpload(list);
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
-      const chunks = this.chunkModelsList(sortedModels, 250);
-      chunks.forEach(async chunk => {
-        try {
-          const res = await apiService.addModels(chunk);
-          print("*** Upload result:", "info");
-          print(JSON.stringify(res, null, 2), "info");
-        } catch (exc) {
-          exc.customMessage = "Error adding models";
-          eventService.publishError(exc);
-        }
-      });
+      sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
+      if (sortedModels.length > 0) {
+        const chunks = this.chunkModelsList(sortedModels, 250);
+        chunks.forEach(async chunk => {
+          try {
+            const res = await apiService.addModels(chunk);
+            print("*** Upload result:", "info");
+            print(JSON.stringify(res, null, 2), "info");
+          } catch (exc) {
+            exc.customMessage = "Error adding models";
+            eventService.publishError(exc);
+          }
+        });
+      }
     } catch (exc) {
       success = false;
       exc.customMessage = "Upload error";
