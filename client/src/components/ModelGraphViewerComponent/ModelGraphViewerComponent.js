@@ -218,6 +218,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onRelationshipsToggleChange = async () => {
     const { showRelationships } = this.state;
+    if (!this.relationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showRelationships) {
       this.cyRef.current.removeRelationships(this.relationships);
@@ -232,6 +235,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onInheritancesToggleChange = async () => {
     const { showInheritances } = this.state;
+    if (!this.extendRelationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showInheritances) {
       this.cyRef.current.removeRelationships(this.extendRelationships);
@@ -246,6 +252,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onComponentsToggleChange = async () => {
     const { showComponents } = this.state;
+    if (!this.componentRelationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showComponents) {
       this.cyRef.current.removeRelationships(this.componentRelationships);
