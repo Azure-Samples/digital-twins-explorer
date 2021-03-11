@@ -215,7 +215,8 @@
 .filter-input {
   width: 25%;
   max-width: 300px;
-  margin-bottom: 10px;
+  min-width: 298px;
+  margin: 0px 10px 10px 0px;
   .configuration-input {
     margin-right: 10px;
     label {
@@ -251,6 +252,7 @@
 .filter-terms {
   padding: 0 16px;
   display: flex;
+  overflow-x: auto;
   .filter-term {
     margin-right: 12px;
     position: relative;
