@@ -24,7 +24,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = {
+      hideContextMenu: false
+    };
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "Klay";
@@ -146,6 +148,10 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   componentDidMount() {
+    this.setContextMenu();
+  }
+
+  setContextMenu = () => {
     const cy = this.graphControl;
     this.contextMenu = cy.contextMenus({
       menuItems: this.contextMenuItems,
@@ -538,6 +544,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeRightClick = ({ target: node }) => {
+    this.setState({ hideContextMenu: false });
     this.contextMenuIsOpen = true;
     this.onNodeUnhover();
     if (this.selectedNodes.length === 1 && this.selectedNodes[0].id !== node.id()) {
@@ -658,6 +665,12 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
+  onControlRightClick = e => {
+    if (e.target === this.graphControl && this.props.onControlClicked) {
+      this.setState({ hideContextMenu: true });
+    }
+  }
+
   onControlClicked = e => {
     if (e.target === this.graphControl && this.props.onControlClicked) {
       this.props.onControlClicked(e);
@@ -775,10 +788,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   render() {
+    const { hideContextMenu } = this.state;
     return (
       <div className="cytoscape-wrap">
         <CytoscapeComponent elements={[]}
-          className="graph-control"
+          className={`graph-control ${hideContextMenu ? "hide-context" : ""}`}
           stylesheet={graphStyles}
           maxZoom={2}
           cy={cy => {
@@ -793,6 +807,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("click", this.onControlClicked);
               this.graphControl.on("dblclick", "node", this.onNodeDoubleClicked);
               this.graphControl.on("cxttap", "node", this.onNodeRightClick);
+              this.graphControl.on("cxttap", this.onControlRightClick);
               this.graphControl.on("mouseout", this.onNodeUnhover);
               this.graphControl.on("mousedown", this.onNodeUnhover);
             }

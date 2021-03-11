@@ -75,3 +75,9 @@
     color: $textColorLight1 !important;
   }
 }
+
+.hide-context {
+  .custom-context-menu {
+    display: none !important;
+  }
+}
