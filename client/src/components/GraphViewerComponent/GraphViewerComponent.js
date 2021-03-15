@@ -191,9 +191,9 @@ export class GraphViewerComponent extends React.Component {
       });
     } else {
       await apiService.query(query, async data => {
+        await this.cyRef.current.clearTwins();
         if (data.twins.length > 0) {
           this.setState({ couldNotDisplay: false });
-          await this.cyRef.current.clearTwins();
           this.cyRef.current.addTwins(data.twins);
           await this.cyRef.current.doLayout();
           data.twins.forEach(x => allTwins.push(x));
