@@ -22,7 +22,9 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = {
+      hideContextMenu: false
+    };
     this.graphControl = null;
     this.selectedNodes = [];
     this.layout = "d3Force";
@@ -517,8 +519,15 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   }
 
   onEdgeRightClick = () => {
+    this.setState({ hideContextMenu: false });
     this.contextMenuIsOpen = true;
     this.onNodeUnhover();
+  }
+
+  onControlRightClick = e => {
+    if (e.target === this.graphControl) {
+      this.setState({ hideContextMenu: true });
+    }
   }
 
   onShowDestination = e => {
@@ -540,10 +549,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   }
 
   render() {
+    const { hideContextMenu } = this.state;
     return (
       <div style={{ position: "relative", height: "100%" }}>
         <CytoscapeComponent elements={[]}
-          className="graph-control"
+          className={`graph-control ${hideContextMenu ? "hide-context" : ""}`}
           stylesheet={graphStyles}
           maxZoom={2}
           cy={cy => {
@@ -561,6 +571,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("mousedown", this.onNodeUnhover);
               this.graphControl.on("zoom", this.onGraphZoom);
               this.graphControl.on("cxttap", "edge", this.onEdgeRightClick);
+              this.graphControl.on("cxttap", this.onControlRightClick);
             }
           }} />
         <div className="navigator-container">
