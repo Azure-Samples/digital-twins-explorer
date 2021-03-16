@@ -46,7 +46,8 @@ export class GraphViewerComponent extends React.Component {
       couldNotDisplay: false,
       outputIsOpen: false,
       highlightingTerms: [],
-      filteringTerms: []
+      filteringTerms: [],
+      noResults: false
     };
     this.view = React.createRef();
     this.create = React.createRef();
@@ -178,7 +179,7 @@ export class GraphViewerComponent extends React.Component {
     if (overlayResults) {
       await apiService.query(query, async data => {
         if (data.twins.length > 0 || data.relationships.length > 0) {
-          this.setState({ couldNotDisplay: false });
+          this.setState({ couldNotDisplay: false, noResults: false });
           extraTwins = data.twins.filter(twin => !existingTwins.some(et => et === twin.$dtId));
           this.cyRef.current.addTwins(extraTwins);
           await this.cyRef.current.doLayout();
@@ -193,13 +194,15 @@ export class GraphViewerComponent extends React.Component {
       await apiService.query(query, async data => {
         await this.cyRef.current.clearTwins();
         if (data.twins.length > 0) {
-          this.setState({ couldNotDisplay: false });
+          this.setState({ couldNotDisplay: false, noResults: false });
           this.cyRef.current.addTwins(data.twins);
           await this.cyRef.current.doLayout();
           data.twins.forEach(x => allTwins.push(x));
           this.updateProgress();
         } else if (data.other.length > 0) {
           this.setState({ couldNotDisplay: true });
+        } else {
+          this.setState({ couldNotDisplay: true, noResults: true });
         }
       });
     }
@@ -679,19 +682,9 @@ export class GraphViewerComponent extends React.Component {
   }
 
   render() {
-    const {
-      isLoading,
-      progress,
-      filterIsOpen,
-      propertyInspectorIsOpen,
-      overlayResults,
-      overlayItems,
-      propInspectorDetailWidth,
-      couldNotDisplay,
-      outputIsOpen,
-      highlightingTerms,
-      filteringTerms
-    } = this.state;
+    const { isLoading, progress, filterIsOpen, propertyInspectorIsOpen,
+      overlayResults, overlayItems, propInspectorDetailWidth, couldNotDisplay,
+      outputIsOpen, highlightingTerms, filteringTerms, noResults } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
         <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
@@ -719,18 +712,21 @@ export class GraphViewerComponent extends React.Component {
               isHighlighting={highlightingTerms && highlightingTerms.length > 0}
               highlightFilteredNodes={this.highlightNodes}
               onNodeMouseEnter={this.onNodeMouseEnter} />
-            {couldNotDisplay && <div className="alert-no-display" style={{ left: outputIsOpen ? "30%" : "15%", width: outputIsOpen ? "40%" : "70%" }}>
+            {couldNotDisplay && <div className={`alert-no-display ${outputIsOpen ? "output" : ""} ${noResults ? "no-results" : ""}`}>
               <div className="alert--info">i</div>
               <div className="alert--message">
-                <span>The query returned results that could not be displayed or highlighted. </span>
-                {!outputIsOpen && <>
-                  <span>Open the </span>
-                  <a onClick={() => {
-                    eventService.publishOpenOptionalComponent("output");
-                    this.setState({ couldNotDisplay: false });
-                  }}>Output Panel</a>
-                  <span> and run the query again to see the results.</span>
-                </>}
+                {noResults ? <span>No results found. </span>
+                  : <>
+                    <span>The query returned results that could not be displayed or highlighted. </span>
+                    {!outputIsOpen && <>
+                      <span>Open the </span>
+                      <a onClick={() => {
+                        eventService.publishOpenOptionalComponent("output");
+                        this.setState({ couldNotDisplay: false });
+                      }}>Output Panel</a>
+                      <span> and run the query again to see the results.</span>
+                    </>}
+                  </>}
               </div>
               <Icon
                 className="alert--close"

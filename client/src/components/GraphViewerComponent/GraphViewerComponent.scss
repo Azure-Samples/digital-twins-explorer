@@ -180,6 +180,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px;
+  left: 15%;
+  width: 70%;
+  &.no-results {
+    left: 40%;
+    width: 20%
+  }
+  &.output {
+    left: 30%;
+    width: 40%;
+  }
 }
 
 .alert--info{
