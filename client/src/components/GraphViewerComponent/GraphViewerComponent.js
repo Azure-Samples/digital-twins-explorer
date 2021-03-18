@@ -70,7 +70,9 @@ export class GraphViewerComponent extends React.Component {
       this.resetFiltering();
       if (this.state.overlayResults && !overlayResults) {
         this.disableOverlay();
-        this.cyRef.current.clearOverlay();
+        if (this.cyRef.current) {
+          this.cyRef.current.clearOverlay();
+        }
       }
       this.setState({ overlayResults });
     });
@@ -143,11 +145,11 @@ export class GraphViewerComponent extends React.Component {
       if (this.cyRef.current) {
         this.cyRef.current.clearSelection();
       }
-      this.allNodes = await this.getTwinsData(query, overlayResults);
+      const allTwins = await this.getTwinsData(query, overlayResults);
       if (!this.state.couldNotDisplay) {
-        await this.getRelationshipsData(this.allNodes, 30, false, !overlayResults, REL_TYPE_OUTGOING);
+        await this.getRelationshipsData(allTwins, 30, false, !overlayResults, REL_TYPE_OUTGOING);
         if (selectedNode) {
-          const selected = this.allNodes.find(t => t.$dtId === selectedNode.id);
+          const selected = allTwins.find(t => t.$dtId === selectedNode.id);
           if (selected) {
             eventService.publishSelection({ selection: selected, selectionType: "twin" });
           } else {
@@ -158,6 +160,8 @@ export class GraphViewerComponent extends React.Component {
           const { overlayItems: { twins, relationships } } = this.state;
           this.cyRef.current.selectNodes(twins);
           this.cyRef.current.selectEdges(relationships);
+        } else {
+          this.allNodes = allTwins;
         }
       }
     } catch (exc) {
@@ -173,7 +177,7 @@ export class GraphViewerComponent extends React.Component {
   async getTwinsData(query, overlayResults = false) {
     const allTwins = [];
     let extraTwins = [];
-    const existingTwins = this.cyRef.current.getTwins();
+    const existingTwins = this.cyRef.current ? this.cyRef.current.getTwins() : [];
     this.updateProgress(5);
 
     if (overlayResults) {
@@ -578,12 +582,16 @@ export class GraphViewerComponent extends React.Component {
   }
 
   highlightNodes = () => {
-    const { highlightingTerms } = this.state;
+    const { highlightingTerms, overlayItems, overlayResults } = this.state;
     this.cyRef.current.clearHighlighting();
     const termsHighlightingId = highlightingTerms.filter(term => term.match$dtId);
     const highlightedNodes = this.getFilteredNodes(termsHighlightingId);
-    if (highlightedNodes.length > 0) {
-      this.cyRef.current.highlightNodes(highlightedNodes);
+    let highlightedNodesIds = highlightedNodes.map(n => n.$dtId);
+    if (overlayResults && overlayItems.twins && overlayItems.twins.length > 0) {
+      highlightedNodesIds = [ ...highlightedNodesIds, ...overlayItems.twins ];
+    }
+    if (highlightedNodesIds.length > 0) {
+      this.cyRef.current.highlightNodes(highlightedNodesIds);
     }
   }
 
