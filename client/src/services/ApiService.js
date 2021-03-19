@@ -92,7 +92,6 @@ class ApiService {
 
   async queryTwins(query) {
     const list = [];
-    debugger;
     await this.query(query, ({ twins }) => twins.forEach(x => list.push(x)));
 
     return list;
