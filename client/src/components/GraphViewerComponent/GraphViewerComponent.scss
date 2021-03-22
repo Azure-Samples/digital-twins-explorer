@@ -95,7 +95,7 @@
   &.open {
     .gc-filter {
       .gc-filter-contents {
-        height: 140px;
+        height: 160px;
       }
     }
 
@@ -262,11 +262,13 @@
 .filter-terms {
   padding: 0 16px;
   display: flex;
-  overflow-x: auto;
+  flex: 1;
+  flex-wrap: wrap;
   .filter-term {
     margin-right: 12px;
     position: relative;
     height: 22px;
+    margin-bottom: 12px;
     .filter-buttons {
       display: flex;
     }
