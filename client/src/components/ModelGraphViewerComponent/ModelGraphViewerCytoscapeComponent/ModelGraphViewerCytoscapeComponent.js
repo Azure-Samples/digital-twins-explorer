@@ -533,19 +533,31 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
   onShowDestination = e => {
     const target = e.target || e.cyTarget;
     const cy = this.graphControl;
-    cy.fit(cy.$id(target.target().id()));
+    cy.animate({
+      fit: {
+        eles: cy.$id(target.target().id())
+      }
+    });
   }
 
   onShowSource = e => {
     const target = e.target || e.cyTarget;
     const cy = this.graphControl;
-    cy.fit(cy.$id(target.source().id()));
+    cy.animate({
+      fit: {
+        eles: cy.$id(target.source().id())
+      }
+    });
   }
 
   onScaleToRel = e => {
     const target = e.target || e.cyTarget;
     const cy = this.graphControl;
-    cy.fit(cy.$(`[id = "${target.source().id()}"], [id = "${target.target().id()}"]`));
+    cy.animate({
+      fit: {
+        eles: cy.$(`[id = "${target.source().id()}"], [id = "${target.target().id()}"]`)
+      }
+    });
   }
 
   render() {
