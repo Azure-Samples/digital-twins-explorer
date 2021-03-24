@@ -107,7 +107,7 @@ export class ConsoleComponent extends Component {
       const allTwins = await apiService.getAllTwins();
       const ids = allTwins ? allTwins.map(twin => twin.$dtId) : [];
       await apiService.deleteAllTwins(ids);
-      eventService.publishClearData();
+      eventService.publishClearTwinsData();
       this.pushToStdout(`*** Deleted all twins.`);
     } catch (exc) {
       this.pushToStdout(`*** Error deleting twins: ${exc}`);
@@ -223,7 +223,7 @@ export class ConsoleComponent extends Component {
   deleteAllModels = async () => {
     try {
       await new ModelService().deleteAll();
-      eventService.publishClearData();
+      eventService.publishClearModelsData();
       this.pushToStdout(`*** All models deleted.`);
     } catch (exc) {
       this.pushToStdout(`*** Error deleting all models: ${exc}`);

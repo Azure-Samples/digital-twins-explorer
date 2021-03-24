@@ -20,7 +20,8 @@ const GraphViewerFilteringComponent = ({
   onUpdateFilteringTerm,
   onUpdateHighlightingTerm,
   highlightingTerms,
-  filteringTerms
+  filteringTerms,
+  onSwitchFilters
 }) => (
   <>
     <div className="gc-controls">
@@ -67,15 +68,15 @@ const GraphViewerFilteringComponent = ({
     </div>
     <div className="gc-filter-contents">
       <div>
-        <Pivot>
-          <PivotItem headerText="Filter">
+        <Pivot onLinkClick={onSwitchFilters}>
+          <PivotItem headerText="Filter" key="filter">
             <GraphViewerTermManagementComponent
               onAddFilteringTerm={onAddFilteringTerm}
               onRemoveFilteringTerm={onRemoveFilteringTerm}
               onUpdateTerm={onUpdateFilteringTerm}
               terms={filteringTerms} />
           </PivotItem>
-          <PivotItem headerText="Highlight">
+          <PivotItem headerText="Highlight" key="highlight">
             <GraphViewerTermManagementComponent
               onAddFilteringTerm={onAddHighlightingTerm}
               onRemoveFilteringTerm={onRemoveHighlightingTerm}

@@ -61,7 +61,8 @@ export class ModelGraphViewerComponent extends React.Component {
         this.retrieveModels();
       }
     });
-    eventService.subscribeClearData(() => {
+    eventService.subscribeClearModelsData(() => {
+      this.modelService = new ModelService();
       this.cyRef.current.clearNodes();
       this.setState({ isLoading: false });
     });
@@ -453,10 +454,17 @@ export class ModelGraphViewerComponent extends React.Component {
     return filteredNodes;
   }
 
-  resetFiltering = () => {
-    if (this.cyRef.current) {
-      this.cyRef.current.showAllNodes();
-      this.cyRef.current.clearHighlighting();
+  onSwitchFilters = e => {
+    if (e.key.includes("filter")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.clearHighlighting();
+      }
+      this.filterNodes();
+    } else if (e.key.includes("highlight")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.showAllNodes();
+      }
+      this.highlightNodes();
     }
   }
 
@@ -506,7 +514,11 @@ export class ModelGraphViewerComponent extends React.Component {
   };
 
   render() {
+<<<<<<< HEAD
     const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth } = this.state;
+=======
+    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth, filteringTerms, layout } = this.state;
+>>>>>>> 5feb320... - When I delete all twins - the model list clears, it shouldn't
     return (
       <div className={`mgv-wrap ${modelDetailIsOpen ? "md-open" : "md-closed"}`}>
         <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
@@ -539,7 +551,9 @@ export class ModelGraphViewerComponent extends React.Component {
               onRemoveFilteringTerm={this.onRemoveFilteringTerm}
               onUpdateFilteringTerm={this.onUpdateFilteringTerm}
               onUpdateHighlightingTerm={this.onUpdateHighlightingTerm}
-              resetFiltering={this.resetFiltering} />
+              highlightingTerms={highlightingTerms}
+              filteringTerms={filteringTerms}
+              onSwitchFilters={this.onSwitchFilters} />
           </div>
           {isLoading && (
             <LoaderComponent

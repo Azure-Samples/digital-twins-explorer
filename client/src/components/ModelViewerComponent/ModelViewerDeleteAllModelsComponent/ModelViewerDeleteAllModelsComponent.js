@@ -25,7 +25,7 @@ export default class ModelViewerDeleteAllModelsComponent extends Component {
     try {
       const modelService = new ModelService();
       await modelService.deleteAll();
-      eventService.publishClearData();
+      eventService.publishClearModelsData();
     } catch (exc) {
       exc.customMessage = "Error deleting models";
       eventService.publishError(exc);

@@ -92,7 +92,7 @@ export class GraphViewerComponent extends React.Component {
         this.clearData();
       }
     });
-    eventService.subscribeClearData(() => {
+    eventService.subscribeClearTwinsData(() => {
       this.clearData();
     });
     eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
@@ -689,6 +689,20 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ highlightingTerms: [], filteringTerms: [] });
   }
 
+  onSwitchFilters = e => {
+    if (e.key.includes("filter")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.clearHighlighting();
+      }
+      this.filterNodes();
+    } else if (e.key.includes("highlight")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.showAllNodes();
+      }
+      this.highlightNodes();
+    }
+  }
+
   render() {
     const { isLoading, progress, filterIsOpen, propertyInspectorIsOpen,
       overlayResults, overlayItems, propInspectorDetailWidth, couldNotDisplay,
@@ -753,7 +767,7 @@ export class GraphViewerComponent extends React.Component {
               onRemoveFilteringTerm={this.onRemoveFilteringTerm}
               onUpdateFilteringTerm={this.onUpdateFilteringTerm}
               onUpdateHighlightingTerm={this.onUpdateHighlightingTerm}
-              resetFiltering={this.resetFiltering}
+              onSwitchFilters={this.onSwitchFilters}
               highlightingTerms={highlightingTerms}
               filteringTerms={filteringTerms} />
           </div>

@@ -59,7 +59,7 @@ export class ModelViewerComponent extends Component {
       }
     });
 
-    eventService.subscribeClearData(() => {
+    eventService.subscribeClearModelsData(() => {
       this.setState({ items: [], isLoading: false });
     });
   }
@@ -119,7 +119,6 @@ export class ModelViewerComponent extends Component {
 
     this.setState({ isLoading: false });
     await this.retrieveModels();
-    eventService.publishModelsUpdate();
     this.uploadModelRef.current.value = "";
   }
 

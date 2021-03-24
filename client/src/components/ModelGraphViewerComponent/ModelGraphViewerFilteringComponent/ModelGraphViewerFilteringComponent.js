@@ -16,9 +16,11 @@ const ModelGraphViewerFilteringComponent = ({
   onRemoveFilteringTerm,
   onAddHighlightingTerm,
   onRemoveHighlightingTerm,
-  resetFiltering,
+  onSwitchFilters,
   onUpdateFilteringTerm,
-  onUpdateHighlightingTerm
+  onUpdateHighlightingTerm,
+  highlightingTerms,
+  filteringTerms
 }) => (
   <>
     <div className="gc-controls">
@@ -57,17 +59,19 @@ const ModelGraphViewerFilteringComponent = ({
     </div>
     <div className="gc-filter-contents">
       <div>
-        <Pivot onLinkClick={resetFiltering}>
-          <PivotItem headerText="Filter">
+        <Pivot onLinkClick={onSwitchFilters}>
+          <PivotItem headerText="Filter" key="filter">
             <ModelGraphViewerTermManagementComponent
               onAddFilteringTerm={onAddFilteringTerm}
               onRemoveFilteringTerm={onRemoveFilteringTerm}
+              terms={filteringTerms}
               onUpdateTerm={onUpdateFilteringTerm} />
           </PivotItem>
-          <PivotItem headerText="Highlight">
+          <PivotItem headerText="Highlight" key="highlight">
             <ModelGraphViewerTermManagementComponent
               onAddFilteringTerm={onAddHighlightingTerm}
               onRemoveFilteringTerm={onRemoveHighlightingTerm}
+              terms={highlightingTerms}
               onUpdateTerm={onUpdateHighlightingTerm} />
           </PivotItem>
         </Pivot>

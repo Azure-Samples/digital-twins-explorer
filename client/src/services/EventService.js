@@ -62,16 +62,20 @@ class EventService {
     this._off("preferences", callback);
   }
 
-  publishClearData() {
-    this._emit("clear");
+  publishClearTwinsData() {
+    this._emit("cleartwins");
   }
 
-  subscribeClearData(callback) {
-    this._on("clear", callback);
+  subscribeClearTwinsData(callback) {
+    this._on("cleartwins", callback);
   }
 
-  unsubscribeClearData(callback) {
-    this._off("clear", callback);
+  publishClearModelsData() {
+    this._emit("clearmodels");
+  }
+
+  subscribeClearModelsData(callback) {
+    this._on("clearmodels", callback);
   }
 
   publishError(error) {
