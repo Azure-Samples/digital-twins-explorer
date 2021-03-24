@@ -69,6 +69,9 @@ export class ModelGraphViewerComponent extends React.Component {
       this.setState({ isLoading: false });
     });
     eventService.subscribeModelsUpdate(() => {
+      this.modelService = new ModelService();
+      this.cyRef.current.clearNodes();
+      this.setState({ isLoading: false });
       this.retrieveModels();
     });
   }
