@@ -3,7 +3,7 @@
 
 import React from "react";
 
-import { ModelGraphViewerCytoscapeComponent } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
+import { ModelGraphViewerCytoscapeComponent, ModelGraphViewerCytoscapeLayouts } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
 import { ModelGraphViewerRelationshipsToggle } from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
@@ -14,6 +14,7 @@ import "./ModelGraphViewerComponent.scss";
 import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
 import { Icon } from "office-ui-fabric-react";
 import { DETAIL_MIN_WIDTH } from "../../services/Constants";
+import { ModelGraphViewerCommandBarComponent } from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
 
 export class ModelGraphViewerComponent extends React.Component {
 
@@ -29,7 +30,8 @@ export class ModelGraphViewerComponent extends React.Component {
       showComponents: true,
       highlightingTerms: [],
       filteringTerms: [],
-      modelDetailWidth: DETAIL_MIN_WIDTH
+      modelDetailWidth: DETAIL_MIN_WIDTH,
+      layout: "d3Force"
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -190,11 +192,6 @@ export class ModelGraphViewerComponent extends React.Component {
           relationshipId: r.name
         }))
     );
-
-  onLayoutChanged = layout => {
-    this.cyRef.current.setLayout(layout);
-    this.cyRef.current.doLayout(this.progressCallback);
-  };
 
   toggleFilter = () => {
     const { filterIsOpen } = this.state;
@@ -513,18 +510,29 @@ export class ModelGraphViewerComponent extends React.Component {
     window.addEventListener("mouseup", this.handleMouseUp);
   };
 
+  onLayoutChanged = async layout => {
+    this.setState({ layout });
+    this.cyRef.current.setLayout(layout);
+    this.updateProgress(0);
+    await this.cyRef.current.doLayout(this.progressCallback);
+    this.updateProgress(100);
+  }
+
   render() {
-<<<<<<< HEAD
-    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth } = this.state;
-=======
     const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth, filteringTerms, layout } = this.state;
->>>>>>> 5feb320... - When I delete all twins - the model list clears, it shouldn't
     return (
       <div className={`mgv-wrap ${modelDetailIsOpen ? "md-open" : "md-closed"}`}>
         <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
           <div className="gc-wrap">
+            <div className="gc-toolbar">
+              <ModelGraphViewerCommandBarComponent
+                className="gc-commandbar" buttonClass="gc-toolbarButtons"
+                layouts={Object.keys(ModelGraphViewerCytoscapeLayouts)} layout={layout}
+                onLayoutChanged={this.onLayoutChanged} />
+            </div>
             <ModelGraphViewerCytoscapeComponent
               onNodeClicked={this.onNodeClicked}
+              layout={layout}
               onControlClicked={this.onControlClicked}
               onNodeMouseEnter={this.onNodeMouseEnter}
               onEdgeMouseEnter={this.onEdgeMouseEnter}
