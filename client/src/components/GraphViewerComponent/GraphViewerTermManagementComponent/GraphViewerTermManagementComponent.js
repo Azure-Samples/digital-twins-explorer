@@ -105,6 +105,7 @@ export default class GraphViewerTermManagementComponent extends Component {
               onKeyDown={this.handleKeyDown}
               placeholder="Match term"
               value={filterTerm}
+              disabled={terms.length >= 6}
               iconProps={{
                 iconName: "Add",
                 style: addIconStyle

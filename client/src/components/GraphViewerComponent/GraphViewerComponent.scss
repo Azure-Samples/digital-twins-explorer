@@ -95,7 +95,7 @@
   &.open {
     .gc-filter {
       .gc-filter-contents {
-        height: 160px;
+        height: 120px;
       }
     }
 
@@ -225,7 +225,7 @@
 .filter-input {
   width: 25%;
   max-width: 300px;
-  min-width: 298px;
+  min-width: 130px;
   margin: 0px 10px 10px 0px;
   .configuration-input {
     margin-right: 10px;
@@ -269,6 +269,9 @@
     position: relative;
     height: 22px;
     margin-bottom: 12px;
+    min-width: 80px;
+    max-width: 140px;
+    width: 13%;
     .filter-buttons {
       display: flex;
     }
@@ -287,8 +290,14 @@
       display: flex;
       justify-content: space-between;
       padding-left: 5px;
-      min-width: 105px;
       align-items: center;
+      width: 100%;
+      >span {
+        max-width: calc(100% - 44px);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
     }
     .term-options {
       .ms-Checkbox-text {

@@ -137,6 +137,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
               onKeyDown={this.handleKeyDown}
               placeholder="Match term"
               value={filterTerm}
+              disabled={matchTerms.length >= 6}
               iconProps={{
                 iconName: "Add",
                 style: addIconStyle
