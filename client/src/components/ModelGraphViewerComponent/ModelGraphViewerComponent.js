@@ -278,6 +278,22 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onEdgeMouseEnter = (source, relationshipId) => {
     const model = this.modelService.getModel(source);
+
+    const componentEdge = this.componentRelationships.find(cr => cr.sourceId === source);
+    if (componentEdge) {
+      return {
+        name: model.components[0].displayName,
+        componentModel: model.components[0].schema
+      };
+    }
+
+    const inheritanceEdge = this.extendRelationships.find(er => er.sourceId === source);
+    if (inheritanceEdge) {
+      return {
+        baseModel: model.bases[0]
+      };
+    }
+
     return model.relationships.find(r => r.name === relationshipId);
   }
 

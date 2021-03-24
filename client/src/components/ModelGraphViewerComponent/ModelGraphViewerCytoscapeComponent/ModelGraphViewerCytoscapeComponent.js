@@ -35,16 +35,16 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.contextMenuIsOpen = false;
     this.contextMenuItems = [
       {
-        id: "show-destination",
-        content: "Show destination",
-        selector: "edge",
-        onClickFunction: this.onShowDestination
-      },
-      {
         id: "show-source",
         content: "Show source",
         selector: "edge",
         onClickFunction: this.onShowSource
+      },
+      {
+        id: "show-destination",
+        content: "Show destination",
+        selector: "edge",
+        onClickFunction: this.onShowDestination
       },
       {
         id: "scale-to-rel",
@@ -363,7 +363,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
         this.hoverTimeout = setTimeout(async () => {
           if (this.canRenderPopper) {
             const relationship = await this.props.onEdgeMouseEnter(source, relationshipId);
-            const contentDiv = this.getPopperRelationshipContent(target.data(), relationship && relationship.properties ? relationship.properties : []);
+            const contentDiv = this.getPopperRelationshipContent(target.data(), relationship);
             document.body.appendChild(contentDiv);
             this.renderPopper(target.id(), contentDiv);
           }
@@ -420,8 +420,9 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     return div;
   };
 
-  getPopperRelationshipContent = (data, properties) => {
+  getPopperRelationshipContent = (data, relationship) => {
     const {source, target, label } = data;
+    const properties = relationship.properties || [];
     const { definedProperties } = this.getRelationshipsContents(properties);
     const div = document.createElement("div");
     div.setAttribute("id", "cy-popper");
@@ -432,23 +433,55 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       this.canRenderPopper = false;
       this.removePopper();
     });
-    div.innerHTML = `
-      <div>
-        <h4>SOURCE ID:</h4>
-        <p>${source}</p>
-      </div>
-      ${label && `<div>
-        <h4>RELATIONSHIP NAME:</h4>
-        <p>${label}</p>
-      </div>`}
-      ${target && `<div>
-        <h4>TARGET ID:</h4>
-        <p>${target}</p>
-      </div>`}
+
+    if (relationship.componentModel) {
+      div.innerHTML = `
+        <div>
+          <h4>HOST MODEL:</h4>
+          <p>${source}</p>
+        </div>
+        <div>
+          <h4>COMPONENT NAME:</h4>
+          <p>${relationship.name}</p>
+        </div>
+        <div>
+          <h4>COMPONENT MODEL:</h4>
+          <p>${relationship.componentModel}</p>
+        </div>
+      `;
+    } else if (relationship.baseModel) {
+      div.innerHTML = `
+        <div>
+          <h4>EXTENDED MODEL:</h4>
+          <p>${source}</p>
+        </div>
+        <div>
+          <h4>EXTENDS</h4>
+        </div>
+        <div>
+          <h4>BASE MODEL:</h4>
+          <p>${relationship.baseModel}</p>
+        </div>
+      `;
+    } else {
+      div.innerHTML = `
+        <div>
+          <h4>SOURCE ID:</h4>
+          <p>${source}</p>
+        </div>
+        ${label && `<div>
+          <h4>RELATIONSHIP NAME:</h4>
+          <p>${label}</p>
+        </div>`}
+        ${target && `<div>
+          <h4>TARGET ID:</h4>
+          <p>${target}</p>
+        </div>`}
       ${definedProperties && `<div>
         <h4>PROPERTIES</h4>
         <ul>${definedProperties}</ul>
-      </div>`}`;
+      `}`;
+    }
 
     return div;
   };
