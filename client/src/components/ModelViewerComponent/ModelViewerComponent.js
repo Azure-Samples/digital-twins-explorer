@@ -37,6 +37,7 @@ export class ModelViewerComponent extends Component {
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
     this.deleteRef = React.createRef();
+    this.selectRef = React.createRef();
     this.updateModelImageRef = React.createRef();
     this.inputFileRef = null;
   }
@@ -62,6 +63,20 @@ export class ModelViewerComponent extends Component {
     eventService.subscribeClearModelsData(() => {
       this.setState({ items: [], isLoading: false });
     });
+
+    eventService.subscribeModelSelectioUpdatedInGraph(modelId => {
+      this.updateModelItemSelection(modelId);
+    });
+  }
+
+  updateModelItemSelection(modelId) {
+    const { items } = this.state;
+    const updatedItems = items.map(item => {
+      item.selected = modelId && item.key === modelId;
+      return item;
+    });
+    this.originalItems = updatedItems.slice(0, updatedItems.length);
+    this.setState({ items: updatedItems });
   }
 
   async retrieveModels() {
@@ -77,7 +92,8 @@ export class ModelViewerComponent extends Component {
 
     const items = list.map(m => ({
       displayName: (m.displayName && m.displayName.en) || m.id,
-      key: m.id
+      key: m.id,
+      selected: false
     }));
     sortArray(items, "displayName", "key");
 
@@ -242,6 +258,21 @@ export class ModelViewerComponent extends Component {
 
   onDelete = item => this.deleteRef.current.open(item)
 
+  onSelect = clickedItem => {
+    const { items } = this.state;
+    let currentSelectedItem = null;
+    const updatedItems = items.map(item => {
+      item.selected = item.key === clickedItem.key ? !clickedItem.selected : false;
+      if (item.selected) {
+        currentSelectedItem = item;
+      }
+      return item;
+    });
+    this.originalItems = updatedItems.slice(0, updatedItems.length);
+    this.setState({ items: updatedItems });
+    eventService.publishSelectModel(currentSelectedItem);
+  }
+
   render() {
     const { items, isLoading, filterText } = this.state;
     return (
@@ -268,11 +299,12 @@ export class ModelViewerComponent extends Component {
               {items.map((item, index) => {
                 const modelImage = settingsService.getModelImage(item.key);
                 return (
-                  <ModelViewerItem key={item.key} item={item} itemIndex={index}
+                  <ModelViewerItem key={item.key} item={item} itemIndex={index} isSelected={item.selected}
                     modelImage={modelImage}
                     onUpdateModelImage={this.onUpdateModelImage}
                     onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
-                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
+                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)}
+                    onSelect={() => this.onSelect(item)} />
                 );
               })}
             </SelectionZone>

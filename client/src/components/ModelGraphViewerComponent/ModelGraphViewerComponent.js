@@ -31,7 +31,8 @@ export class ModelGraphViewerComponent extends React.Component {
       highlightingTerms: [],
       filteringTerms: [],
       modelDetailWidth: DETAIL_MIN_WIDTH,
-      layout: "d3Force"
+      layout: "d3Force",
+      selectedModel: null
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -73,6 +74,11 @@ export class ModelGraphViewerComponent extends React.Component {
       this.cyRef.current.clearNodes();
       this.setState({ isLoading: false });
       this.retrieveModels();
+    });
+    eventService.subscribeSelectModel(item => {
+      this.setState({ selectedModel: item }, () => {
+        this.highlightNodes();
+      });
     });
   }
 
@@ -307,10 +313,12 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onNodeClicked = modelId => {
     this.modelDetail.current.loadModel(modelId);
+    eventService.publishModelSelectionUpdatedInGraph(modelId);
   }
 
   onControlClicked = () => {
     this.modelDetail.current.clear();
+    eventService.publishModelSelectionUpdatedInGraph();
   }
 
   onAddFilteringTerm = term => {
@@ -382,11 +390,12 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   highlightNodes = () => {
-    const { highlightingTerms } = this.state;
+    const { highlightingTerms, selectedModel } = this.state;
     this.cyRef.current.clearHighlighting();
     const termsHighlightingId = highlightingTerms.filter(term => term.matchDtmi);
     const termsHighlightingDisplayName = highlightingTerms.filter(term => term.matchDisplayName);
-    const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName);
+    const selectedModelKey = selectedModel ? selectedModel.key : null;
+    const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName, selectedModelKey);
     if (highlightedNodes.length > 0) {
       this.cyRef.current.highlightNodes(highlightedNodes);
     }
@@ -405,7 +414,12 @@ export class ModelGraphViewerComponent extends React.Component {
     }
   }
 
-  getFilteredNodes = (termsFilteringId, termsFilteringDisplayName) => {
+  getFilteredNodes = (termsFilteringId, termsFilteringDisplayName, selectedModelKey) => {
+    if (!this.allNodes) {
+      eventService.publishModelSelectionUpdatedInGraph();
+      return [];
+    }
+
     let superTypes = [];
     let subTypes = [];
     let outgoingRels = [];
@@ -440,7 +454,8 @@ export class ModelGraphViewerComponent extends React.Component {
         }
         return matches;
       });
-      return matchesId || matchesDisplayName;
+      const matchesSelectedNode = selectedModelKey && node.id.toLowerCase() === selectedModelKey.toLowerCase();
+      return matchesId || matchesDisplayName || matchesSelectedNode;
     });
     if (superTypes.length > 0) {
       filteredNodes = [ ...new Set([ ...filteredNodes, ...superTypes ]) ];
@@ -464,8 +479,8 @@ export class ModelGraphViewerComponent extends React.Component {
       if (this.cyRef.current) {
         this.cyRef.current.showAllNodes();
       }
-      this.highlightNodes();
     }
+    this.highlightNodes();
   }
 
   toggleModelDetail = () => {
