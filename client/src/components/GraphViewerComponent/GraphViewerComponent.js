@@ -299,6 +299,11 @@ export class GraphViewerComponent extends React.Component {
 
   onNodeClicked = async e => {
     this.setState({ selectedNode: e.selectedNode, selectedNodes: e.selectedNodes });
+    const { highlightingTerms } = this.state;
+    if (highlightingTerms.length > 0) {
+      const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
+      this.setState({ highlightingTerms: newTerms });
+    }
     if (e.selectedNodes && e.selectedNodes.length > 1) {
       eventService.publishSelection();
     } else if (e.selectedNode) {
@@ -584,7 +589,8 @@ export class GraphViewerComponent extends React.Component {
   highlightNodes = () => {
     const { highlightingTerms, overlayItems, overlayResults } = this.state;
     this.cyRef.current.clearHighlighting();
-    const termsHighlightingId = highlightingTerms.filter(term => term.match$dtId);
+    const activeTerms = highlightingTerms.filter(term => term.isActive);
+    const termsHighlightingId = activeTerms.filter(term => term.match$dtId);
     const highlightedNodes = this.getFilteredNodes(termsHighlightingId);
     let highlightedNodesIds = highlightedNodes.map(n => n.$dtId);
     if (overlayResults && overlayItems.twins && overlayItems.twins.length > 0) {
@@ -597,7 +603,8 @@ export class GraphViewerComponent extends React.Component {
 
   filterNodes = () => {
     const { filteringTerms } = this.state;
-    const termsFilteringId = filteringTerms.filter(term => term.match$dtId);
+    const activeTerms = filteringTerms.filter(term => term.isActive);
+    const termsFilteringId = activeTerms.filter(term => term.match$dtId);
     const filteredNodes = this.getFilteredNodes(termsFilteringId);
     if (this.cyRef.current) {
       this.cyRef.current.showAllNodes();

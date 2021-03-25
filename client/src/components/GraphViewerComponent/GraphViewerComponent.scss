@@ -129,6 +129,27 @@
       padding: 10px;
     }
   }
+
+  .filter-toggle {
+    margin-bottom: 0;
+    height: 100%;
+    .ms-Toggle-background {
+      border-color: transparent;
+      background: #7E7E7E;
+      .ms-Toggle-thumb {
+        background: white;
+        height: 8px;
+        width: 8px;
+        font-size: 6px;
+      }
+    }
+    &.is-checked {
+      .ms-Toggle-background {
+        background: #084772;
+      }
+    }
+  }
+  
 }
 
 .gc-toolbar {
@@ -284,14 +305,17 @@
       height: 22px;
       color: $textColorLight1;
       font-size: 12px;
-      font-weight: 600;
       background: $inputOutlineColor;
+      font-weight: 600;
       border-radius: 3px;
       display: flex;
       justify-content: space-between;
       padding-left: 5px;
       align-items: center;
       width: 100%;
+      &.active {
+        background: $buttonColor;
+      }
       >span {
         max-width: calc(100% - 44px);
         text-overflow: ellipsis;
