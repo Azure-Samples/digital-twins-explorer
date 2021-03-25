@@ -123,7 +123,6 @@ export class ModelViewerComponent extends Component {
   }
 
   addModels = async list => {
-    let success = true;
     let sortedModels = [];
     try {
       const { items } = this.state;
@@ -133,25 +132,21 @@ export class ModelViewerComponent extends Component {
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
       if (sortedModels.length > 0) {
         const chunks = this.chunkModelsList(sortedModels, 250);
-        chunks.forEach(async chunk => {
-          try {
-            const res = await apiService.addModels(chunk);
+        for (const chunk of chunks) {
+          apiService.addModels(chunk).then(res => {
             print("*** Upload result:", "info");
             print(JSON.stringify(res, null, 2), "info");
-          } catch (exc) {
-            exc.customMessage = "Error adding models";
-            eventService.publishError(exc);
-          }
-        });
+            eventService.publishCreateModel(chunk);
+          })
+            .catch(exc => {
+              exc.customMessage = "Error adding models";
+              eventService.publishError(exc);
+            });
+        }
       }
     } catch (exc) {
-      success = false;
       exc.customMessage = "Upload error";
       eventService.publishError(exc);
-    } finally {
-      if (success) {
-        eventService.publishCreateModel(sortedModels);
-      }
     }
   }
 
