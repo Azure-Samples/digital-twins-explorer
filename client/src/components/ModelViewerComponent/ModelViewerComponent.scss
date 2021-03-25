@@ -47,8 +47,9 @@
 
 .mv_listItem {
   margin-bottom: 7px;
-  padding: 8px 8px 12px 8px;
+  padding: 6px 6px 10px 6px;
   background-color: $backgroundColor8;
+  border: solid 2px $backgroundColor8;
   line-height: 1.7;
   > .ms-Stack {
     display: flex;
@@ -59,6 +60,10 @@
       justify-content: space-between;
     }
   }
+}
+
+.mv_listItem_selected {
+  border: solid 2px $buttonColor;
 }
 
 .mv_listItemName_unselected {

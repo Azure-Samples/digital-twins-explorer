@@ -62,16 +62,20 @@ class EventService {
     this._off("preferences", callback);
   }
 
-  publishClearData() {
-    this._emit("clear");
+  publishClearTwinsData() {
+    this._emit("cleartwins");
   }
 
-  subscribeClearData(callback) {
-    this._on("clear", callback);
+  subscribeClearTwinsData(callback) {
+    this._on("cleartwins", callback);
   }
 
-  unsubscribeClearData(callback) {
-    this._off("clear", callback);
+  publishClearModelsData() {
+    this._emit("clearmodels");
+  }
+
+  subscribeClearModelsData(callback) {
+    this._on("clearmodels", callback);
   }
 
   publishError(error) {
@@ -140,6 +144,22 @@ class EventService {
 
   subscribeDeleteModel(callback) {
     this._on("deletemodel", callback);
+  }
+
+  publishSelectModel(item) {
+    this._emit("selectmodel", item);
+  }
+
+  subscribeSelectModel(callback) {
+    this._on("selectmodel", callback);
+  }
+
+  publishModelSelectionUpdatedInGraph(modelId) {
+    this._emit("modelselectionupdatedingraph", modelId);
+  }
+
+  subscribeModelSelectioUpdatedInGraph(callback) {
+    this._on("modelselectionupdatedingraph", callback);
   }
 
   publishCloseComponent(component) {

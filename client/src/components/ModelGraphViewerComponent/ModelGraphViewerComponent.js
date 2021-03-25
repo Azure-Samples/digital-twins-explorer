@@ -3,7 +3,7 @@
 
 import React from "react";
 
-import { ModelGraphViewerCytoscapeComponent } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
+import { ModelGraphViewerCytoscapeComponent, ModelGraphViewerCytoscapeLayouts } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
 import { ModelGraphViewerRelationshipsToggle } from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
@@ -14,6 +14,7 @@ import "./ModelGraphViewerComponent.scss";
 import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
 import { Icon } from "office-ui-fabric-react";
 import { DETAIL_MIN_WIDTH } from "../../services/Constants";
+import { ModelGraphViewerCommandBarComponent } from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
 
 export class ModelGraphViewerComponent extends React.Component {
 
@@ -29,7 +30,9 @@ export class ModelGraphViewerComponent extends React.Component {
       showComponents: true,
       highlightingTerms: [],
       filteringTerms: [],
-      modelDetailWidth: DETAIL_MIN_WIDTH
+      modelDetailWidth: DETAIL_MIN_WIDTH,
+      layout: "d3Force",
+      selectedModel: null
     };
     this.cyRef = React.createRef();
     this.commandRef = React.createRef();
@@ -61,12 +64,21 @@ export class ModelGraphViewerComponent extends React.Component {
         this.retrieveModels();
       }
     });
-    eventService.subscribeClearData(() => {
+    eventService.subscribeClearModelsData(() => {
+      this.modelService = new ModelService();
       this.cyRef.current.clearNodes();
       this.setState({ isLoading: false });
     });
     eventService.subscribeModelsUpdate(() => {
+      this.modelService = new ModelService();
+      this.cyRef.current.clearNodes();
+      this.setState({ isLoading: false });
       this.retrieveModels();
+    });
+    eventService.subscribeSelectModel(item => {
+      this.setState({ selectedModel: item }, () => {
+        this.highlightNodes();
+      });
     });
   }
 
@@ -190,11 +202,6 @@ export class ModelGraphViewerComponent extends React.Component {
         }))
     );
 
-  onLayoutChanged = layout => {
-    this.cyRef.current.setLayout(layout);
-    this.cyRef.current.doLayout(this.progressCallback);
-  };
-
   toggleFilter = () => {
     const { filterIsOpen } = this.state;
     this.setState({ filterIsOpen: !filterIsOpen });
@@ -218,6 +225,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onRelationshipsToggleChange = async () => {
     const { showRelationships } = this.state;
+    if (!this.relationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showRelationships) {
       this.cyRef.current.removeRelationships(this.relationships);
@@ -232,6 +242,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onInheritancesToggleChange = async () => {
     const { showInheritances } = this.state;
+    if (!this.extendRelationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showInheritances) {
       this.cyRef.current.removeRelationships(this.extendRelationships);
@@ -246,6 +259,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onComponentsToggleChange = async () => {
     const { showComponents } = this.state;
+    if (!this.componentRelationships) {
+      return;
+    }
     this.updateProgress(0);
     if (showComponents) {
       this.cyRef.current.removeRelationships(this.componentRelationships);
@@ -269,6 +285,22 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onEdgeMouseEnter = (source, relationshipId) => {
     const model = this.modelService.getModel(source);
+
+    const componentEdge = this.componentRelationships.find(cr => cr.sourceId === source);
+    if (componentEdge) {
+      return {
+        name: model.components[0].displayName,
+        componentModel: model.components[0].schema
+      };
+    }
+
+    const inheritanceEdge = this.extendRelationships.find(er => er.sourceId === source);
+    if (inheritanceEdge) {
+      return {
+        baseModel: model.bases[0]
+      };
+    }
+
     return model.relationships.find(r => r.name === relationshipId);
   }
 
@@ -281,10 +313,12 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onNodeClicked = modelId => {
     this.modelDetail.current.loadModel(modelId);
+    eventService.publishModelSelectionUpdatedInGraph(modelId);
   }
 
   onControlClicked = () => {
     this.modelDetail.current.clear();
+    eventService.publishModelSelectionUpdatedInGraph();
   }
 
   onAddFilteringTerm = term => {
@@ -356,11 +390,12 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   highlightNodes = () => {
-    const { highlightingTerms } = this.state;
+    const { highlightingTerms, selectedModel } = this.state;
     this.cyRef.current.clearHighlighting();
     const termsHighlightingId = highlightingTerms.filter(term => term.matchDtmi);
     const termsHighlightingDisplayName = highlightingTerms.filter(term => term.matchDisplayName);
-    const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName);
+    const selectedModelKey = selectedModel ? selectedModel.key : null;
+    const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName, selectedModelKey);
     if (highlightedNodes.length > 0) {
       this.cyRef.current.highlightNodes(highlightedNodes);
     }
@@ -379,7 +414,12 @@ export class ModelGraphViewerComponent extends React.Component {
     }
   }
 
-  getFilteredNodes = (termsFilteringId, termsFilteringDisplayName) => {
+  getFilteredNodes = (termsFilteringId, termsFilteringDisplayName, selectedModelKey) => {
+    if (!this.allNodes) {
+      eventService.publishModelSelectionUpdatedInGraph();
+      return [];
+    }
+
     let superTypes = [];
     let subTypes = [];
     let outgoingRels = [];
@@ -414,7 +454,8 @@ export class ModelGraphViewerComponent extends React.Component {
         }
         return matches;
       });
-      return matchesId || matchesDisplayName;
+      const matchesSelectedNode = selectedModelKey && node.id.toLowerCase() === selectedModelKey.toLowerCase();
+      return matchesId || matchesDisplayName || matchesSelectedNode;
     });
     if (superTypes.length > 0) {
       filteredNodes = [ ...new Set([ ...filteredNodes, ...superTypes ]) ];
@@ -428,11 +469,18 @@ export class ModelGraphViewerComponent extends React.Component {
     return filteredNodes;
   }
 
-  resetFiltering = () => {
-    if (this.cyRef.current) {
-      this.cyRef.current.showAllNodes();
-      this.cyRef.current.clearHighlighting();
+  onSwitchFilters = e => {
+    if (e.key.includes("filter")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.clearHighlighting();
+      }
+      this.filterNodes();
+    } else if (e.key.includes("highlight")) {
+      if (this.cyRef.current) {
+        this.cyRef.current.showAllNodes();
+      }
     }
+    this.highlightNodes();
   }
 
   toggleModelDetail = () => {
@@ -480,14 +528,29 @@ export class ModelGraphViewerComponent extends React.Component {
     window.addEventListener("mouseup", this.handleMouseUp);
   };
 
+  onLayoutChanged = async layout => {
+    this.setState({ layout });
+    this.cyRef.current.setLayout(layout);
+    this.updateProgress(0);
+    await this.cyRef.current.doLayout(this.progressCallback);
+    this.updateProgress(100);
+  }
+
   render() {
-    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth } = this.state;
+    const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth, filteringTerms, layout } = this.state;
     return (
       <div className={`mgv-wrap ${modelDetailIsOpen ? "md-open" : "md-closed"}`}>
         <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
           <div className="gc-wrap">
+            <div className="gc-toolbar">
+              <ModelGraphViewerCommandBarComponent
+                className="gc-commandbar" buttonClass="gc-toolbarButtons"
+                layouts={Object.keys(ModelGraphViewerCytoscapeLayouts)} layout={layout}
+                onLayoutChanged={this.onLayoutChanged} />
+            </div>
             <ModelGraphViewerCytoscapeComponent
               onNodeClicked={this.onNodeClicked}
+              layout={layout}
               onControlClicked={this.onControlClicked}
               onNodeMouseEnter={this.onNodeMouseEnter}
               onEdgeMouseEnter={this.onEdgeMouseEnter}
@@ -514,7 +577,9 @@ export class ModelGraphViewerComponent extends React.Component {
               onRemoveFilteringTerm={this.onRemoveFilteringTerm}
               onUpdateFilteringTerm={this.onUpdateFilteringTerm}
               onUpdateHighlightingTerm={this.onUpdateHighlightingTerm}
-              resetFiltering={this.resetFiltering} />
+              highlightingTerms={highlightingTerms}
+              filteringTerms={filteringTerms}
+              onSwitchFilters={this.onSwitchFilters} />
           </div>
           {isLoading && (
             <LoaderComponent

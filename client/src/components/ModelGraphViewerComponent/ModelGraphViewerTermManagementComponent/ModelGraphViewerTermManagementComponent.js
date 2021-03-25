@@ -18,8 +18,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterTerm: "",
-      matchTerms: []
+      filterTerm: ""
     };
     this.menuItems = [
       {
@@ -60,27 +59,23 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
 
   clearAfterEnvironmentChange = () => {
     this.setState({
-      filterTerm: "",
-      matchTerms: []
+      filterTerm: ""
     });
   }
 
   onTermChanged = (_, text) => this.setState({ filterTerm: text });
 
   removeTerm = term => {
-    const { matchTerms } = this.state;
     const { onRemoveFilteringTerm } = this.props;
-    matchTerms.splice(matchTerms.map(t => t.text).indexOf(term.text), 1);
-    this.setState({ matchTerms });
     if (onRemoveFilteringTerm) {
       onRemoveFilteringTerm(term);
     }
   };
 
   addTerm = () => {
-    const { filterTerm, matchTerms } = this.state;
-    const { onAddFilteringTerm } = this.props;
-    if (filterTerm && !matchTerms.some(t => t.text === filterTerm)) {
+    const { filterTerm } = this.state;
+    const { terms, onAddFilteringTerm } = this.props;
+    if (filterTerm && !terms.some(t => t.text === filterTerm)) {
       const term = {
         text: filterTerm,
         menuIsOpen: false,
@@ -93,20 +88,22 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
       if (onAddFilteringTerm) {
         onAddFilteringTerm(term);
       }
-      matchTerms.push(term);
-      this.setState({ matchTerms, filterTerm: "" });
+      this.setState({ filterTerm: "" });
     }
   };
 
   toggleTermOptions = term => {
-    const { matchTerms } = this.state;
+    const { terms, onUpdateTerm } = this.props;
+    const newTerms = [ ...terms ];
     if (!term.menuIsOpen) {
-      matchTerms.forEach(t => {
+      newTerms.forEach(t => {
         t.menuIsOpen = false;
       });
     }
-    matchTerms[matchTerms.map(t => t.text).indexOf(term.text)].menuIsOpen = !term.menuIsOpen;
-    this.setState({ matchTerms });
+    newTerms[newTerms.map(t => t.text).indexOf(term.text)].menuIsOpen = !term.menuIsOpen;
+    newTerms.forEach(t => {
+      onUpdateTerm(t);
+    });
   }
 
   handleKeyDown = e => {
@@ -116,9 +113,8 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
   }
 
   toggleCheckbox = (term, key) => {
-    const { matchTerms } = this.state;
-    const { onUpdateTerm } = this.props;
-    matchTerms.forEach(t => {
+    const { terms, onUpdateTerm } = this.props;
+    terms.forEach(t => {
       if (t.text === term.text) {
         t[key] = !t[key];
         if (onUpdateTerm) {
@@ -126,11 +122,11 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
         }
       }
     });
-    this.setState({ matchTerms });
   }
 
   render() {
-    const { matchTerms, filterTerm } = this.state;
+    const { terms } = this.props;
+    const { filterTerm } = this.state;
     return (
       <Label className="highlight-section">
         <div className="filter-input">
@@ -141,6 +137,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
               onKeyDown={this.handleKeyDown}
               placeholder="Match term"
               value={filterTerm}
+              disabled={terms.length >= 6}
               iconProps={{
                 iconName: "Add",
                 style: addIconStyle
@@ -149,7 +146,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
           </div>
         </div>
         <div className="filter-terms">
-          {matchTerms.map(term => (
+          {terms.map(term => (
             <div className="filter-term" key={term.text}>
               <div className="term-bar">
                 <span>{term.text}</span>

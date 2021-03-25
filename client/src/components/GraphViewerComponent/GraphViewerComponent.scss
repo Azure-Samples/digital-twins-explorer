@@ -95,7 +95,7 @@
   &.open {
     .gc-filter {
       .gc-filter-contents {
-        height: 200px;
+        height: 120px;
       }
     }
 
@@ -129,6 +129,27 @@
       padding: 10px;
     }
   }
+
+  .filter-toggle {
+    margin-bottom: 0;
+    height: 100%;
+    .ms-Toggle-background {
+      border-color: transparent;
+      background: #7E7E7E;
+      .ms-Toggle-thumb {
+        background: white;
+        height: 8px;
+        width: 8px;
+        font-size: 6px;
+      }
+    }
+    &.is-checked {
+      .ms-Toggle-background {
+        background: #084772;
+      }
+    }
+  }
+  
 }
 
 .gc-toolbar {
@@ -180,6 +201,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px;
+  left: 15%;
+  width: 70%;
+  &.no-results {
+    left: 40%;
+    width: 20%
+  }
+  &.output {
+    left: 30%;
+    width: 40%;
+  }
 }
 
 .alert--info{
@@ -215,7 +246,8 @@
 .filter-input {
   width: 25%;
   max-width: 300px;
-  margin-bottom: 10px;
+  min-width: 130px;
+  margin: 0px 10px 10px 0px;
   .configuration-input {
     margin-right: 10px;
     label {
@@ -251,10 +283,16 @@
 .filter-terms {
   padding: 0 16px;
   display: flex;
+  flex: 1;
+  flex-wrap: wrap;
   .filter-term {
     margin-right: 12px;
     position: relative;
     height: 22px;
+    margin-bottom: 12px;
+    min-width: 80px;
+    max-width: 140px;
+    width: 13%;
     .filter-buttons {
       display: flex;
     }
@@ -267,14 +305,23 @@
       height: 22px;
       color: $textColorLight1;
       font-size: 12px;
-      font-weight: 600;
       background: $inputOutlineColor;
+      font-weight: 600;
       border-radius: 3px;
       display: flex;
       justify-content: space-between;
       padding-left: 5px;
-      min-width: 105px;
       align-items: center;
+      width: 100%;
+      &.active {
+        background: $buttonColor;
+      }
+      >span {
+        max-width: calc(100% - 44px);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
     }
     .term-options {
       .ms-Checkbox-text {

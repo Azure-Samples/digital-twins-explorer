@@ -38,8 +38,14 @@ export class ImportComponent extends Component {
     }
 
     if (this.data) {
-      this.cyRef.current.addTwins(this.data.digitalTwinsGraph.digitalTwins);
-      this.cyRef.current.addRelationships(this.data.digitalTwinsGraph.relationships);
+      if (this.data.digitalTwinsGraph) {
+        if (this.data.digitalTwinsGraph.digitalTwins) {
+          this.cyRef.current.addTwins(this.data.digitalTwinsGraph.digitalTwins);
+        }
+        if (this.data.digitalTwinsGraph.relationships) {
+          this.cyRef.current.addRelationships(this.data.digitalTwinsGraph.relationships);
+        }
+      }
       await this.cyRef.current.doLayout();
     }
 

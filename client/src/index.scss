@@ -251,6 +251,11 @@ code[class*="language-"], pre[class*="language-"] {
 }
 
 .language-json {
+
+  *::selection {
+    background:rgba(255,255,255, 0.25) !important;
+  }
+
   .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
     background: transparent;
   }
@@ -262,6 +267,7 @@ code[class*="language-"], pre[class*="language-"] {
   .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
     color: lightgreen;
   }
+
 }
 
 #cy-popper {
