@@ -81,3 +81,9 @@
     display: none !important;
   }
 }
+
+.description-container {
+  max-height: 48px;
+  overflow-y: auto;
+  max-width: 400px;
+}

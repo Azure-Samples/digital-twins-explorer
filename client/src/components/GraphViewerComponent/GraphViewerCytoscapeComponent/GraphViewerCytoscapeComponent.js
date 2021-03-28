@@ -590,7 +590,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         ${
           modelDescription
             ? `<h4>DESCRIPTION:</h4>
-          <p>${modelDescription ? modelDescription : ""}</p>`
+          <p class="description-container">${modelDescription ? modelDescription : ""}</p>`
             : ""
         }
       </div>
