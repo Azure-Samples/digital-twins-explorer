@@ -314,11 +314,28 @@ export class ModelGraphViewerComponent extends React.Component {
   onNodeClicked = modelId => {
     this.modelDetail.current.loadModel(modelId);
     eventService.publishModelSelectionUpdatedInGraph(modelId);
+    const { highlightingTerms } = this.state;
+    if (highlightingTerms.length > 0) {
+      const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
+      this.setState({ highlightingTerms: newTerms });
+    }
   }
 
   onControlClicked = () => {
     this.modelDetail.current.clear();
     eventService.publishModelSelectionUpdatedInGraph();
+    const { highlightingTerms, filteringTerms } = this.state;
+    if (highlightingTerms.length > 0) {
+      const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
+      this.setState({ highlightingTerms: newTerms });
+    }
+    if (filteringTerms.length > 0) {
+      const newTerms = filteringTerms.map(t => ({ ...t, isActive: false }));
+      if (this.cyRef.current) {
+        this.cyRef.current.showAllNodes();
+      }
+      this.setState({ filteringTerms: newTerms });
+    }
   }
 
   onAddFilteringTerm = term => {
@@ -392,8 +409,9 @@ export class ModelGraphViewerComponent extends React.Component {
   highlightNodes = () => {
     const { highlightingTerms, selectedModel } = this.state;
     this.cyRef.current.clearHighlighting();
-    const termsHighlightingId = highlightingTerms.filter(term => term.matchDtmi);
-    const termsHighlightingDisplayName = highlightingTerms.filter(term => term.matchDisplayName);
+    const activeTerms = highlightingTerms.filter(term => term.isActive);
+    const termsHighlightingId = activeTerms.filter(term => term.matchDtmi);
+    const termsHighlightingDisplayName = activeTerms.filter(term => term.matchDisplayName);
     const selectedModelKey = selectedModel ? selectedModel.key : null;
     const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName, selectedModelKey);
     if (highlightedNodes.length > 0) {
@@ -403,8 +421,9 @@ export class ModelGraphViewerComponent extends React.Component {
 
   filterNodes = () => {
     const { filteringTerms } = this.state;
-    const termsFilteringId = filteringTerms.filter(term => term.matchDtmi);
-    const termsFilteringDisplayName = filteringTerms.filter(term => term.matchDisplayName);
+    const activeTerms = filteringTerms.filter(term => term.isActive);
+    const termsFilteringId = activeTerms.filter(term => term.matchDtmi);
+    const termsFilteringDisplayName = activeTerms.filter(term => term.matchDisplayName);
     const filteredNodes = this.getFilteredNodes(termsFilteringId, termsFilteringDisplayName);
     if (this.cyRef.current) {
       this.cyRef.current.showAllNodes();

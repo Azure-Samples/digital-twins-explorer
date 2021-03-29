@@ -188,6 +188,27 @@
     display: flex;
     flex: 1;
     flex-wrap: wrap;
+
+    .filter-toggle {
+      margin-bottom: 0;
+      height: 100%;
+      margin-right: 5px;
+      .ms-Toggle-background {
+        border-color: transparent;
+        background: #7E7E7E;
+        .ms-Toggle-thumb {
+          background: white;
+          height: 8px;
+          width: 8px;
+          font-size: 6px;
+        }
+      }
+      &.is-checked {
+        .ms-Toggle-background {
+          background: #084772;
+        }
+      }
+    }
     .filter-term {
       margin-right: 12px;
       position: relative;
@@ -213,6 +234,9 @@
         padding-left: 5px;
         min-width: 105px;
         align-items: center;
+        &.active {
+          background: $buttonColor;
+        }
       }
       .term-options {
         .ms-Checkbox-text {

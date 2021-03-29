@@ -133,6 +133,7 @@
   .filter-toggle {
     margin-bottom: 0;
     height: 100%;
+    margin-right: 5px;
     .ms-Toggle-background {
       border-color: transparent;
       background: #7E7E7E;
@@ -321,6 +322,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+        flex: 1;
       }
     }
     .term-options {

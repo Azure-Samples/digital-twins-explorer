@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { eventService } from "../../../services/EventService";
-import { IconButton, Label, TextField, Checkbox } from "office-ui-fabric-react";
+import { IconButton, Label, TextField, Checkbox, Toggle } from "office-ui-fabric-react";
 
 const addIconStyle = {
   background: "#0078d4",
@@ -81,9 +81,10 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
         menuIsOpen: false,
         matchDtmi: true,
         matchDisplayName: true,
-        addSuperTypes: true,
-        addSubTypes: true,
-        addOutgoingRelationships: true
+        addSuperTypes: false,
+        addSubTypes: false,
+        addOutgoingRelationships: false,
+        isActive: true
       };
       if (onAddFilteringTerm) {
         onAddFilteringTerm(term);
@@ -110,6 +111,19 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
     if (e.key === "Enter") {
       this.addTerm();
     }
+  }
+
+  onTermActiveChange = term => {
+    const { terms, onUpdateTerm } = this.props;
+    const newTerms = [ ...terms ];
+    newTerms.forEach(t => {
+      if (t.text === term.text) {
+        t.isActive = !t.isActive;
+        if (onUpdateTerm) {
+          onUpdateTerm(t);
+        }
+      }
+    });
   }
 
   toggleCheckbox = (term, key) => {
@@ -147,8 +161,14 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
         </div>
         <div className="filter-terms">
           {terms.map(term => (
-            <div className="filter-term" key={term.text}>
-              <div className="term-bar">
+            <div className="filter-term" key={`${term.text}-${term.isActive ? "active" : "inactive"}`}>
+              <div className={`term-bar ${term.isActive ? "active" : ""}`}>
+                <Toggle className="filter-toggle"
+                  checked={term.isActive} onChange={() => this.onTermActiveChange(term)} style={{
+                    marginBottom: 0,
+                    height: 12,
+                    width: 24
+                  }} />
                 <span>{term.text}</span>
                 <div className="filter-buttons">
                   <div className="term-options">
@@ -175,9 +195,11 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
                   <IconButton
                     onClick={() => this.removeTerm(term)}
                     style={{
-                      background: "#084772",
+                      background: term.isActive ? "#084772" : "#7E7E7E",
                       height: 22,
-                      width: 22
+                      width: 22,
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0
                     }}
                     iconProps={{
                       iconName: "ChromeClose",
