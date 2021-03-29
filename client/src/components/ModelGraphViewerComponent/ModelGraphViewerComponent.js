@@ -473,7 +473,7 @@ export class ModelGraphViewerComponent extends React.Component {
         }
         return matches;
       });
-      const matchesSelectedNode = selectedModelKey && node.id.toLowerCase() === selectedModelKey.toLowerCase();
+      const matchesSelectedNode = selectedModelKey && node.id && node.id.toLowerCase() === selectedModelKey.toLowerCase();
       return matchesId || matchesDisplayName || matchesSelectedNode;
     });
     if (superTypes.length > 0) {
