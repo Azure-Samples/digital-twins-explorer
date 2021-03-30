@@ -18,6 +18,7 @@ const getDataFromQueryResponse = response => {
     relationships: [],
     other: []
   };
+
   for (let i = 0; i < list.length; i++) {
     const current = list[i];
     if (current.$dtId && !data.twins.some(t => t.$dtId === current.$dtId)) {
@@ -26,8 +27,6 @@ const getDataFromQueryResponse = response => {
     } else if (current.$relationshipId) {
       data.relationships.push(current);
       continue;
-    } else {
-      data.other.push(current);
     }
 
     for (const k of Object.keys(current)) {
@@ -36,6 +35,8 @@ const getDataFromQueryResponse = response => {
         list.push(v);
       } else if (Array.isArray(v)) {
         v.forEach(x => list.push(x));
+      } else {
+        data.other.push(v);
       }
     }
   }
