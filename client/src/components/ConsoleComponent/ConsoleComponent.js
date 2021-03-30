@@ -194,8 +194,8 @@ export class ConsoleComponent extends Component {
     if (arg1) {
       try {
         const model = JSON.parse(arg1);
-        eventService.publishCreateModel();
         const result = await apiService.addModels([ model ]);
+        eventService.publishCreateModel();
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
         this.pushToStdout(
