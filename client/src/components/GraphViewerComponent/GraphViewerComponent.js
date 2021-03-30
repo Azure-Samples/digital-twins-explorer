@@ -198,15 +198,21 @@ export class GraphViewerComponent extends React.Component {
       await apiService.query(query, async data => {
         await this.cyRef.current.clearTwins();
         if (data.twins.length > 0) {
-          this.setState({ couldNotDisplay: false, noResults: false });
+          this.setState({ couldNotDisplay: false, noResults: false, relationshipsOnly: false });
           this.cyRef.current.addTwins(data.twins);
           await this.cyRef.current.doLayout();
           data.twins.forEach(x => allTwins.push(x));
           this.updateProgress();
+
+          if (data.other.length > 0) {
+            this.setState({ couldNotDisplay: true });
+          }
+        } else if (data.relationships.length > 0) {
+          this.setState({ couldNotDisplay: true, relationshipsOnly: true });
         } else if (data.other.length > 0) {
-          this.setState({ couldNotDisplay: true });
+          this.setState({ couldNotDisplay: true, relationshipsOnly: false });
         } else {
-          this.setState({ couldNotDisplay: true, noResults: true });
+          this.setState({ couldNotDisplay: true, noResults: true, relationshipsOnly: false });
         }
       });
     }
@@ -712,7 +718,7 @@ export class GraphViewerComponent extends React.Component {
 
   render() {
     const { isLoading, progress, filterIsOpen, propertyInspectorIsOpen,
-      overlayResults, overlayItems, propInspectorDetailWidth, couldNotDisplay,
+      overlayResults, overlayItems, propInspectorDetailWidth, couldNotDisplay, relationshipsOnly,
       outputIsOpen, highlightingTerms, filteringTerms, noResults } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
@@ -746,7 +752,8 @@ export class GraphViewerComponent extends React.Component {
               <div className="alert--message">
                 {noResults ? <span>No results found. </span>
                   : <>
-                    <span>The query returned results that could not be displayed or highlighted. </span>
+                    {relationshipsOnly ? <span>You can only render relationships if a twin is returned too. </span>
+                      : <span>The query returned results that could not be displayed or overlayed. </span>}
                     {!outputIsOpen && <>
                       <span>Open the </span>
                       <a onClick={() => {
