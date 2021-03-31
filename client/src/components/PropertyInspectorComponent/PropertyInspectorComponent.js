@@ -77,6 +77,7 @@ export class PropertyInspectorComponent extends Component {
     this.state = {
       showModal: false,
       selection: null,
+      selectionType: null,
       changed: false,
       patch: null,
       isLoading: false
@@ -85,6 +86,7 @@ export class PropertyInspectorComponent extends Component {
     this.properties = null;
     this.original = null;
     this.updated = null;
+    this.modelService = null;
   }
 
   get editor() {
@@ -92,8 +94,15 @@ export class PropertyInspectorComponent extends Component {
   }
 
   componentDidMount() {
+    this.initializeModelService();
     this.subscribeSelection();
     this.subscribeTelemetry();
+    eventService.subscribeCreateModel(this.initializeModelService);
+    eventService.subscribeDeleteModel(this.initializeModelService);
+  }
+
+  initializeModelService = () => {
+    this.modelService = new ModelService();
   }
 
   subscribeTelemetry = () => {
@@ -103,29 +112,39 @@ export class PropertyInspectorComponent extends Component {
         const appendedSelection = {...selection};
         appendedSelection.telemetry = telemetry.data;
         this.setState({ selection: appendedSelection });
-        this.editor.update(appendedSelection);
+        this.original.telemetry = this.updated.telemetry = telemetry.data;
+        this.editor.update(this.updated);
       }
     });
   }
 
   subscribeSelection = () => {
-    eventService.subscribeSelection(async selection => {
-      let properties = null;
-      try {
-        properties = selection ? await new ModelService().getProperties(selection.$metadata.$model) : null;
-      } catch (exc) {
-        print(`*** Error fetching twin properties: ${exc}`, "error");
-      }
-
-      this.properties = properties;
-      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
-      this.setState({ changed: false, selection, patch: null });
-      if (selection) {
-        this.editor.set(this.original);
-        const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
-        if (rootMetaIndex >= 0) {
-          this.editor.node.childs[rootMetaIndex].expand(true);
+    eventService.subscribeSelection(async payload => {
+      if (payload) {
+        const { selection, selectionType } = payload;
+        if (selectionType === "twin") {
+          let properties = null;
+          try {
+            properties = selection ? await this.modelService.getProperties(selection.$metadata.$model) : null;
+          } catch (exc) {
+            print(`*** Error fetching twin properties: ${exc}`, "error");
+          }
+          this.properties = properties;
+          this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
+        } else if (selectionType === "relationship") {
+          this.original = this.updated = selection ? selection : null;
         }
+        this.setState({ changed: false, selection, patch: null, selectionType }, () => {
+          if (payload && payload.selection) {
+            this.editor.set(this.original);
+            const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
+            if (rootMetaIndex >= 0) {
+              this.editor.node.childs[rootMetaIndex].expand(true);
+            }
+          }
+        });
+      } else {
+        this.setState({ changed: false, selection: null, patch: null, selectionType: null });
       }
     });
   }
@@ -139,11 +158,12 @@ export class PropertyInspectorComponent extends Component {
   }
 
   onEditable = node => {
+    const { selectionType } = this.state;
     if (node && node.field === "") {
       return { field: true, value: true };
     }
 
-    if (node) {
+    if (node && selectionType === "twin") {
       let current = this.properties;
       for (const p of node.path) {
         if (NonPatchableFields.indexOf(p) > -1 || ("writable" in current && !current.writable)) {
@@ -194,22 +214,29 @@ export class PropertyInspectorComponent extends Component {
   }
 
   onSave = async () => {
-    const { changed, selection } = this.state;
-    if (changed) {
+    const { changed, selection, selectionType } = this.state;
+    if (changed && selectionType === "twin") {
       const deltaFromDefaults = compare(this.original, this.updated);
       const deltaFromOriginal = compare(selection, this.updated);
-      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x => deltaFromDefaults.some(y => y.path === x.path)));
-      this.setState({ patch: delta });
-
-      const patch = JSON.stringify(delta, null, 2);
-      print("*** PI Changes:", "info");
-      print(patch, "info");
-      if (patch.length > 0) {
-        await this.patchTwin(delta);
+      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x =>
+        deltaFromDefaults.some(y => y.path === x.path)
+          || deltaFromDefaults.some(y => y.path.startsWith(`${x.path}/`))));
+      const modelService = new ModelService();
+      try {
+        modelService.validateTwinPatch(this.properties, delta);
+        this.setState({ patch: delta });
+        const patch = JSON.stringify(delta, null, 2);
+        print("*** PI Changes:", "info");
+        print(patch, "info");
+        if (patch.length > 0) {
+          await this.patchTwin(delta);
+        }
+        this.showModal();
+        this.setState({ changed: false });
+      } catch (exc) {
+        exc.customMessage = "Error in patching twin";
+        eventService.publishError(exc);
       }
-
-      this.showModal();
-      this.setState({ changed: false });
     }
   }
 
@@ -228,13 +255,14 @@ export class PropertyInspectorComponent extends Component {
   onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null
 
   render() {
-    const { showModal, selection, changed, patch, isLoading } = this.state;
+    const { showModal, selection, changed, patch, isLoading, selectionType } = this.state;
     return (
       <div className="pi-gridWrapper">
         <div className="pi-grid">
           <PropertyInspectorCommandBarComponent buttonClass="pi-toolbarButtons"
             changed={changed}
             selection={selection}
+            selectionType={selectionType}
             onExpand={() => this.onExpand()}
             onCollapse={() => this.onCollapse()}
             onUndo={() => this.onUndo()}

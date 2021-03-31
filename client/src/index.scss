@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-@import './theme/theme.scss';
+@import "./theme/theme.scss";
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1e1e1e;
@@ -46,16 +46,19 @@ body {
   opacity: 1; /* Firefox */
 }
 
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
- color: grey !important;
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: grey !important;
 }
 
-::-ms-input-placeholder { /* Microsoft Edge */
- color: grey !important;
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: grey !important;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 html,
@@ -68,7 +71,7 @@ body {
 .main-grid {
   display: grid;
   grid-gap: 0px;
-  grid-template-rows: 30px auto;
+  grid-template-rows: 48px auto;
   font-size: 12px;
   height: 100vh;
   overflow: hidden;
@@ -76,20 +79,25 @@ body {
 
 .header {
   grid-row: 1;
-  background-color: black;
+  background-color: #3c3c41;
   padding: 2px;
   color: white;
+  padding: 0 8px 0 16px;
+  align-items: center;
+  display: flex;
 }
 
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  height: 100%;
 
   .top-bar-title {
-    font-weight: 600;
     vertical-align: top;
-    padding-left: 6px;
+    padding-left: 16px;
+    font-size: 15px;
   }
 }
 
@@ -103,10 +111,9 @@ body {
 
 .work-area {
   grid-row: 3;
-  padding: 2px;
-  height: calc(100vh - 30px);
+  padding-top: 4px;
+  height: calc(100vh - 52px);
   color: white;
-  background-color: #2d2d2d;
 }
 
 .json-markup-string {
@@ -130,14 +137,14 @@ body {
   border: 1px solid $inputOutlineColor;
   border-radius: 0;
   color: $textColorLight1;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .ms-Dropdown-item {
   background: $inputColor;
   border-radius: 0;
   color: $textColorLight1;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .featured-dropdown {
@@ -145,7 +152,7 @@ body {
     background: $buttonColor;
     border-radius: 0;
     color: $textColorLight1;
-    font-size: 13px;
+    font-size: 14px;
     border: none;
     text-align: center;
   }
@@ -154,9 +161,8 @@ body {
     background: $inputColor;
     border-radius: 0;
     color: $textColorLight1;
-    font-size: 11px;
+    font-size: 14px;
   }
-
 }
 
 .error-page {
@@ -164,4 +170,149 @@ body {
   font-size: 18px;
   font-family: $fontFamilyMain;
   padding: 30px;
+}
+
+.configuration-input {
+  font-size: 12px;
+  font-weight: 200;
+  margin-bottom: 10px;
+  font-family: $fontFamilyMain;
+  color: $textColorLight2;
+  label {
+    color: $textColorLight2;
+    font-weight: 400;
+  }
+  .ms-Toggle-background {
+    border-color: transparent;
+    background: $textColorLight2;
+    .ms-Toggle-thumb {
+      background: white;
+    }
+  }
+  &.is-checked {
+    .ms-Toggle-background {
+      background: $buttonColor;
+    }
+  }
+}
+
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+  background: transparent;
+  text-shadow: none;
+}
+
+code[class*="language-"], pre[class*="language-"] {
+  text-shadow: none;
+  user-select: text;
+}
+
+.cytoscape-navigator{
+	position: fixed;
+	border: 1px solid #000;
+	background: #fff;
+	z-index: 99999;
+	width: 400px;
+	height: 400px;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+}
+
+.cytoscape-navigator > img{
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.cytoscape-navigator > canvas{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
+.cytoscape-navigatorView{
+	position: absolute;
+	top: 0;
+  left: 0;
+  cursor: move;
+	background: #B7E1ED;
+	-moz-opacity: 0.50;
+	opacity: 0.50;
+	z-index: 102;
+}
+
+.cytoscape-navigatorOverlay{
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+  z-index: 103;
+}
+
+.language-json {
+
+  *::selection {
+    background:rgba(255,255,255, 0.25) !important;
+  }
+
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+    background: transparent;
+  }
+
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+    color: orange;
+  }
+
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+    color: lightgreen;
+  }
+
+}
+
+#cy-popper {
+  background-color: $backgroundColor2;
+  box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  color: white;
+  border: 1px solid $backgroundColor4;
+  div {
+    padding: 8px;
+    border-bottom: 1px solid rgb(78, 76, 82);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  >div {
+    p {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h4, p, ul {
+    margin: 0;
+    padding: 0;
+  }
+  h4 {
+    color: $textColorLight2;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  p {
+    color: $textColorLight1;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  ul {
+    list-style: none;
+    max-height: 50px;
+    overflow: auto;
+
+    li {
+      padding: 2px 8px 2px 4px;
+      font-size: 13px;
+    }
+  }
 }

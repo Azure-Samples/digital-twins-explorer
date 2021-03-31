@@ -26,7 +26,7 @@ export default class DeleteAllTwinsComponent extends Component {
       const allTwins = await apiService.getAllTwins();
       const ids = allTwins ? allTwins.map(twin => twin.$dtId) : [];
       await apiService.deleteAllTwins(ids);
-      eventService.publishClearData();
+      eventService.publishClearTwinsData();
     } catch (exc) {
       exc.customMessage = "Error deleting twins";
       eventService.publishError(exc);

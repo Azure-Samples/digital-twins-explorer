@@ -3,7 +3,7 @@
 
 import React, { Component } from "react";
 import { DefaultButton, FocusZone, FocusZoneTabbableElements } from "office-ui-fabric-react";
-import jsonMarkup from "json-markup";
+import Prism from "prismjs";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -22,10 +22,6 @@ export class ModelViewerViewComponent extends Component {
     };
   }
 
-  getMarkup(model) {
-    return { __html: jsonMarkup(model) };
-  }
-
   async open(item) {
     this.setState({ showModal: true, isLoading: true, model: null });
 
@@ -36,7 +32,9 @@ export class ModelViewerViewComponent extends Component {
       print(`Error in retrieving model. Requested ${item.key}. Exception: ${exp}`, "error");
     }
 
-    this.setState({ model: data.model ? data.model : data, isLoading: false });
+    this.setState({ model: data.model ? data.model : data, isLoading: false }, () => {
+      Prism.highlightAll();
+    });
   }
 
   close = e => {
@@ -52,7 +50,11 @@ export class ModelViewerViewComponent extends Component {
           <form onSubmit={this.close}>
             <h2 className="heading-2">Model Information</h2>
             <div className="pre-wrapper modal-scroll">
-              {model && <pre dangerouslySetInnerHTML={this.getMarkup(model)} />}
+              {model && <pre>
+                <code className="language-json">
+                  {JSON.stringify(model, null, 1)}
+                </code>
+              </pre>}
             </div>
             <div className="btn-group">
               <DefaultButton id="close-model-btn" className="modal-button close-button" type="submit" onClick={this.close}>

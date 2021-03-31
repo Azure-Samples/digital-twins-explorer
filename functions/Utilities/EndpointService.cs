@@ -40,7 +40,7 @@ namespace AdtExplorer.Functions.Utilities
 
     public static string EncodeInstanceNameForSignalR(string instanceName)
     {
-      // ADT supports '-' in names but not '_'
+      // Azure Digital Twins supports '-' in names but not '_'
       // SignalR supports '_' in hub names but not '-'
       return instanceName.Replace("-", "_");
     }

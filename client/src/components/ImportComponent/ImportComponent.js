@@ -20,7 +20,8 @@ export class ImportComponent extends Component {
       error: false,
       isLoading: true,
       isComplete: false,
-      showImportModal: false
+      showImportModal: false,
+      dataImported: false
     };
     this.cyRef = React.createRef();
     this.data = null;
@@ -38,8 +39,14 @@ export class ImportComponent extends Component {
     }
 
     if (this.data) {
-      this.cyRef.current.addTwins(this.data.digitalTwinsGraph.digitalTwins);
-      this.cyRef.current.addRelationships(this.data.digitalTwinsGraph.relationships);
+      if (this.data.digitalTwinsGraph) {
+        if (this.data.digitalTwinsGraph.digitalTwins) {
+          this.cyRef.current.addTwins(this.data.digitalTwinsGraph.digitalTwins);
+        }
+        if (this.data.digitalTwinsGraph.relationships) {
+          this.cyRef.current.addRelationships(this.data.digitalTwinsGraph.relationships);
+        }
+      }
       await this.cyRef.current.doLayout();
     }
 
@@ -50,8 +57,8 @@ export class ImportComponent extends Component {
     this.setState({ isLoading: true });
 
     try {
-      await importService.save(this.data);
-      this.setState({ isComplete: true, showImportModal: true });
+      const dataImported = await importService.save(this.data);
+      this.setState({ isComplete: true, showImportModal: true, dataImported });
     } catch (exc) {
       exc.customMessage = "Error in importing graph";
       eventService.publishError(exc);
@@ -67,7 +74,7 @@ export class ImportComponent extends Component {
   }
 
   render() {
-    const { error, isLoading, isComplete, showImportModal } = this.state;
+    const { error, isLoading, isComplete, showImportModal, dataImported } = this.state;
     return (
       <div className="iv-grid">
         {!error && <div className="iv-toolbar">
@@ -82,7 +89,7 @@ export class ImportComponent extends Component {
         </div>}
         {!error && <GraphViewerCytoscapeComponent ref={this.cyRef} />}
         {isLoading && <LoaderComponent />}
-        <ImportStatsComponent data={this.data} isVisible={showImportModal} onClose={this.closeModal} />
+        <ImportStatsComponent data={this.data} isVisible={showImportModal} dataImported={dataImported} onClose={this.closeModal} />
       </div>
     );
   }

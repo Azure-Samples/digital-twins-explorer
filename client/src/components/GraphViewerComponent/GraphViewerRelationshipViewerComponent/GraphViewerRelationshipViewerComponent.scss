@@ -8,6 +8,27 @@
     font-weight: 400;
     margin-bottom: 10px;
     margin-top: 0;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 10px;
+      color: rgb(0, 120, 212);
+    }
+  }
+  .relationships {
+    box-sizing: border-box;
+    background-color: black;
+    padding: 0 14px;
+    overflow: auto;
+    max-height: 200px;
+    margin-bottom: 20px;
+
+    a {
+      color: lightgreen;
+      pointer-events: none;
+      text-decoration: none;
+    }
   }
   .modal-button {
     width: 100px;

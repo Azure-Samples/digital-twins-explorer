@@ -3,12 +3,154 @@
 
 @import "../../theme/theme.scss";
 
+.gvc-wrap {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  .pi-wrap {
+    position: relative;
+    .pi-toggle {
+      position: absolute;
+      top: 15px;
+      left: -30px;
+      height: 30px;
+      width: 30px;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $backgroundColor2;
+      cursor: pointer;
+    }
+  }
+  &.pi-open {
+    .pi-wrap {
+      width: 24%;
+
+      .dragable {
+        width: 2px;
+        height: 100%;
+        position: absolute;
+        left: -2px;
+        top: 0;
+        background-color: $backgroundColor2;
+        transition: background-color 200ms ease;
+
+        &:hover {
+          cursor: col-resize;
+          background-color: #3f3f3f;
+        }
+      }
+    }
+  }
+  &.pi-closed {
+    .pi-wrap {
+      width: 0;
+    }
+  }
+}
 .gc-grid {
   display: flex;
   flex-direction: column;
   font-size: 12px;
   height: 100%;
   overflow: hidden;
+  flex: 1;
+  position: relative;
+  .controls_buttonGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    background-color: $backgroundColor2;
+    border-radius: 5px;
+    i {
+      font-size: 14px;
+      color: $textColorLight2;
+    }
+  }
+
+  .controls_singleButton {
+    background-color: $backgroundColor2;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    i {
+      font-size: 18px;
+      color: $textColorLight2;
+    }
+  }
+
+  .filter_button {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    font-size: 18px;
+  }
+
+  .control-loadButtons {
+    height: 30px;
+    font-weight: 200;
+    padding: 0;
+  }
+
+  &.open {
+    .gc-filter {
+      .gc-filter-contents {
+        height: 120px;
+      }
+    }
+
+    .gc-wrap {
+      height: calc(100% - 250px);
+    }
+  }
+}
+
+.gc-wrap {
+  transition: height 0.2s ease-out;
+  flex: 1;
+  height: calc(100% - 58px);
+  position: relative;
+}
+
+.gc-filter {
+  flex: 0;
+  position: relative;
+  background-color: $backgroundColor2;
+  .gc-controls {
+    position: absolute;
+    top: -174px;
+    left: 20px;
+  }
+
+  .gc-filter-contents {
+    height: 8px;
+    transition: height 0.2s ease-out;
+    > div {
+      padding: 10px;
+    }
+  }
+
+  .filter-toggle {
+    margin-bottom: 0;
+    height: 100%;
+    margin-right: 5px;
+    .ms-Toggle-background {
+      border-color: transparent;
+      background: #7E7E7E;
+      .ms-Toggle-thumb {
+        background: white;
+        height: 8px;
+        width: 8px;
+        font-size: 6px;
+      }
+    }
+    &.is-checked {
+      .ms-Toggle-background {
+        background: #084772;
+      }
+    }
+  }
+  
 }
 
 .gc-toolbar {
@@ -18,6 +160,7 @@
   max-width: 100%;
   background-color: $backgroundColor3;
   padding: 15px;
+  padding-right: 40px;
 }
 
 .gc-toolbarButtons {
@@ -42,13 +185,185 @@
 
 .ms-CommandBarItem-link {
   background: transparent;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: transparent;
   }
 }
 
-.gc-wrap {
+.alert-no-display{
+  box-sizing: border-box;
+  background-color: #fff;
+  width: 70%;
+  position: absolute;
+  left: 15%;
+  bottom: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  left: 15%;
+  width: 70%;
+  &.no-results {
+    left: 40%;
+    width: 20%
+  }
+  &.output {
+    left: 30%;
+    width: 40%;
+  }
+}
+
+.alert--info{
+  height: 33px;
+  min-width: 33px;
+  background-color: #2070BA;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 9px;
+  font-size: 18px;
+}
+
+.alert--message{
+  color: #000;
+  margin-right: 25px;
+
+  a {
+    color: #0471b9;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.alert--close{
+  color: #000;
+  font-size: 14px;
+  cursor: pointer;
+  padding-right: 14px;
+}
+.filter-input {
+  width: 25%;
+  max-width: 300px;
+  min-width: 130px;
+  margin: 0px 10px 10px 0px;
+  .configuration-input {
+    margin-right: 10px;
+    label {
+      font-size: 12;
+      font-weight: 500;
+      color: $textColorLight1;
+      white-space: nowrap;
+      margin-left: 3px;
+    }
+  }
+  .gv-filter-wrap {
+    position: relative;
+  }
+  .filter-add-hitbox {
+    position: absolute;
+    height: 100%;
+    width: 40px;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+  }
+}
+
+.filter-options {
+  display: flex;
+}
+
+.highlight-section {
+  display: flex;
+  padding-top: 10px;
+}
+
+.filter-terms {
+  padding: 0 16px;
+  display: flex;
   flex: 1;
-  height: calc(100% - 50px);
-  position: relative;
+  flex-wrap: wrap;
+  .filter-term {
+    margin-right: 12px;
+    position: relative;
+    height: 22px;
+    margin-bottom: 12px;
+    min-width: 80px;
+    max-width: 140px;
+    width: 13%;
+    .filter-buttons {
+      display: flex;
+    }
+    .more-icon {
+      &:hover {
+        background: transparent;
+      }
+    }
+    .term-bar {
+      height: 22px;
+      color: $textColorLight1;
+      font-size: 12px;
+      background: $inputOutlineColor;
+      font-weight: 600;
+      border-radius: 3px;
+      display: flex;
+      justify-content: space-between;
+      padding-left: 5px;
+      align-items: center;
+      width: 100%;
+      &.active {
+        background: $buttonColor;
+      }
+      >span {
+        max-width: calc(100% - 44px);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        flex: 1;
+      }
+    }
+    .term-options {
+      .ms-Checkbox-text {
+        color: $textColorLight2;
+        font-size: 10px;
+        margin-left: 0;
+      }
+      .ms-Checkbox-checkbox {
+        height: 15px;
+        width: 15px;
+      }
+      .ms-Checkbox-label {
+        align-items: center;
+        margin-left: 5px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+    }
+    .term-menu {
+      position: absolute;
+      background: $backgroundColor2;
+      color: $textColorLight2;
+      font-size: 10px;
+      padding: 8px;
+      border: 1px solid $outlineColor2;
+      border-radius: 5px;
+      bottom: 25px;
+      left: 0;
+      .term-menu-item {
+        display: flex;
+        white-space: nowrap;
+        align-items: center;
+        margin-right: 5px;
+      }
+    }
+    .ms-Checkbox-label {
+      align-items: center;
+      margin-left: 5px;
+      margin-top: 3px;
+      margin-bottom: 3px;
+    }
+  }
 }

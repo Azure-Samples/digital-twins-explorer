@@ -9,10 +9,9 @@ export const colors = [
   "7f80cd", "b3e900", "c42e60", "a65628", "f781bf", "8dd3c7", "bebada",
   "fb8072", "80b1d3", "fdb462", "fccde5", "bc80bd", "ffed6f", "c4eaff",
   "cf8c00", "1b9e77", "d95f02", "e7298a", "e6ab02", "a6761d", "0097ff",
-  "00d067", "000000", "252525", "525252", "737373", "969696", "bdbdbd",
-  "f43600", "4ba93b", "5779bb", "927acc", "97ee3f", "bf3947", "9f5b00",
-  "f48758", "8caed6", "f2b94f", "eff26e", "e43872", "d9b100", "9d7a00",
-  "698cff", "d9d9d9", "00d27e", "d06800", "009f82", "c49200", "cbe8ff",
+  "00d067", "f43600", "4ba93b", "5779bb", "927acc", "97ee3f", "bf3947",
+  "9f5b00", "f48758", "8caed6", "f2b94f", "eff26e", "e43872", "d9b100",
+  "9d7a00", "698cff", "00d27e", "d06800", "009f82", "c49200", "cbe8ff",
   "fecddf", "c27eb6", "8cd2ce", "c4b8d9", "f883b0", "a49100", "f48800",
   "27d0df", "a04a9b"
 ];
@@ -99,7 +98,6 @@ export const graphStyles = [ // the stylesheet for the graph
     }
   }
 ]
-
 
 export const dagreOptions = {
   name: "dagre",
@@ -346,4 +344,14 @@ export const klayOptions = {
     thoroughness: 7 // How much effort should be spent to produce a nice layout..
   },
   priority: function () { return null; }, // Edges with a non-nil value are skipped when greedy edge cycle breaking is enabled
+};
+
+export const navigationOptions = {
+  container: true, // html dom element
+  viewLiveFramerate: 2, // set false to update graph pan only on drag end; set 0 to do it instantly; set a number (frames per second) to update not more than N times per second
+  thumbnailEventFramerate: 30, // max thumbnail's updates per second triggered by graph updates
+  thumbnailLiveFramerate: false, // max thumbnail's updates per second. Set false to disable
+  dblClickDelay: 200, // milliseconds
+  removeCustomContainer: true, // destroy the container specified by user on plugin destroy
+  rerenderDelay: 500 // ms to throttle rerender updates to the panzoom for performance
 };

@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { TextField, Dropdown, DefaultButton, Icon, IconButton, FocusZone, FocusZoneTabbableElements } from "office-ui-fabric-react";
+import { TextField, Dropdown, DefaultButton, Icon, IconButton,
+  FocusZone, FocusZoneTabbableElements, Checkbox } from "office-ui-fabric-react";
 
 import { print } from "../../services/LoggingService";
 import { eventService } from "../../services/EventService";
@@ -11,6 +12,8 @@ import { settingsService } from "../../services/SettingsService";
 import "./QueryComponent.scss";
 import { SaveQueryDialogComponent } from "./SaveQueryDialogComponent/SaveQueryDialogComponent";
 import { ConfirmQueryDialogComponent } from "./ConfirmQueryDialogComponent/ConfirmQueryDialogComponent";
+
+const defaultQuery = "SELECT * FROM digitaltwins";
 
 export class QueryComponent extends Component {
 
@@ -23,18 +26,38 @@ export class QueryComponent extends Component {
     super(props);
     this.state = {
       queries: [],
-      selectedQuery: "SELECT * FROM digitaltwins",
+      selectedQuery: defaultQuery,
       selectedQueryKey: null,
       queryKeyToBeRemoved: "",
       showSaveQueryModal: false,
       showConfirmDeleteModal: false,
       showConfirmOverwriteModal: false,
-      newQueryName: ""
+      newQueryName: "",
+      isOverlayResultsChecked: false
     };
   }
 
   componentDidMount() {
     this.setState({ queries: settingsService.queries });
+    eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  componentWillUnmount() {
+    eventService.unsubscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  clearAfterEnvironmentChange = () => {
+    this.setState({
+      queries: [],
+      selectedQuery: defaultQuery,
+      selectedQueryKey: null,
+      queryKeyToBeRemoved: "",
+      showSaveQueryModal: false,
+      showConfirmDeleteModal: false,
+      showConfirmOverwriteModal: false,
+      newQueryName: "",
+      isOverlayResultsChecked: false
+    });
   }
 
   onChange = evt => {
@@ -128,9 +151,14 @@ export class QueryComponent extends Component {
         tabIndex="0" />
     </div>)
 
+  onOverlayResultsChange = (e, checked) => {
+    this.setState({ isOverlayResultsChecked: !!checked });
+    eventService.publishOverlayQueryResults(!!checked);
+  };
+
   render() {
-    const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName, showConfirmDeleteModal, showConfirmOverwriteModal }
-      = this.state;
+    const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
+      showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
     return (
       <>
         <div className="qc-grid">
@@ -152,6 +180,7 @@ export class QueryComponent extends Component {
               </form>
             </FocusZone>
             <div className="qc-queryControls">
+              <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
               <DefaultButton className="query-button" onClick={this.executeQuery}>
                 Run Query
               </DefaultButton>

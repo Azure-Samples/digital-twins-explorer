@@ -5,7 +5,7 @@
     "digitalTwinsInstance": {
       "type": "string",
       "metadata": {
-        "description": "ADT instance name connected to EventGrid"
+        "description": "Azure Digital Twins instance name connected to EventGrid"
       }
     },
     "uniqueSuffix": {

@@ -4,9 +4,20 @@
 import React, { Component } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Stack } from "office-ui-fabric-react/lib/";
+import cytoscape from "cytoscape";
+import fcose from "cytoscape-fcose";
+import cola from "cytoscape-cola";
+import dagre from "cytoscape-dagre";
+import klay from "cytoscape-klay";
+import d3Force from "cytoscape-d3-force";
+import dblclick from "cytoscape-dblclick";
+import popper from "cytoscape-popper";
+import navigator from "cytoscape-navigator";
+import contextMenus from "cytoscape-context-menus";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
+import { ModelGraphViewerComponent } from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
 import { ModelViewerComponent } from "./components/ModelViewerComponent/ModelViewerComponent";
 import { PropertyInspectorComponent } from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
@@ -22,12 +33,26 @@ import Messages from "./messages/messages";
 import { eventService } from "./services/EventService";
 import logo from "./assets/logo192.png";
 
+import "prismjs/components/prism-json";
+import "prismjs/themes/prism.css";
+
+cytoscape.use(klay);
+cytoscape.use(dagre);
+cytoscape.use(cola);
+cytoscape.use(fcose);
+cytoscape.use(d3Force);
+cytoscape.use(dblclick);
+cytoscape.use(popper);
+cytoscape.use(navigator);
+cytoscape.use(contextMenus);
+
 class App extends Component {
 
   goldenLayoutConfig = {
     dimensions: {
       borderWidth: 3,
-      minItemWidth: 285
+      minItemWidth: 285,
+      headerHeight: 24
     },
     settings: {
       showPopoutIcon: false,
@@ -60,7 +85,7 @@ class App extends Component {
             height: 100,
             content: [
               {
-                title: "MODEL VIEW",
+                title: "MODELS",
                 isClosable: false,
                 width: 15,
                 type: "react-component",
@@ -71,10 +96,10 @@ class App extends Component {
               },
               {
                 type: "stack",
-                width: 65,
+                width: 85,
                 content: [
                   {
-                    title: "GRAPH VIEW",
+                    title: "TWIN GRAPH",
                     type: "react-component",
                     isClosable: false,
                     component: "graph",
@@ -84,19 +109,20 @@ class App extends Component {
                     setting: {
                       showCloseIcon: false
                     }
+                  },
+                  {
+                    title: "MODEL GRAPH",
+                    type: "react-component",
+                    isClosable: false,
+                    component: "modelGraphViewer",
+                    props: {
+                      className: "graph-component"
+                    },
+                    setting: {
+                      showCloseIcon: false
+                    }
                   }
                 ]
-              },
-              {
-                title: "PROPERTY EXPLORER",
-                isClosable: false,
-                id: "gl-property-inspector",
-                width: 20,
-                type: "react-component",
-                component: "propInspector",
-                setting: {
-                  showCloseIcon: false
-                }
               }
             ]
           }
@@ -166,6 +192,13 @@ class App extends Component {
     eventService.subscribeCloseComponent(component => {
       this.goldenLayout.current.removeComponent(component);
     });
+    eventService.subscribeOpenOptionalComponent(id => {
+      if (!this.state[id].visible) {
+        const c = this.optionalComponents.find(x => x.id === id);
+        this.goldenLayout.current.addComponent(c.config, c.row);
+        this.setState(prevState => ({ [id]: { visible: !prevState[id].visible } }));
+      }
+    });
     eventService.subscribeLoading(isLoading => this.setState({ isLoading }));
   }
 
@@ -178,6 +211,12 @@ class App extends Component {
         this.goldenLayout.current.addComponent(c.config, c.row);
       }
       this.setState(prevState => ({ [id]: { visible: !prevState[id].visible } }));
+    }
+  }
+
+  onGoldenLayoutItemDestroyed = item => {
+    if (item.config && item.config.type === "component") {
+      eventService.publishComponentClosed(item.config.component);
     }
   }
 
@@ -212,8 +251,8 @@ class App extends Component {
             <div className="header">
               <Stack horizontal className="top-bar">
                 <div>
-                  <img src={logo} width={16} height={16} alt="" />
-                  <span className="top-bar-title">AZURE DIGITAL TWINS EXPLORER</span>
+                  <img src={logo} width={20} height={20} alt="" />
+                  <span className="top-bar-title">Azure Digital Twins Explorer</span>
                 </div>
                 <AppCommandBar optionalComponents={this.optionalComponents}
                   optionalComponentsState={optionalComponentsState}
@@ -225,8 +264,10 @@ class App extends Component {
               htmlAttrs={{ className: "work-area" }}
               config={this.goldenLayoutConfig}
               onTabCreated={this.onGoldenLayoutTabCreated}
+              onItemDestroyed={this.onGoldenLayoutItemDestroyed}
               registerComponents={gLayout => {
                 gLayout.registerComponent("graph", GraphViewerComponent);
+                gLayout.registerComponent("modelGraphViewer", ModelGraphViewerComponent);
                 gLayout.registerComponent("modelViewer", ModelViewerComponent);
                 gLayout.registerComponent("propInspector", PropertyInspectorComponent);
                 gLayout.registerComponent("outputComponent", OutputComponent);

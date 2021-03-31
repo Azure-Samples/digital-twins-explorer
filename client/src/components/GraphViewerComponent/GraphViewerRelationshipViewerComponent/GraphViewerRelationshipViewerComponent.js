@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { DefaultButton } from "office-ui-fabric-react";
-import jsonMarkup from "json-markup";
+import { DefaultButton, Icon } from "office-ui-fabric-react";
+import Prism from "prismjs";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -40,10 +40,6 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     }
   }
 
-  getMarkup(relationships) {
-    return { __html: jsonMarkup(relationships || {}) };
-  }
-
   async open() {
     const { selectedNode } = this.props;
     if (!selectedNode) {
@@ -64,7 +60,9 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       exc.customMessage = `Error in retrieving outgoing relationships for ${nodeId}`;
       eventService.publishError(exc);
     }
-    this.setState({ outgoingRelationships });
+    this.setState({ outgoingRelationships }, () => {
+      Prism.highlightAll();
+    });
   }
 
   async getIncomingRelationships(nodeId) {
@@ -76,7 +74,9 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       exc.customMessage = `Error in retrieving incoming relationships for ${nodeId}`;
       eventService.publishError(exc);
     }
-    this.setState({ incomingRelationships });
+    this.setState({ incomingRelationships }, () => {
+      Prism.highlightAll();
+    });
   }
 
   close = () => {
@@ -91,22 +91,33 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     const { incomingRelationships, outgoingRelationships, isLoading, showModal } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-relationship-view-modal">
-        <h2 className="heading-2">Relationship Information</h2>
-        <div className="modal-scroll">
-          {!!incomingRelationships
-          && incomingRelationships.length > 0
-          && <div>
+        <h2 className="heading-2"><Icon iconName="Relationship" />Relationship Information</h2>
+        {!!incomingRelationships
+          && incomingRelationships.length > 0 && (
+          <div className="relationship-type">
             <h3>Incoming</h3>
-            <pre dangerouslySetInnerHTML={this.getMarkup(incomingRelationships)} />
-          </div>}
-
-          {!!outgoingRelationships
-          && outgoingRelationships.length > 0
-          && <div>
+            <div className="relationships">
+              <pre>
+                <code className="language-json">
+                  {JSON.stringify(incomingRelationships, null, 1)}
+                </code>
+              </pre>
+            </div>
+          </div>
+        )}
+        {!!outgoingRelationships
+          && outgoingRelationships.length > 0 && (
+          <div className="relationship-type">
             <h3>Outgoing</h3>
-            <pre dangerouslySetInnerHTML={this.getMarkup(outgoingRelationships)} />
-          </div>}
-        </div>
+            <div className="relationships">
+              <pre>
+                <code className="language-json">
+                  {JSON.stringify(outgoingRelationships, null, 1)}
+                </code>
+              </pre>
+            </div>
+          </div>
+        )}
         <div className="btn-group">
           <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
         </div>

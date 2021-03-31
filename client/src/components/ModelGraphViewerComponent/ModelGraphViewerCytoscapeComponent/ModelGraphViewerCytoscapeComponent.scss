@@ -1,0 +1,46 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../../theme/theme.scss";
+
+.graph-control {
+  height: 100%;
+  background-color: $backgroundColor3;
+  grid-row: 2;
+}
+
+.navigator-container {
+  position: absolute;
+  top: 120px;
+  left: 20px;
+  background: $backgroundColor2;
+  height: 120px;
+  width: 155px;
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid $backgroundColor4;
+  .graph-navigator {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: $backgroundColor3;
+    z-index: 0;
+  }
+}
+
+#hidden-text-ruler {
+  visibility: hidden;
+  white-space: nowrap;
+  position: absolute;
+  // These should match the node to have and accurate reading
+  font-size: 6px;
+  font-family: Segoe UI, sans-serif;
+  font-weight: 400;
+}
+
+.hide-context {
+  .custom-context-menu {
+    display: none;
+  }
+}

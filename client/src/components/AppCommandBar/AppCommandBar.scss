@@ -4,13 +4,21 @@
 @import "../../theme/theme.scss";
 
 .app-toolbarButtons {
-  height: 28px;
-  font-size: 12px;
-  font-weight: 200;
+  height: 48px;
+  width: 60px;
+  margin-top: -2px;
+  i {
+    color: $textColorLight1 !important;
+  }
+  &:hover{
+    background: $backgroundColor5;
+  }
 }
 
-.app-commandbar .ms-CommandBar {
-  height: 28px;
+.app-commandbar-container{
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .settings-button {
@@ -20,13 +28,5 @@
         display: none;
       }
     }
-  }
-}
-
-.delete-button {
-  i {
-    border-right: 1px solid $backgroundColor4;
-    padding-right: 15px;
-    margin-right: 0;
   }
 }

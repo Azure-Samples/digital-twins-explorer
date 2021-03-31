@@ -15,11 +15,19 @@ class EventService {
   }
 
   publishQuery(query) {
-    this._emit("query", { query });
+    this._emit("query", query);
   }
 
   subscribeQuery(callback) {
     this._on("query", callback);
+  }
+
+  publishOverlayQueryResults(overlayResults) {
+    this._emit("overlay", overlayResults);
+  }
+
+  subscribeOverlayQueryResults(callback) {
+    this._on("overlay", callback);
   }
 
   publishLog(data, type) {
@@ -54,16 +62,20 @@ class EventService {
     this._off("preferences", callback);
   }
 
-  publishClearData() {
-    this._emit("clear");
+  publishClearTwinsData() {
+    this._emit("cleartwins");
   }
 
-  subscribeClearData(callback) {
-    this._on("clear", callback);
+  subscribeClearTwinsData(callback) {
+    this._on("cleartwins", callback);
   }
 
-  unsubscribeClearData(callback) {
-    this._off("clear", callback);
+  publishClearModelsData() {
+    this._emit("clearmodels");
+  }
+
+  subscribeClearModelsData(callback) {
+    this._on("clearmodels", callback);
   }
 
   publishError(error) {
@@ -118,13 +130,14 @@ class EventService {
     this._on("deleterelationship", callback);
   }
 
-  publishCreateModel(callback) {
-    this._emit("createmodel", callback);
+  publishCreateModel(models) {
+    this._emit("createmodel", models);
   }
 
   subscribeCreateModel(callback) {
     this._on("createmodel", callback);
   }
+
 
   publishDeleteModel(evt) {
     this._emit("deletemodel", evt);
@@ -134,12 +147,44 @@ class EventService {
     this._on("deletemodel", callback);
   }
 
+  publishSelectModel(item) {
+    this._emit("selectmodel", item);
+  }
+
+  subscribeSelectModel(callback) {
+    this._on("selectmodel", callback);
+  }
+
+  publishModelSelectionUpdatedInGraph(modelId) {
+    this._emit("modelselectionupdatedingraph", modelId);
+  }
+
+  subscribeModelSelectionUpdatedInGraph(callback) {
+    this._on("modelselectionupdatedingraph", callback);
+  }
+
   publishCloseComponent(component) {
     this._emit("closecomponent", component);
   }
 
   subscribeCloseComponent(callback) {
     this._on("closecomponent", callback);
+  }
+
+  publishOpenOptionalComponent(component) {
+    this._emit("opencomponent", component);
+  }
+
+  subscribeOpenOptionalComponent(callback) {
+    this._on("opencomponent", callback);
+  }
+
+  publishComponentClosed(component) {
+    this._emit("componentclosed", component);
+  }
+
+  subscribeComponentClosed(callback) {
+    this._on("componentclosed", callback);
   }
 
   publishImport(evt) {
@@ -174,11 +219,31 @@ class EventService {
     this._on("modeliconupdate", callback);
   }
 
-  _emit = (name, payload) => this._action({ type: "emit", name, payload })
+  publishModelsUpdate(modelId) {
+    this._emit("modelsupdate", modelId);
+  }
 
-  _off = (name, payload) => this._action({ type: "off", name, payload })
+  subscribeModelsUpdate(callback) {
+    this._on("modelsupdate", callback);
+  }
 
-  _on = (name, payload) => this._action({ type: "on", name, payload })
+  publishEnvironmentChange() {
+    this._emit("environmentChanged");
+  }
+
+  subscribeEnvironmentChange(callback) {
+    this._on("environmentChanged", callback);
+  }
+
+  unsubscribeEnvironmentChange(callback) {
+    this._off("environmentChanged", callback);
+  }
+
+  _emit = (name, payload) => this._action({ type: "emit", name, payload });
+
+  _off = (name, payload) => this._action({ type: "off", name, payload });
+
+  _on = (name, payload) => this._action({ type: "on", name, payload });
 
   _action({ type, name, payload }) {
     if (this.eventHub) {

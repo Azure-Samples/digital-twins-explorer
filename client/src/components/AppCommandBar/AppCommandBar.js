@@ -30,8 +30,8 @@ export class AppCommandBar extends Component {
         },
         {
           key: "signIn",
-          text: "ADT URL",
-          ariaLabel: "adt url",
+          text: "Azure Digital Twins URL",
+          ariaLabel: "azure digital twins url",
           iconOnly: true,
           iconProps: { iconName: "Signin" },
           split: true,

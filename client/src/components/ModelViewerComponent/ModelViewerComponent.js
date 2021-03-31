@@ -15,6 +15,7 @@ import { print } from "../../services/LoggingService";
 import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
+import { ModelService } from "../../services/ModelService";
 import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
@@ -27,7 +28,8 @@ export class ModelViewerComponent extends Component {
     this.state = {
       items: [],
       filterText: "",
-      isLoading: false
+      isLoading: false,
+      isUploadingModels: false
     };
 
     this.originalItems = [];
@@ -36,6 +38,7 @@ export class ModelViewerComponent extends Component {
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
     this.deleteRef = React.createRef();
+    this.selectRef = React.createRef();
     this.updateModelImageRef = React.createRef();
     this.inputFileRef = null;
   }
@@ -48,7 +51,13 @@ export class ModelViewerComponent extends Component {
         this.setState({ items, filterText: "" });
       }
     });
-    eventService.subscribeCreateModel(() => this.retrieveModels());
+
+    eventService.subscribeCreateModel(() => {
+      const { isUploadingModels } = this.state;
+      if (!isUploadingModels) {
+        this.retrieveModels();
+      }
+    });
 
     await this.retrieveModels();
 
@@ -58,9 +67,23 @@ export class ModelViewerComponent extends Component {
       }
     });
 
-    eventService.subscribeClearData(() => {
+    eventService.subscribeClearModelsData(() => {
       this.setState({ items: [], isLoading: false });
     });
+
+    eventService.subscribeModelSelectionUpdatedInGraph(modelId => {
+      this.updateModelItemSelection(modelId);
+    });
+  }
+
+  updateModelItemSelection(modelId) {
+    const { items } = this.state;
+    const updatedItems = items.map(item => {
+      item.selected = modelId && item.key === modelId;
+      return item;
+    });
+    this.originalItems = updatedItems.slice(0, updatedItems.length);
+    this.setState({ items: updatedItems });
   }
 
   async retrieveModels() {
@@ -76,7 +99,8 @@ export class ModelViewerComponent extends Component {
 
     const items = list.map(m => ({
       displayName: (m.displayName && m.displayName.en) || m.id,
-      key: m.id
+      key: m.id,
+      selected: false
     }));
     sortArray(items, "displayName", "key");
 
@@ -93,7 +117,7 @@ export class ModelViewerComponent extends Component {
 
   handleUpload = async evt => {
     const files = evt.target.files;
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, isUploadingModels: true });
 
     print("*** Uploading selected models", "info");
     const list = [];
@@ -113,19 +137,52 @@ export class ModelViewerComponent extends Component {
     }
 
     if (list.length > 0) {
-      try {
-        const res = await apiService.addModels(list);
-        print("*** Upload result:", "info");
-        print(JSON.stringify(res, null, 2), "info");
-      } catch (exc) {
-        exc.customMessage = "Upload error";
-        eventService.publishError(exc);
-      }
+      await this.addModels(list);
     }
 
-    this.setState({ isLoading: false });
-    this.retrieveModels();
+    this.setState({ isLoading: false, isUploadingModels: false });
+    await this.retrieveModels();
     this.uploadModelRef.current.value = "";
+  }
+
+  addModels = async list => {
+    let sortedModels = [];
+    try {
+      const { items } = this.state;
+      const modelService = new ModelService();
+      const sortedModelsId = await modelService.getModelIdsForUpload(list);
+      sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
+      sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
+      if (sortedModels.length > 0) {
+        const chunks = this.chunkModelsList(sortedModels, 1);
+        await Promise.all(chunks.map(this.createModels));
+      }
+    } catch (exc) {
+      exc.customMessage = "Upload error";
+      eventService.publishError(exc);
+    }
+  }
+
+  createModels(models) {
+    return apiService.addModels(models).then(res => {
+      print("*** Upload result:", "info");
+      print(JSON.stringify(res, null, 2), "info");
+      eventService.publishCreateModel(models);
+    })
+      .catch(exc => {
+        exc.customMessage = "Error adding models";
+        eventService.publishError(exc);
+      });
+  }
+
+  chunkModelsList(array, size) {
+    const chunkedArr = [];
+    let index = 0;
+    while (index < array.length) {
+      chunkedArr.push(array.slice(index, size + index));
+      index += size;
+    }
+    return chunkedArr;
   }
 
   handleUploadOfModelImages = async evt => {
@@ -142,10 +199,8 @@ export class ModelViewerComponent extends Component {
           .join(".")
           .toLowerCase();
         const matchedModels = models.filter(model => {
-          const formattedModelName = model.id.toLowerCase().split(":")
-            .join("_")
-            .split(";")
-            .join("-");
+          const formattedModelName = model.id.toLowerCase().replace(/:/g, "_")
+            .replace(/;/g, "-");
           return formattedModelName === fileNameWithoutExtension;
         });
         if (matchedModels.length > 0) {
@@ -212,10 +267,19 @@ export class ModelViewerComponent extends Component {
 
   onDelete = item => this.deleteRef.current.open(item)
 
-  updateModelList = itemKey => {
-    this.originalItems.splice(this.originalItems.findIndex(i => i.key === itemKey), 1);
-    const items = this.originalItems;
-    this.setState({ items, filterText: "" });
+  onSelect = clickedItem => {
+    const { items } = this.state;
+    let currentSelectedItem = null;
+    const updatedItems = items.map(item => {
+      item.selected = item.key === clickedItem.key ? !clickedItem.selected : false;
+      if (item.selected) {
+        currentSelectedItem = item;
+      }
+      return item;
+    });
+    this.originalItems = updatedItems.slice(0, updatedItems.length);
+    this.setState({ items: updatedItems });
+    eventService.publishSelectModel(currentSelectedItem);
   }
 
   render() {
@@ -244,11 +308,12 @@ export class ModelViewerComponent extends Component {
               {items.map((item, index) => {
                 const modelImage = settingsService.getModelImage(item.key);
                 return (
-                  <ModelViewerItem key={item.key} item={item} itemIndex={index}
+                  <ModelViewerItem key={item.key} item={item} itemIndex={index} isSelected={item.selected}
                     modelImage={modelImage}
                     onUpdateModelImage={this.onUpdateModelImage}
                     onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
-                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)} />
+                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)}
+                    onSelect={() => this.onSelect(item)} />
                 );
               })}
             </SelectionZone>
@@ -257,7 +322,7 @@ export class ModelViewerComponent extends Component {
         </div>
         <ModelViewerViewComponent ref={this.viewRef} />
         <ModelViewerCreateComponent ref={this.createRef} />
-        <ModelViewerDeleteComponent ref={this.deleteRef} onDelete={this.updateModelList} />
+        <ModelViewerDeleteComponent ref={this.deleteRef} />
         <ModelViewerUpdateModelImageComponent
           ref={this.updateModelImageRef}
           onDelete={this.onDeleteModelImage}

@@ -5,16 +5,39 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function (app) {
-  const credential = new DefaultAzureCredential();
-  let token = null;
+  const credentialDigitalTwins = new DefaultAzureCredential();
+  const credentialRBAC = new DefaultAzureCredential();
+  const credentialGraph = new DefaultAzureCredential();
+  let tokenDigitalTwins = null;
+  let tokenRBAC = null;
+  let tokenGraph = null;
 
-  const pathRewrite = async function (path, req) {
-    if (!token || token.expiresOnTimestamp < Date.now()) {
-      token = await credential.getToken("https://digitaltwins.azure.net/.default");
+  const tokenSetRefresh = async (trToken, trCredential, trContext) => {
+    let tmpTrToken = trToken;
+    if (!tmpTrToken || tmpTrToken.expiresOnTimestamp < Date.now()) {
+      tmpTrToken = await trCredential.getToken(trContext);
     }
-    req.headers.authorization = `Bearer ${token.token}`;
+    return tmpTrToken;
+  };
 
-    return path.replace("/api/proxy", "");
+  const pathRewrite = async (path, req) => {
+    let destinationPath = null;
+    let requestToken = null;
+    if (path.startsWith("/api/proxy/RBAC")) {
+      destinationPath = "/api/proxy/RBAC";
+      tokenRBAC = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
+      requestToken = tokenRBAC;
+    } else if (path.startsWith("/api/proxy/Graph")) {
+      destinationPath = "/api/proxy/Graph";
+      tokenGraph = await tokenSetRefresh(tokenGraph, credentialGraph, "https://graph.microsoft.com/.default");
+      requestToken = tokenGraph;
+    } else {
+      destinationPath = "/api/proxy";
+      tokenDigitalTwins = await tokenSetRefresh(tokenDigitalTwins, credentialDigitalTwins, "https://digitaltwins.azure.net/.default");
+      requestToken = tokenDigitalTwins;
+    }
+    req.headers.authorization = `Bearer ${requestToken.token}`;
+    return path.replace(destinationPath, "");
   };
 
   app.use(

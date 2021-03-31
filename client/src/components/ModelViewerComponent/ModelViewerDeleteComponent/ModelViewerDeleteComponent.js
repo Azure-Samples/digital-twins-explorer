@@ -5,6 +5,7 @@ import React, { Component } from "react";
 import { DefaultButton } from "office-ui-fabric-react";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
+
 import { apiService } from "../../../services/ApiService";
 import { eventService } from "../../../services/EventService";
 
@@ -38,7 +39,7 @@ export class ModelViewerDeleteComponent extends Component {
     const { item } = this.state;
     try {
       await apiService.deleteModel(item.key);
-      this.props.onDelete(item.key);
+      eventService.publishDeleteModel(item.key);
     } catch (exc) {
       exc.customMessage = "Error with deleting instance";
       eventService.publishError(exc);

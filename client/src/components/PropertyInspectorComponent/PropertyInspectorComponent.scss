@@ -35,6 +35,10 @@
   display: grid;
   grid-template-rows: auto auto 1fr;
   height: 100%;
+
+  .pi-title {
+    font-size: 10px;
+  }
 }
 
 .pi-toolbarButtons {
@@ -67,16 +71,22 @@
 
   .ms-TextField-field {
     font-family: $fontFamilyMain;
-    font-weight: 600;
-    font-size: 12px;
+    font-size: 14px;
     background-color: #353535;
-    color: #a3a3a3;
+    color: $textColorLight1;
     border-width: 0px;
     flex: 1 1;
+  }
+}
 
-    &::placeholder {
-      font-size: 12px;
-    }
+.pi-command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px;
+  color: #888888;
+  .pi-title {
+    text-transform: uppercase;
   }
 }
 
