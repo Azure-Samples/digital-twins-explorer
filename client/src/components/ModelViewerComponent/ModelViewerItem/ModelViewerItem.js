@@ -33,7 +33,7 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSetModelImage, onUpdateModelImage, modelImage }) => {
+export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect, onSetModelImage, onUpdateModelImage, modelImage, isSelected }) => {
   const uploadModelImageRef = React.createRef();
 
   const onHandleModelImage = () => {
@@ -45,8 +45,8 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
   };
 
   return (
-    <div className={classNames.item} data-is-focusable data-selection-index={itemIndex}>
-      <div className="mv_listItem" data-is-focusable data-selection-toggle data-selection-invoke>
+    <div className={classNames.item} data-is-focusable data-selection-index={itemIndex} onClick={onSelect}>
+      <div className={`mv_listItem ${isSelected ? "mv_listItem_selected" : ""}`} data-is-focusable data-selection-toggle data-selection-invoke>
         <Stack horizontal={false}>
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>

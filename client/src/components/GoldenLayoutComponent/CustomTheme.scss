@@ -50,12 +50,13 @@
 
 .lm_header .lm_tab {
     font-family: Segoe UI, sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 400;
-    color: #888888;
+    color: $outlineColor1;
     background: #242424;
     margin-right: 2px;
-    padding-bottom: 2px;
+    padding-bottom: 7px;
+    padding-top: 2px;
     border-bottom: none;
 }
 
@@ -70,7 +71,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     right: 6px;
-    top: 4px;
+    top: 6px;
     opacity: 0.4;
     background-size: contain;
 }
@@ -82,7 +83,6 @@
 .lm_header .lm_tab.lm_active {
     border-bottom: none;
     box-shadow: 2px -2px 2px -2px rgba(0, 0, 0, 0.2);
-    padding-bottom: 5px;
 }
 
 .lm_header .lm_tab.lm_active .lm_close_tab {

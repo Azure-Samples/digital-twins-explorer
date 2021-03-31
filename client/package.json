@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@azure/digital-twins-core": "^1.0.0-alpha.20201022.2",
-    "@azure/identity": "^1.1.0",
+    "@azure/digital-twins-core": "^1.0.3",
+    "@azure/identity": "^1.2.4",
     "@microsoft/signalr": "^3.1.11",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
@@ -29,10 +29,10 @@
     "msal": "^1.2.1",
     "office-ui-fabric-react": "^7.117.4",
     "prismjs": "^1.23.0",
-    "react": "^16.13.1",
+    "react": "^17.0.1",
     "react-console-emulator": "^4.0.1",
     "react-cytoscapejs": "^1.2.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "^17.0.1",
     "react-error-boundary": "^2.0.1",
     "react-excel-renderer": "^1.1.0",
     "react-router-dom": "^5.1.2",
@@ -47,7 +47,7 @@
     "immer": "8.0.1"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
+    "preinstall": "npx npm-force-resolutions@0.0.3",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

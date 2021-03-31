@@ -51,7 +51,8 @@ class App extends Component {
   goldenLayoutConfig = {
     dimensions: {
       borderWidth: 3,
-      minItemWidth: 285
+      minItemWidth: 285,
+      headerHeight: 24
     },
     settings: {
       showPopoutIcon: false,
@@ -84,7 +85,7 @@ class App extends Component {
             height: 100,
             content: [
               {
-                title: "MODEL VIEW",
+                title: "MODELS",
                 isClosable: false,
                 width: 15,
                 type: "react-component",
@@ -98,7 +99,7 @@ class App extends Component {
                 width: 85,
                 content: [
                   {
-                    title: "GRAPH VIEW",
+                    title: "TWIN GRAPH",
                     type: "react-component",
                     isClosable: false,
                     component: "graph",
@@ -110,7 +111,7 @@ class App extends Component {
                     }
                   },
                   {
-                    title: "MODEL VIEW",
+                    title: "MODEL GRAPH",
                     type: "react-component",
                     isClosable: false,
                     component: "modelGraphViewer",
@@ -191,6 +192,13 @@ class App extends Component {
     eventService.subscribeCloseComponent(component => {
       this.goldenLayout.current.removeComponent(component);
     });
+    eventService.subscribeOpenOptionalComponent(id => {
+      if (!this.state[id].visible) {
+        const c = this.optionalComponents.find(x => x.id === id);
+        this.goldenLayout.current.addComponent(c.config, c.row);
+        this.setState(prevState => ({ [id]: { visible: !prevState[id].visible } }));
+      }
+    });
     eventService.subscribeLoading(isLoading => this.setState({ isLoading }));
   }
 
@@ -203,6 +211,12 @@ class App extends Component {
         this.goldenLayout.current.addComponent(c.config, c.row);
       }
       this.setState(prevState => ({ [id]: { visible: !prevState[id].visible } }));
+    }
+  }
+
+  onGoldenLayoutItemDestroyed = item => {
+    if (item.config && item.config.type === "component") {
+      eventService.publishComponentClosed(item.config.component);
     }
   }
 
@@ -237,8 +251,8 @@ class App extends Component {
             <div className="header">
               <Stack horizontal className="top-bar">
                 <div>
-                  <img src={logo} width={16} height={16} alt="" />
-                  <span className="top-bar-title">AZURE DIGITAL TWINS EXPLORER</span>
+                  <img src={logo} width={20} height={20} alt="" />
+                  <span className="top-bar-title">Azure Digital Twins Explorer</span>
                 </div>
                 <AppCommandBar optionalComponents={this.optionalComponents}
                   optionalComponentsState={optionalComponentsState}
@@ -250,6 +264,7 @@ class App extends Component {
               htmlAttrs={{ className: "work-area" }}
               config={this.goldenLayoutConfig}
               onTabCreated={this.onGoldenLayoutTabCreated}
+              onItemDestroyed={this.onGoldenLayoutItemDestroyed}
               registerComponents={gLayout => {
                 gLayout.registerComponent("graph", GraphViewerComponent);
                 gLayout.registerComponent("modelGraphViewer", ModelGraphViewerComponent);

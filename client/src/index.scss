@@ -71,7 +71,7 @@ body {
 .main-grid {
   display: grid;
   grid-gap: 0px;
-  grid-template-rows: 30px auto;
+  grid-template-rows: 48px auto;
   font-size: 12px;
   height: 100vh;
   overflow: hidden;
@@ -79,20 +79,25 @@ body {
 
 .header {
   grid-row: 1;
-  background-color: black;
+  background-color: #3c3c41;
   padding: 2px;
   color: white;
+  padding: 0 8px 0 16px;
+  align-items: center;
+  display: flex;
 }
 
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  height: 100%;
 
   .top-bar-title {
-    font-weight: 600;
     vertical-align: top;
-    padding-left: 6px;
+    padding-left: 16px;
+    font-size: 15px;
   }
 }
 
@@ -106,10 +111,9 @@ body {
 
 .work-area {
   grid-row: 3;
-  padding: 2px;
-  height: calc(100vh - 30px);
+  padding-top: 4px;
+  height: calc(100vh - 52px);
   color: white;
-  background-color: #2d2d2d;
 }
 
 .json-markup-string {
@@ -133,14 +137,14 @@ body {
   border: 1px solid $inputOutlineColor;
   border-radius: 0;
   color: $textColorLight1;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .ms-Dropdown-item {
   background: $inputColor;
   border-radius: 0;
   color: $textColorLight1;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .featured-dropdown {
@@ -148,7 +152,7 @@ body {
     background: $buttonColor;
     border-radius: 0;
     color: $textColorLight1;
-    font-size: 13px;
+    font-size: 14px;
     border: none;
     text-align: center;
   }
@@ -157,7 +161,7 @@ body {
     background: $inputColor;
     border-radius: 0;
     color: $textColorLight1;
-    font-size: 11px;
+    font-size: 14px;
   }
 }
 
@@ -187,7 +191,7 @@ body {
   }
   &.is-checked {
     .ms-Toggle-background {
-      background: $inputOutlineColor;
+      background: $buttonColor;
     }
   }
 }
@@ -247,6 +251,11 @@ code[class*="language-"], pre[class*="language-"] {
 }
 
 .language-json {
+
+  *::selection {
+    background:rgba(255,255,255, 0.25) !important;
+  }
+
   .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
     background: transparent;
   }
@@ -258,6 +267,7 @@ code[class*="language-"], pre[class*="language-"] {
   .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
     color: lightgreen;
   }
+
 }
 
 #cy-popper {

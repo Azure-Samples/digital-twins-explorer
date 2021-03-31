@@ -3,12 +3,26 @@ import {
   IconButton,
   Stack,
   Pivot,
-  PivotItem,
-  Label
+  PivotItem
 } from "office-ui-fabric-react";
-import GraphViewerFilteringHighlightComponent from "../GraphViewerFilteringHighlightComponent/GraphViewerFilteringHighlightComponent";
+import GraphViewerTermManagementComponent from "../GraphViewerTermManagementComponent/GraphViewerTermManagementComponent";
 
-const GraphViewerFilteringComponent = ({ toggleFilter, onZoomIn, onZoomOut, onZoomToFit, onCenter }) => (
+const GraphViewerFilteringComponent = ({
+  toggleFilter,
+  onZoomIn,
+  onZoomOut,
+  onZoomToFit,
+  onCenter,
+  onAddFilteringTerm,
+  onRemoveFilteringTerm,
+  onAddHighlightingTerm,
+  onRemoveHighlightingTerm,
+  onUpdateFilteringTerm,
+  onUpdateHighlightingTerm,
+  highlightingTerms,
+  filteringTerms,
+  onSwitchFilters
+}) => (
   <>
     <div className="gc-controls">
       <Stack horizontal={false}>
@@ -54,12 +68,20 @@ const GraphViewerFilteringComponent = ({ toggleFilter, onZoomIn, onZoomOut, onZo
     </div>
     <div className="gc-filter-contents">
       <div>
-        <Pivot>
-          <PivotItem headerText="Filter">
-            <Label />
+        <Pivot onLinkClick={onSwitchFilters}>
+          <PivotItem headerText="Filter" key="filter">
+            <GraphViewerTermManagementComponent
+              onAddFilteringTerm={onAddFilteringTerm}
+              onRemoveFilteringTerm={onRemoveFilteringTerm}
+              onUpdateTerm={onUpdateFilteringTerm}
+              terms={filteringTerms} />
           </PivotItem>
-          <PivotItem headerText="Highlight">
-            <GraphViewerFilteringHighlightComponent />
+          <PivotItem headerText="Highlight" key="highlight">
+            <GraphViewerTermManagementComponent
+              onAddFilteringTerm={onAddHighlightingTerm}
+              onRemoveFilteringTerm={onRemoveHighlightingTerm}
+              onUpdateTerm={onUpdateHighlightingTerm}
+              terms={highlightingTerms} />
           </PivotItem>
         </Pivot>
       </div>

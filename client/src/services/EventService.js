@@ -62,16 +62,20 @@ class EventService {
     this._off("preferences", callback);
   }
 
-  publishClearData() {
-    this._emit("clear");
+  publishClearTwinsData() {
+    this._emit("cleartwins");
   }
 
-  subscribeClearData(callback) {
-    this._on("clear", callback);
+  subscribeClearTwinsData(callback) {
+    this._on("cleartwins", callback);
   }
 
-  unsubscribeClearData(callback) {
-    this._off("clear", callback);
+  publishClearModelsData() {
+    this._emit("clearmodels");
+  }
+
+  subscribeClearModelsData(callback) {
+    this._on("clearmodels", callback);
   }
 
   publishError(error) {
@@ -142,12 +146,44 @@ class EventService {
     this._on("deletemodel", callback);
   }
 
+  publishSelectModel(item) {
+    this._emit("selectmodel", item);
+  }
+
+  subscribeSelectModel(callback) {
+    this._on("selectmodel", callback);
+  }
+
+  publishModelSelectionUpdatedInGraph(modelId) {
+    this._emit("modelselectionupdatedingraph", modelId);
+  }
+
+  subscribeModelSelectioUpdatedInGraph(callback) {
+    this._on("modelselectionupdatedingraph", callback);
+  }
+
   publishCloseComponent(component) {
     this._emit("closecomponent", component);
   }
 
   subscribeCloseComponent(callback) {
     this._on("closecomponent", callback);
+  }
+
+  publishOpenOptionalComponent(component) {
+    this._emit("opencomponent", component);
+  }
+
+  subscribeOpenOptionalComponent(callback) {
+    this._on("opencomponent", callback);
+  }
+
+  publishComponentClosed(component) {
+    this._emit("componentclosed", component);
+  }
+
+  subscribeComponentClosed(callback) {
+    this._on("componentclosed", callback);
   }
 
   publishImport(evt) {
@@ -190,11 +226,23 @@ class EventService {
     this._on("modelsupdate", callback);
   }
 
-  _emit = (name, payload) => this._action({ type: "emit", name, payload })
+  publishEnvironmentChange() {
+    this._emit("environmentChanged");
+  }
 
-  _off = (name, payload) => this._action({ type: "off", name, payload })
+  subscribeEnvironmentChange(callback) {
+    this._on("environmentChanged", callback);
+  }
 
-  _on = (name, payload) => this._action({ type: "on", name, payload })
+  unsubscribeEnvironmentChange(callback) {
+    this._off("environmentChanged", callback);
+  }
+
+  _emit = (name, payload) => this._action({ type: "emit", name, payload });
+
+  _off = (name, payload) => this._action({ type: "off", name, payload });
+
+  _on = (name, payload) => this._action({ type: "on", name, payload });
 
   _action({ type, name, payload }) {
     if (this.eventHub) {

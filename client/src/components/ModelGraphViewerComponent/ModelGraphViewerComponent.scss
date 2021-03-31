@@ -26,7 +26,7 @@
 
   &.md-open {
     .model-detail {
-      width: 22%;
+      width: 24%;
 
       .dragable {
         width: 2px;
@@ -118,7 +118,7 @@
   &.open {
     .gc-filter {
       .gc-filter-contents {
-        height: 200px;
+        height: 120px;
       }
     }
     .gc-wrap {
@@ -160,7 +160,8 @@
   .filter-input {
     width: 25%;
     max-width: 300px;
-    margin-bottom: 10px;
+    min-width: 298px;
+    margin: 0px 10px 10px 0px;
     .configuration-input {
       margin-right: 10px;
       label {
@@ -185,10 +186,34 @@
   .filter-terms {
     padding: 0 16px;
     display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+
+    .filter-toggle {
+      margin-bottom: 0;
+      height: 100%;
+      margin-right: 5px;
+      .ms-Toggle-background {
+        border-color: transparent;
+        background: #7E7E7E;
+        .ms-Toggle-thumb {
+          background: white;
+          height: 8px;
+          width: 8px;
+          font-size: 6px;
+        }
+      }
+      &.is-checked {
+        .ms-Toggle-background {
+          background: #084772;
+        }
+      }
+    }
     .filter-term {
       margin-right: 12px;
       position: relative;
       height: 22px;
+      margin-bottom: 12px;
       .filter-buttons {
         display: flex;
       }
@@ -209,6 +234,9 @@
         padding-left: 5px;
         min-width: 105px;
         align-items: center;
+        &.active {
+          background: $buttonColor;
+        }
       }
       .term-options {
         .ms-Checkbox-text {

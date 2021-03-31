@@ -38,3 +38,9 @@
   font-family: Segoe UI, sans-serif;
   font-weight: 400;
 }
+
+.hide-context {
+  .custom-context-menu {
+    display: none;
+  }
+}

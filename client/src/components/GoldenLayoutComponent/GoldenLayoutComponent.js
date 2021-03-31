@@ -97,7 +97,10 @@ export class GoldenLayoutComponent extends Component {
     this.goldenLayoutInstance.reactContainer = this;
     this.goldenLayoutInstance.init();
     this.goldenLayoutInstance.on("tabCreated", this.props.onTabCreated);
-    this.goldenLayoutInstance.on("itemDestroyed", () => this.updateDimensions());
+    this.goldenLayoutInstance.on("itemDestroyed", item => {
+      this.updateDimensions();
+      this.props.onItemDestroyed(item);
+    });
   }
 
   componentWillUnmount() {
