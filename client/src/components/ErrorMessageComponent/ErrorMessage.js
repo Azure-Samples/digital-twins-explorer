@@ -30,14 +30,18 @@ export class ErrorMessageComponent extends Component {
   componentDidMount() {
     eventService.subscribeError(exc => {
       let message = "";
-      let auth = "";
+      let errorMessage = "";
+      let auth = false;
+
       if (exc && exc.name === "RestError" && exc.statusCode === 403) {
+        errorMessage = CUSTOM_AUTH_ERROR_MESSAGE;
         message = CUSTOM_AUTH_ERROR_MESSAGE;
         auth = true;
       } else if (exc && exc.name === "RestError" && exc.statusCode === 404) {
-        message = CUSTOM_NOT_FOUND_ERROR_MESSAGE;
+        errorMessage = CUSTOM_NOT_FOUND_ERROR_MESSAGE;
       } else {
-        message = exc.customMessage ? `${exc.customMessage}` : `${exc.code}`;
+        errorMessage = exc.customMessage ? `${exc.customMessage}` : `${exc.code}`;
+        message = exc.customMessage ? `${exc.customMessage}: ${exc}` : `${exc}`;
       }
 
       print(message, "error");
