@@ -24,7 +24,7 @@ class RBACService {
         "x-adt-host": "graph.microsoft.com"
       }
     };
-    const results = await fetch(`http://localhost:3000/api/proxy/Graph/${path}`, userOptions);
+    const results = await fetch(`/api/proxy/Graph/${path}`, userOptions);
     return await results.json();
   }
 
@@ -35,7 +35,7 @@ class RBACService {
         "x-adt-host": "management.azure.com"
       }
     };
-    const results = await fetch(`http://localhost:3000/api/proxy/RBAC/${path}`, userOptions);
+    const results = await fetch(`/api/proxy/RBAC/${path}`, userOptions);
     return await results.json();
   }
 
@@ -53,7 +53,7 @@ class RBACService {
         }
       })
     };
-    return await fetch(`http://localhost:3000/api/proxy/RBAC${twinARMId}/providers/Microsoft.Authorization/roleAssignments/${this.uuidv4()}?api-version=2020-04-01-preview`, userOptions);
+    return await fetch(`/api/proxy/RBAC${twinARMId}/providers/Microsoft.Authorization/roleAssignments/${this.uuidv4()}?api-version=2020-04-01-preview`, userOptions);
   }
 
   async postTwinsAccess(appName, subId, userPrincipalId) {

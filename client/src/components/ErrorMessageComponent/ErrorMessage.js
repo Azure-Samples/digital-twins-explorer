@@ -64,10 +64,11 @@ export class ErrorMessageComponent extends Component {
       {showAuthSpinner: true,
         showFixAuth: false});
     const requestParams = await rbacService.addReaderRBAC();
-    this.setState(
-      {showAuthSpinner: false,
-        showAuthResponse: true,
-        showAuthStatus: requestParams});
+    this.setState({
+      showAuthSpinner: false,
+      showAuthResponse: true,
+      showAuthStatus: requestParams
+    });
   }
 
   render() {

@@ -5,24 +5,24 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function (app) {
-  const credential = new DefaultAzureCredential();
+  const credentialDigitalTwins = new DefaultAzureCredential();
   const credentialRBAC = new DefaultAzureCredential();
   const credentialGraph = new DefaultAzureCredential();
-  let token = null;
+  let tokenDigitalTwins = null;
   let tokenRBAC = null;
   let tokenGraph = null;
 
-  async function tokenSetRefresh(trToken, trCredential, trContext) {
+  const tokenSetRefresh = async (trToken, trCredential, trContext) => {
     let tmpTrToken = trToken;
     if (!tmpTrToken || tmpTrToken.expiresOnTimestamp < Date.now()) {
       tmpTrToken = await trCredential.getToken(trContext);
     }
     return tmpTrToken;
-  }
+  };
 
-  const pathRewrite = async function (path, req) {
-    let destinationPath = "/api/proxy";
-    let requestToken = token;
+  const pathRewrite = async (path, req) => {
+    let destinationPath = null;
+    let requestToken = null;
     if (path.startsWith("/api/proxy/RBAC")) {
       destinationPath = "/api/proxy/RBAC";
       tokenRBAC = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
@@ -33,8 +33,8 @@ module.exports = function (app) {
       requestToken = tokenGraph;
     } else {
       destinationPath = "/api/proxy";
-      token = await tokenSetRefresh(token, credential, "https://digitaltwins.azure.net/.default");
-      requestToken = token;
+      tokenDigitalTwins = await tokenSetRefresh(tokenDigitalTwins, credentialDigitalTwins, "https://digitaltwins.azure.net/.default");
+      requestToken = tokenDigitalTwins;
     }
     req.headers.authorization = `Bearer ${requestToken.token}`;
     return path.replace(destinationPath, "");
