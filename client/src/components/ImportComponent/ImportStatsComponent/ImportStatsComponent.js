@@ -6,7 +6,7 @@ import { DefaultButton } from "office-ui-fabric-react";
 import ModalComponent from "../../ModalComponent/ModalComponent";
 
 const ImportStatsComponent = props => {
-  const { isVisible, onClose, data } = props;
+  const { isVisible, onClose, data, dataImported } = props;
   if (data) {
     const twins = data.digitalTwinsGraph && data.digitalTwinsGraph.digitalTwins ? data.digitalTwinsGraph.digitalTwins : [];
     const relationships = data.digitalTwinsGraph && data.digitalTwinsGraph.relationships ? data.digitalTwinsGraph.relationships : [];
@@ -14,7 +14,7 @@ const ImportStatsComponent = props => {
     return (
       <ModalComponent isVisible={isVisible} className="import-stats-modal">
         <div className="message-container">
-          <h2 className="heading-2">Import Successful</h2>
+          <h2 className="heading-2">{ dataImported ? "Import Successful" : "Nothing to import from file"} </h2>
           {models.length > 0 && <p>{`${models.length} models imported`}</p>}
           {twins.length > 0 && <p>{`${twins.length} twins imported`}</p>}
           {relationships.length > 0 && <p>{`${relationships.length} relationships imported`}</p>}

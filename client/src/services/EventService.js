@@ -130,13 +130,14 @@ class EventService {
     this._on("deleterelationship", callback);
   }
 
-  publishCreateModel(callback) {
-    this._emit("createmodel", callback);
+  publishCreateModel(models) {
+    this._emit("createmodel", models);
   }
 
   subscribeCreateModel(callback) {
     this._on("createmodel", callback);
   }
+
 
   publishDeleteModel(evt) {
     this._emit("deletemodel", evt);
@@ -158,7 +159,7 @@ class EventService {
     this._emit("modelselectionupdatedingraph", modelId);
   }
 
-  subscribeModelSelectioUpdatedInGraph(callback) {
+  subscribeModelSelectionUpdatedInGraph(callback) {
     this._on("modelselectionupdatedingraph", callback);
   }
 

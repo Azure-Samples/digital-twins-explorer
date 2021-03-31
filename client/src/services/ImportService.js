@@ -24,12 +24,17 @@ class ImportService {
   }
 
   async save(data) {
-    if (data.digitalTwinsModels.length > 0) {
+    let dataImported = false;
+    if (data.digitalTwinsModels && data.digitalTwinsModels.length > 0) {
       await this.saveModels(data);
+      dataImported = true;
     }
-    if (data.digitalTwinsGraph.digitalTwins.length > 0 || data.digitalTwinsGraph.relationships.length > 0) {
+    if ((data.digitalTwinsGraph.digitalTwins && data.digitalTwinsGraph.digitalTwins.length > 0)
+          || (data.digitalTwinsGraph.relationships && data.digitalTwinsGraph.relationships.length > 0)) {
       await this.saveData(data);
+      dataImported = true;
     }
+    return dataImported;
   }
 
   async saveModels(data) {

@@ -90,7 +90,7 @@ export class ConfigurationFormComponent extends Component {
 
     if (!config.appAdtUrl.startsWith("https")) {
       eventService.publishError({
-        customMessage: "ADT URL must start with ‘https’."
+        customMessage: "Azure Digital Twins URL must start with ‘https’."
       });
       return false;
     }
@@ -98,7 +98,7 @@ export class ConfigurationFormComponent extends Component {
     const regexp = /^(https):\/\/[\w-]+.api.[\w-.]+.[\w-.]+digitaltwins[\w-.]+/gm;
     if (!regexp.test(config.appAdtUrl)) {
       eventService.publishError({
-        customMessage: "ADT URL must match the format 'https://<name>.api.<dc>.<domain>'."
+        customMessage: "Azure Digital Twins URL must match the format 'https://<name>.api.<dc>.<domain>'."
       });
       return false;
     }
@@ -195,7 +195,7 @@ export class ConfigurationFormComponent extends Component {
               <TextField
                 required
                 id="appAdtUrlField"
-                label="ADT URL"
+                label="Azure Digital Twins URL"
                 className="configuration-input"
                 styles={this.getStyles}
                 value={appAdtUrl}

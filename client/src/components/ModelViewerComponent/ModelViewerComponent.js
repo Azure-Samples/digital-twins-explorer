@@ -28,7 +28,8 @@ export class ModelViewerComponent extends Component {
     this.state = {
       items: [],
       filterText: "",
-      isLoading: false
+      isLoading: false,
+      isUploadingModels: false
     };
 
     this.originalItems = [];
@@ -50,7 +51,13 @@ export class ModelViewerComponent extends Component {
         this.setState({ items, filterText: "" });
       }
     });
-    eventService.subscribeCreateModel(() => this.retrieveModels());
+
+    eventService.subscribeCreateModel(() => {
+      const { isUploadingModels } = this.state;
+      if (!isUploadingModels) {
+        this.retrieveModels();
+      }
+    });
 
     await this.retrieveModels();
 
@@ -64,7 +71,7 @@ export class ModelViewerComponent extends Component {
       this.setState({ items: [], isLoading: false });
     });
 
-    eventService.subscribeModelSelectioUpdatedInGraph(modelId => {
+    eventService.subscribeModelSelectionUpdatedInGraph(modelId => {
       this.updateModelItemSelection(modelId);
     });
   }
@@ -110,7 +117,7 @@ export class ModelViewerComponent extends Component {
 
   handleUpload = async evt => {
     const files = evt.target.files;
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, isUploadingModels: true });
 
     print("*** Uploading selected models", "info");
     const list = [];
@@ -133,7 +140,7 @@ export class ModelViewerComponent extends Component {
       await this.addModels(list);
     }
 
-    this.setState({ isLoading: false });
+    this.setState({ isLoading: false, isUploadingModels: false });
     await this.retrieveModels();
     this.uploadModelRef.current.value = "";
   }
@@ -147,23 +154,25 @@ export class ModelViewerComponent extends Component {
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
       if (sortedModels.length > 0) {
-        const chunks = this.chunkModelsList(sortedModels, 250);
-        for (const chunk of chunks) {
-          apiService.addModels(chunk).then(res => {
-            print("*** Upload result:", "info");
-            print(JSON.stringify(res, null, 2), "info");
-            eventService.publishCreateModel(chunk);
-          })
-            .catch(exc => {
-              exc.customMessage = "Error adding models";
-              eventService.publishError(exc);
-            });
-        }
+        const chunks = this.chunkModelsList(sortedModels, 1);
+        await Promise.all(chunks.map(this.createModels));
       }
     } catch (exc) {
       exc.customMessage = "Upload error";
       eventService.publishError(exc);
     }
+  }
+
+  createModels(models) {
+    return apiService.addModels(models).then(res => {
+      print("*** Upload result:", "info");
+      print(JSON.stringify(res, null, 2), "info");
+      eventService.publishCreateModel(models);
+    })
+      .catch(exc => {
+        exc.customMessage = "Error adding models";
+        eventService.publishError(exc);
+      });
   }
 
   chunkModelsList(array, size) {

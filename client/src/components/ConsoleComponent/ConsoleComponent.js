@@ -65,7 +65,7 @@ export class ConsoleComponent extends Component {
         const result = await apiService.getTwinById(arg1);
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
-        this.pushToStdout(`*** Error retrieving twin from ADT: ${exc}`);
+        this.pushToStdout(`*** Error retrieving twin from Azure Digital Twins: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -81,7 +81,7 @@ export class ConsoleComponent extends Component {
         eventService.publishCreateTwin({ $dtId: arg2, $metadata: { $model: arg1 } });
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
-        this.pushToStdout(`*** Error creating twin from ADT: ${exc}`);
+        this.pushToStdout(`*** Error creating twin from Azure Digital Twins: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -95,7 +95,7 @@ export class ConsoleComponent extends Component {
         eventService.publishDeleteTwin(arg1);
         this.pushToStdout(`*** Deleted Twin with ID: ${arg1}`);
       } catch (exc) {
-        this.pushToStdout(`*** Error deleting twin from ADT: ${exc}`);
+        this.pushToStdout(`*** Error deleting twin from Azure Digital Twins: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -174,7 +174,7 @@ export class ConsoleComponent extends Component {
         const result = await apiService.getModelById(arg1);
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
-        this.pushToStdout(`*** Error retrieving model from ADT: ${exc}`);
+        this.pushToStdout(`*** Error retrieving model from Azure Digital Twins: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -186,7 +186,7 @@ export class ConsoleComponent extends Component {
       const result = await apiService.queryModels();
       this.pushToStdout(JSON.stringify(result, null, 2));
     } catch (exc) {
-      this.pushToStdout(`*** Error retrieving models from ADT: ${exc}`);
+      this.pushToStdout(`*** Error retrieving models from Azure Digital Twins: ${exc}`);
     }
   }
 
@@ -194,8 +194,8 @@ export class ConsoleComponent extends Component {
     if (arg1) {
       try {
         const model = JSON.parse(arg1);
-        eventService.publishCreateModel();
         const result = await apiService.addModels([ model ]);
+        eventService.publishCreateModel();
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
         this.pushToStdout(
@@ -237,7 +237,7 @@ export class ConsoleComponent extends Component {
         const result = await apiService.queryTwins(query);
         this.pushToStdout(JSON.stringify(result, null, 2));
       } catch (exc) {
-        this.pushToStdout(`*** Error retrieving data from ADT: ${exc}`);
+        this.pushToStdout(`*** Error retrieving data from Azure Digital Twins: ${exc}`);
       }
     } else {
       this.pushToStdout("*** Not enough params");
@@ -511,7 +511,7 @@ export class ConsoleComponent extends Component {
   render() {
     return (
       <Terminal
-        welcomeMessage="ADT Explorer command prompt"
+        welcomeMessage="Azure Digital Twins Explorer command prompt"
         commands={this.commands}
         contentClassName="cc-content"
         inputClassName="cc-input"

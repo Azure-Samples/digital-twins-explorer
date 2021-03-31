@@ -18,10 +18,9 @@ const getDataFromQueryResponse = response => {
     relationships: [],
     other: []
   };
-
   for (let i = 0; i < list.length; i++) {
     const current = list[i];
-    if (current.$dtId && !data.twins.some(t => t.$dtId === current.$dtId)) {
+    if (current.$dtId && current.$metadata && current.$metadata.$model && !data.twins.some(t => t.$dtId === current.$dtId)) {
       data.twins.push(current);
       continue;
     } else if (current.$relationshipId) {
