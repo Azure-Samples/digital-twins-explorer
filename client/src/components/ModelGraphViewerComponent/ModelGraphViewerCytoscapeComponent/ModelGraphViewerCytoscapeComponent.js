@@ -7,6 +7,7 @@ import CytoscapeComponent from "react-cytoscapejs";
 import { graphStyles, modelWithImageStyle, minZoomShowLabels, ellipsisMaxTextLength, ellipsisMaxTextLengthWithImage } from "./config";
 import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions, d3ForceOptions, navigationOptions } from "../../../config/CytoscapeConfig";
 import { settingsService } from "../../../services/SettingsService";
+import { addNavigator } from "../../../utils/utilities";
 
 import "./ModelGraphViewerCytoscapeComponent.scss";
 
@@ -610,7 +611,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
           cy={cy => {
             if (this.graphControl !== cy) {
               this.graphControl = cy;
-              this.graphControl.navigator({ ...navigationOptions, container: "#model-graph-viewer-nav" });
+              addNavigator(this.graphControl, navigationOptions, "#model-graph-viewer-nav");
               this.graphControl.dblclick();
               this.graphControl.on("select", "node", this.onNodeSelected);
               this.graphControl.on("unselect", "node", this.onNodeUnselected);

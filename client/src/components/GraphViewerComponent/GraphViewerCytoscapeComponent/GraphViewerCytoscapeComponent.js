@@ -8,7 +8,7 @@ import CytoscapeComponent from "react-cytoscapejs";
 import _uniqueId from "lodash/uniqueId";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
-import { getUniqueRelationshipId } from "../../../utils/utilities";
+import { getUniqueRelationshipId, addNavigator } from "../../../utils/utilities";
 import { settingsService } from "../../../services/SettingsService";
 
 import "./GraphViewerCytoscapeComponent.scss";
@@ -814,7 +814,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           cy={cy => {
             if (this.graphControl !== cy) {
               this.graphControl = cy;
-              this.graphControl.navigator({ ...navigationOptions, container: `#${this.navControlId}` });
+              addNavigator(this.graphControl, navigationOptions, `#${this.navControlId}`);
               if (this.props.readOnly) {
                 return;
               }
