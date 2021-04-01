@@ -357,6 +357,19 @@ export class GraphViewerComponent extends React.Component {
   onControlClicked = () => {
     this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
     eventService.publishSelection();
+
+    const { highlightingTerms, filteringTerms } = this.state;
+    if (highlightingTerms.length > 0) {
+      const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
+      this.setState({ highlightingTerms: newTerms });
+    }
+    if (filteringTerms.length > 0) {
+      const newTerms = filteringTerms.map(t => ({ ...t, isActive: false }));
+      if (this.cyRef.current) {
+        this.cyRef.current.showAllNodes();
+      }
+      this.setState({ filteringTerms: newTerms });
+    }
   }
 
   onTwinDelete = async ids => {
