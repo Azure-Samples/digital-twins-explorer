@@ -22,12 +22,14 @@
 }
 
 .iv-toolbar {
-  padding: 2px;
   justify-items: stretch;
   align-items: stretch;
   max-width: 100%;
   background-color: $backgroundColor3;
-  padding: 15px;
+
+  > div {
+    padding: 15px;
+  }
 }
 
 .iv-toolbarButtons {
