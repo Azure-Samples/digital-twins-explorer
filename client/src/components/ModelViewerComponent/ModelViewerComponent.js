@@ -154,8 +154,10 @@ export class ModelViewerComponent extends Component {
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
       if (sortedModels.length > 0) {
-        const chunks = this.chunkModelsList(sortedModels, 1);
-        await Promise.all(chunks.map(this.createModels));
+        const chunks = this.chunkModelsList(sortedModels, 6);
+        for (const chunk of chunks) {
+          await this.createModels(chunk);
+        }
       }
     } catch (exc) {
       exc.customMessage = "Upload error";
@@ -164,11 +166,12 @@ export class ModelViewerComponent extends Component {
   }
 
   createModels(models) {
-    return apiService.addModels(models).then(res => {
-      print("*** Upload result:", "info");
-      print(JSON.stringify(res, null, 2), "info");
-      eventService.publishCreateModel(models);
-    })
+    return apiService.addModels(models)
+      .then(res => {
+        print("*** Upload result:", "info");
+        print(JSON.stringify(res, null, 2), "info");
+        eventService.publishCreateModel(models);
+      })
       .catch(exc => {
         exc.customMessage = "Error adding models";
         eventService.publishError(exc);

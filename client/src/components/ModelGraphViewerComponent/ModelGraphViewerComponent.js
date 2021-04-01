@@ -186,9 +186,11 @@ export class ModelGraphViewerComponent extends React.Component {
           if (m.bases && m.bases.length > 0) {
             m.bases.forEach(base => {
               const baseModel = list.find(i => i.id === base);
-              const hasSameRel = baseModel.relationships.some(br => br.name === r.name);
-              if (hasSameRel) {
-                parentHasSameRelationship = true;
+              if (baseModel) {
+                const hasSameRel = baseModel.relationships.some(br => br.name === r.name);
+                if (hasSameRel) {
+                  parentHasSameRelationship = true;
+                }
               }
             });
           }
