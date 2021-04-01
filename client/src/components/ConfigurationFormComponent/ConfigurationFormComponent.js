@@ -76,7 +76,6 @@ export class ConfigurationFormComponent extends Component {
       environmentOptions.push(appAdtUrl);
     }
     settingsService.environments = this.environments;
-    settingsService.queries = [];
     eventService.publishEnvironmentChange();
   };
 
