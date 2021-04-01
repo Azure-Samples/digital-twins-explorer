@@ -185,7 +185,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
                       }} />
                     {term.menuIsOpen && <div className="term-menu">
                       {this.menuItems.map(item => (
-                        <div className="term-menu-item" key={item.key} ariaLabel={item.ariaLabel}>
+                        <div className="term-menu-item" key={item.key} aria-label={item.ariaLabel}>
                           <Checkbox checked={term[item.key] === true} onChange={() => this.toggleCheckbox(term, item.key)} />
                           <span>{item.text}</span>
                         </div>

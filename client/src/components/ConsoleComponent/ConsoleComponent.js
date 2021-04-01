@@ -451,7 +451,7 @@ export class ConsoleComponent extends Component {
       }
     },
     delallmodels: {
-      description: "Deletes all models in your instance",
+      description: "deletes all models in your instance",
       usage: "delallmodels",
       fn: () => {
         this.deleteAllModels();

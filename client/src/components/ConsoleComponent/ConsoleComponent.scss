@@ -7,8 +7,18 @@
   line-height: 15px !important;
 }
 
+.cc-content {
+  height: auto !important;
+  margin: 2px;
+  padding: 0 !important;
+}
+
 .cc-console {
-  width: 100%;
+  background-color: transparent !important;
+  height: calc(100% - 16px);
   max-width: 100%;
+  max-height: inherit !important;
+  min-height: inherit !important;
   user-select: text;
+  width: 100%;
 }

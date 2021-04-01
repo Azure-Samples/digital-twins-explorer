@@ -5,9 +5,10 @@
 
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
+import _uniqueId from "lodash/uniqueId";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
-import { getUniqueRelationshipId } from "../../../utils/utilities";
+import { getUniqueRelationshipId, addNavigator } from "../../../utils/utilities";
 import { settingsService } from "../../../services/SettingsService";
 
 import "./GraphViewerCytoscapeComponent.scss";
@@ -28,6 +29,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       hideContextMenu: false
     };
     this.graphControl = null;
+    this.navControlId = _uniqueId("graph-viewer-nav");
     this.selectedNodes = [];
     this.layout = "Klay";
     this.isSelectingOnOverlay = false;
@@ -148,16 +150,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   componentDidMount() {
-    this.setContextMenu();
-  }
-
-  setContextMenu = () => {
-    const cy = this.graphControl;
-    this.contextMenu = cy.contextMenus({
-      menuItems: this.contextMenuItems,
-      menuItemClasses: [ "custom-menu-item" ],
-      contextMenuClasses: [ "custom-context-menu" ]
-    });
+    if (!this.props.readOnly) {
+      const cy = this.graphControl;
+      this.contextMenu = cy.contextMenus({
+        menuItems: this.contextMenuItems,
+        menuItemClasses: [ "custom-menu-item" ],
+        contextMenuClasses: [ "custom-context-menu" ]
+      });
+    }
   }
 
   addTwins(twins) {
@@ -768,7 +768,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  highlightNodes(nodeIds) {
+  highlightNodes(nodeIds, highlightEdges) {
     const cy = this.graphControl;
     cy.edges().toggleClass("highlighted", false);
     cy.edges().toggleClass("opaque", true);
@@ -782,7 +782,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       connectedEdges.forEach(edge => {
         const relatedNodeId = id === edge.data().source ? edge.data().target : edge.data().source;
         if (nodeIds.indexOf(relatedNodeId) !== -1) {
-          cy.$id(edge.data().id).toggleClass("highlighted", true);
+          cy.$id(edge.data().id).toggleClass("highlighted", highlightEdges);
           cy.$id(edge.data().id).toggleClass("opaque", false);
         }
       });
@@ -817,7 +817,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           cy={cy => {
             if (this.graphControl !== cy) {
               this.graphControl = cy;
-              this.graphControl.navigator({ ...navigationOptions, container: "#graph-viewer-nav" });
+              addNavigator(this.graphControl, navigationOptions, `#${this.navControlId}`);
+              if (this.props.readOnly) {
+                return;
+              }
+
               this.graphControl.dblclick();
               this.graphControl.on("mouseover", this.onNodeHover);
               this.graphControl.on("select", "node", this.onNodeSelected);
@@ -833,7 +837,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id="graph-viewer-nav" className="graph-navigator" />
+          <div id={this.navControlId} className="graph-navigator" />
         </div>
       </div>
     );

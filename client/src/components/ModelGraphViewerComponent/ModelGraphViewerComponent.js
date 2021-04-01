@@ -186,9 +186,11 @@ export class ModelGraphViewerComponent extends React.Component {
           if (m.bases && m.bases.length > 0) {
             m.bases.forEach(base => {
               const baseModel = list.find(i => i.id === base);
-              const hasSameRel = baseModel.relationships.some(br => br.name === r.name);
-              if (hasSameRel) {
-                parentHasSameRelationship = true;
+              if (baseModel) {
+                const hasSameRel = baseModel.relationships.some(br => br.name === r.name);
+                if (hasSameRel) {
+                  parentHasSameRelationship = true;
+                }
               }
             });
           }
@@ -414,9 +416,8 @@ export class ModelGraphViewerComponent extends React.Component {
     const termsHighlightingDisplayName = activeTerms.filter(term => term.matchDisplayName);
     const selectedModelKey = selectedModel ? selectedModel.key : null;
     const highlightedNodes = this.getFilteredNodes(termsHighlightingId, termsHighlightingDisplayName, selectedModelKey);
-    if (highlightedNodes.length > 0) {
-      this.cyRef.current.highlightNodes(highlightedNodes);
-    }
+    const highlight = termsHighlightingId.length > 0 || termsHighlightingDisplayName.length > 0 || selectedModelKey;
+    this.cyRef.current.highlightNodes(highlightedNodes, highlight);
   }
 
   filterNodes = () => {
@@ -427,9 +428,7 @@ export class ModelGraphViewerComponent extends React.Component {
     const filteredNodes = this.getFilteredNodes(termsFilteringId, termsFilteringDisplayName);
     if (this.cyRef.current) {
       this.cyRef.current.showAllNodes();
-      if (filteredNodes.length > 0) {
-        this.cyRef.current.filterNodes(filteredNodes);
-      }
+      this.cyRef.current.filterNodes(filteredNodes);
     }
   }
 
@@ -443,6 +442,9 @@ export class ModelGraphViewerComponent extends React.Component {
     let subTypes = [];
     let outgoingRels = [];
     let filteredNodes = this.allNodes.filter(node => {
+      if (termsFilteringId.length === 0 && termsFilteringDisplayName.length === 0 && !selectedModelKey) {
+        return true;
+      }
       const matchesId = termsFilteringId.some(term => {
         const matches = node.id.toLowerCase().includes(term.text.toLowerCase());
         if (matches) {

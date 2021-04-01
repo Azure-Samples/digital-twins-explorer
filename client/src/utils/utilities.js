@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 import jsonlint from "jsonlint";
 
 export function readFile(file) {
@@ -49,4 +50,27 @@ export function capitalizeName(name) {
 
 export function getUniqueRelationshipId(relationship) {
   return `${relationship.$sourceId}_${relationship.$relationshipId}`;
+}
+
+export function addNavigator(cy, navigationOptions, container) {
+  const nav = cy.navigator({ ...navigationOptions, container });
+
+  /* Sometimes the navigator thumbnail update fails as the DOM is not
+     in the correct state to be modified. As a workaround, this function
+     replaces the rendering event handlers added by the navigator with
+     one that is wrapped in a try/catch. */
+  const fn = nav._onRenderHandler;
+  cy.offRender(fn);
+
+  const newFn = function () {
+    try {
+      fn();
+    } catch (e) {
+      // Retry the render function after a timeout
+      setTimeout(newFn, nav.options.rerenderDelay);
+    }
+  };
+
+  nav._onRenderHandler = newFn;
+  cy.onRender(newFn);
 }

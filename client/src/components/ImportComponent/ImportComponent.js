@@ -34,7 +34,7 @@ export class ImportComponent extends Component {
     try {
       this.data = await importService.tryLoad(file);
     } catch (exc) {
-      exc.customMessage = "Error in creating graph from spreadsheet";
+      exc.customMessage = "Error in creating graph from file";
       eventService.publishError(exc);
     }
 
@@ -87,7 +87,7 @@ export class ImportComponent extends Component {
           <h4>Graph Preview Only</h4>
           <p>Full graph validation is applied on import. Click save to import.</p>
         </div>}
-        {!error && <GraphViewerCytoscapeComponent ref={this.cyRef} />}
+        {!error && <GraphViewerCytoscapeComponent ref={this.cyRef} readOnly />}
         {isLoading && <LoaderComponent />}
         <ImportStatsComponent data={this.data} isVisible={showImportModal} dataImported={dataImported} onClose={this.closeModal} />
       </div>

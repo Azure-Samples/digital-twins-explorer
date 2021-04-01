@@ -7,6 +7,7 @@ import CytoscapeComponent from "react-cytoscapejs";
 import { graphStyles, modelWithImageStyle, minZoomShowLabels, ellipsisMaxTextLength, ellipsisMaxTextLengthWithImage } from "./config";
 import { colors, dagreOptions, colaOptions, klayOptions, fcoseOptions, d3ForceOptions, navigationOptions } from "../../../config/CytoscapeConfig";
 import { settingsService } from "../../../services/SettingsService";
+import { addNavigator } from "../../../utils/utilities";
 
 import "./ModelGraphViewerCytoscapeComponent.scss";
 
@@ -32,7 +33,6 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.isHidingLabels = false;
     this.hiddenTextRuler = React.createRef();
     this.canRenderPopper = false;
-    this.contextMenuIsOpen = false;
     this.contextMenuItems = [
       {
         id: "show-source",
@@ -270,7 +270,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  highlightNodes(nodes) {
+  highlightNodes(nodes, highlightEdges) {
     const nodesIds = nodes.map(node => node.id);
     const cy = this.graphControl;
     cy.edges().toggleClass("highlighted", false);
@@ -279,12 +279,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       cy.$id(cyNode.id()).toggleClass("opaque", true);
     });
     nodes.forEach(node => {
-      const selectedNode = cy.nodes().filter(n => {
-        if (node) {
-          return n.id() === node.id;
-        }
-        return null;
-      });
+      const selectedNode = cy.nodes().filter(n => node && n.id() === node.id);
       cy.$id(selectedNode.id()).toggleClass("opaque", false);
       cy.$id(selectedNode.id()).toggleClass("highlighted", true);
       const connectedEdges = selectedNode.connectedEdges();
@@ -292,7 +287,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
         .forEach(edge => {
           if (nodesIds.includes(edge.data().source)
             && nodesIds.includes(edge.data().target)) {
-            cy.$id(edge.data().id).toggleClass("highlighted", true);
+            cy.$id(edge.data().id).toggleClass("highlighted", highlightEdges);
             cy.$id(edge.data().id).toggleClass("opaque", false);
           }
         });
@@ -559,8 +554,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   onEdgeRightClick = () => {
     this.setState({ hideContextMenu: false });
-    this.contextMenuIsOpen = true;
     this.onNodeUnhover();
+  }
+
+  onNodeRightClick = () => {
+    this.setState({ hideContextMenu: this.contextMenuItems.every(i => i.selector === "edge") });
   }
 
   onControlRightClick = e => {
@@ -610,7 +608,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
           cy={cy => {
             if (this.graphControl !== cy) {
               this.graphControl = cy;
-              this.graphControl.navigator({ ...navigationOptions, container: "#model-graph-viewer-nav" });
+              addNavigator(this.graphControl, navigationOptions, "#model-graph-viewer-nav");
               this.graphControl.dblclick();
               this.graphControl.on("select", "node", this.onNodeSelected);
               this.graphControl.on("unselect", "node", this.onNodeUnselected);
@@ -622,6 +620,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("mousedown", this.onNodeUnhover);
               this.graphControl.on("zoom", this.onGraphZoom);
               this.graphControl.on("cxttap", "edge", this.onEdgeRightClick);
+              this.graphControl.on("cxttap", "node", this.onNodeRightClick);
               this.graphControl.on("cxttap", this.onControlRightClick);
             }
           }} />
