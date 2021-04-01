@@ -138,29 +138,10 @@
     }
   }
 
-  .mgv-filter {
-    font-size: 12px;
-    font-weight: 200;
-  }
-
-  .mgv-filter input {
-    font-family: $fontFamilyMain;
-    font-weight: 600;
-    font-size: 12px;
-    background-color: #353535;
-    color: #a3a3a3;
-    border-width: 0px;
-    flex: 1 1;
-
-    &::placeholder {
-      font-size: 12px;
-    }
-  }
-
   .filter-input {
     width: 25%;
     max-width: 300px;
-    min-width: 298px;
+    min-width: 130px;
     margin: 0px 10px 10px 0px;
     .configuration-input {
       margin-right: 10px;

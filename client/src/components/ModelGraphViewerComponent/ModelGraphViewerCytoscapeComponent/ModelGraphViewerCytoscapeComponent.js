@@ -271,7 +271,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  highlightNodes(nodes) {
+  highlightNodes(nodes, highlightEdges) {
     const nodesIds = nodes.map(node => node.id);
     const cy = this.graphControl;
     cy.edges().toggleClass("highlighted", false);
@@ -280,12 +280,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
       cy.$id(cyNode.id()).toggleClass("opaque", true);
     });
     nodes.forEach(node => {
-      const selectedNode = cy.nodes().filter(n => {
-        if (node) {
-          return n.id() === node.id;
-        }
-        return null;
-      });
+      const selectedNode = cy.nodes().filter(n => node && n.id() === node.id);
       cy.$id(selectedNode.id()).toggleClass("opaque", false);
       cy.$id(selectedNode.id()).toggleClass("highlighted", true);
       const connectedEdges = selectedNode.connectedEdges();
@@ -293,7 +288,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
         .forEach(edge => {
           if (nodesIds.includes(edge.data().source)
             && nodesIds.includes(edge.data().target)) {
-            cy.$id(edge.data().id).toggleClass("highlighted", true);
+            cy.$id(edge.data().id).toggleClass("highlighted", highlightEdges);
             cy.$id(edge.data().id).toggleClass("opaque", false);
           }
         });

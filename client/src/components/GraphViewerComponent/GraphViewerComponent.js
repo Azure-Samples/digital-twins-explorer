@@ -196,7 +196,9 @@ export class GraphViewerComponent extends React.Component {
       });
     } else {
       await apiService.query(query, async data => {
-        await this.cyRef.current.clearTwins();
+        if (this.cyRef.current) {
+          this.cyRef.current.clearTwins();
+        }
         if (data.twins.length > 0) {
           this.setState({ couldNotDisplay: false, noResults: false, relationshipsOnly: false });
           this.cyRef.current.addTwins(data.twins);
@@ -609,33 +611,30 @@ export class GraphViewerComponent extends React.Component {
     const { highlightingTerms, overlayItems, overlayResults } = this.state;
     this.cyRef.current.clearHighlighting();
     const activeTerms = highlightingTerms.filter(term => term.isActive);
-    const termsHighlightingId = activeTerms.filter(term => term.match$dtId);
-    const highlightedNodes = this.getFilteredNodes(termsHighlightingId);
+    const highlightedNodes = this.getFilteredNodes(activeTerms, overlayResults);
     let highlightedNodesIds = highlightedNodes.map(n => n.$dtId);
     if (overlayResults && overlayItems.twins && overlayItems.twins.length > 0) {
       highlightedNodesIds = [ ...highlightedNodesIds, ...overlayItems.twins ];
     }
-    if (highlightedNodesIds.length > 0) {
-      this.cyRef.current.highlightNodes(highlightedNodesIds);
-    }
+    this.cyRef.current.highlightNodes(highlightedNodesIds, activeTerms.length > 0 || overlayResults);
   }
 
   filterNodes = () => {
     const { filteringTerms } = this.state;
     const activeTerms = filteringTerms.filter(term => term.isActive);
-    const termsFilteringId = activeTerms.filter(term => term.match$dtId);
-    const filteredNodes = this.getFilteredNodes(termsFilteringId);
+    const filteredNodes = this.getFilteredNodes(activeTerms, false);
     if (this.cyRef.current) {
       this.cyRef.current.showAllNodes();
-      if (filteredNodes.length > 0) {
-        this.cyRef.current.filterNodes(filteredNodes);
-      }
+      this.cyRef.current.filterNodes(filteredNodes);
     }
   }
 
-  getFilteredNodes = termsFilteringId => {
+  getFilteredNodes = (termsFilteringId, overlayResults) => {
     let outgoingRels = [];
     let filteredNodes = this.allNodes.filter(node => {
+      if (termsFilteringId.length === 0) {
+        return !overlayResults;
+      }
       const matchesId = termsFilteringId.some(term => {
         const matches = node.$dtId.toLowerCase().includes(term.text.toLowerCase());
         if (matches) {

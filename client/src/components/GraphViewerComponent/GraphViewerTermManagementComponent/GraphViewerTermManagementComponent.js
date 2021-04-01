@@ -24,11 +24,6 @@ export default class GraphViewerTermManagementComponent extends Component {
         key: "addOutgoingRelationships",
         text: "Add Outgoing Relationships",
         ariaLabel: "add outgoing relationships"
-      },
-      {
-        key: "match$dtId",
-        text: "Match $dtId",
-        ariaLabel: "match $dtId"
       }
     ];
   }
@@ -49,7 +44,6 @@ export default class GraphViewerTermManagementComponent extends Component {
       const term = {
         text: filterTerm,
         menuIsOpen: false,
-        match$dtId: true,
         addOutgoingRelationships: true,
         isActive: true
       };
@@ -153,7 +147,7 @@ export default class GraphViewerTermManagementComponent extends Component {
                       }} />
                     {term.menuIsOpen && <div className="term-menu">
                       {this.menuItems.map(item => (
-                        <div className="term-menu-item" key={item.key} ariaLabel={item.ariaLabel}>
+                        <div className="term-menu-item" key={item.key} aria-label={item.ariaLabel}>
                           <Checkbox checked={term[item.key] === true} onChange={() => this.toggleCheckbox(term, item.key)} />
                           <span>{item.text}</span>
                         </div>
