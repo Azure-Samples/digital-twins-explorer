@@ -5,6 +5,7 @@
 
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
+import _uniqueId from "lodash/uniqueId";
 
 import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
 import { getUniqueRelationshipId } from "../../../utils/utilities";
@@ -28,6 +29,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       hideContextMenu: false
     };
     this.graphControl = null;
+    this.navControlId = _uniqueId("graph-viewer-nav");
     this.selectedNodes = [];
     this.layout = "Klay";
     this.isSelectingOnOverlay = false;
@@ -148,16 +150,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   componentDidMount() {
-    this.setContextMenu();
-  }
-
-  setContextMenu = () => {
-    const cy = this.graphControl;
-    this.contextMenu = cy.contextMenus({
-      menuItems: this.contextMenuItems,
-      menuItemClasses: [ "custom-menu-item" ],
-      contextMenuClasses: [ "custom-context-menu" ]
-    });
+    if (!this.props.readOnly) {
+      const cy = this.graphControl;
+      this.contextMenu = cy.contextMenus({
+        menuItems: this.contextMenuItems,
+        menuItemClasses: [ "custom-menu-item" ],
+        contextMenuClasses: [ "custom-context-menu" ]
+      });
+    }
   }
 
   addTwins(twins) {
@@ -814,7 +814,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           cy={cy => {
             if (this.graphControl !== cy) {
               this.graphControl = cy;
-              this.graphControl.navigator({ ...navigationOptions, container: "#graph-viewer-nav" });
+              this.graphControl.navigator({ ...navigationOptions, container: `#${this.navControlId}` });
+              if (this.props.readOnly) {
+                return;
+              }
+
               this.graphControl.dblclick();
               this.graphControl.on("mouseover", this.onNodeHover);
               this.graphControl.on("select", "node", this.onNodeSelected);
@@ -830,7 +834,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id="graph-viewer-nav" className="graph-navigator" />
+          <div id={this.navControlId} className="graph-navigator" />
         </div>
       </div>
     );
