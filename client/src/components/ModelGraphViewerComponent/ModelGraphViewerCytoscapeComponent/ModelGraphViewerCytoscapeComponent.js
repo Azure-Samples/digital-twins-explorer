@@ -33,7 +33,6 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     this.isHidingLabels = false;
     this.hiddenTextRuler = React.createRef();
     this.canRenderPopper = false;
-    this.contextMenuIsOpen = false;
     this.contextMenuItems = [
       {
         id: "show-source",
@@ -555,8 +554,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   onEdgeRightClick = () => {
     this.setState({ hideContextMenu: false });
-    this.contextMenuIsOpen = true;
     this.onNodeUnhover();
+  }
+
+  onNodeRightClick = () => {
+    this.setState({ hideContextMenu: this.contextMenuItems.every(i => i.selector === "edge") });
   }
 
   onControlRightClick = e => {
@@ -618,6 +620,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
               this.graphControl.on("mousedown", this.onNodeUnhover);
               this.graphControl.on("zoom", this.onGraphZoom);
               this.graphControl.on("cxttap", "edge", this.onEdgeRightClick);
+              this.graphControl.on("cxttap", "node", this.onNodeRightClick);
               this.graphControl.on("cxttap", this.onControlRightClick);
             }
           }} />
