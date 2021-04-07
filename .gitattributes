@@ -1,8 +1,0 @@
-* text eol=lf
-*.gif -text
-*.jpg -text
-*.png -text
-*.dll -text
-*.exe -text
-*.nupkg -text
-*.xlsx -text

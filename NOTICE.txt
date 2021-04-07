@@ -1,5 +1,0 @@
-This sample code uses the Mpn65 color palette from https://github.com/google/palette.js
-Licensed under the Apache License, Version 2.0
-
-The file GoldenLayoutComponent.js is based on the bug fix suggested by pmunin here: 
-https://github.com/golden-layout/golden-layout/issues/392
