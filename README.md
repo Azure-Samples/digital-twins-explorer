@@ -5,21 +5,21 @@ languages:
 - typescript
 products:
 - azure-digital-twins
-name: Azure Digital Twins (ADT) explorer
+name: Azure Digital Twins explorer
 description: A code sample for visualizing and managing an Azure Digital Twins instance
 urlFragment: digital-twins-explorer
 ---
 
-# Azure Digital Twins (ADT) explorer
+# Azure Digital Twins explorer
  
 ## Note to Existing Users: Change in Authentication
 
-**As of 10/30, we have changed authentication in adt-explorer.** Adt-explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running adt-explorer (does not have to be the same command prompt).
+**As of 10/30, we have changed authentication in Azure Digital Twins explorer.** Azure Digital Twins explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running Azure Digital Twins explorer (does not have to be the same command prompt).
 See below for more information. 
 
 ## Overview
 
-adt-explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
+Azure Digital Twins explorer is a sample application for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to:
 * Upload and explore models 
 * Upload and edit graphs of twins
 * Visualize the twins graph with a number of layout techniques
@@ -30,9 +30,9 @@ adt-explorer is a sample application for the [Azure Digital Twins service](https
 
 There is also an experimental set of features that allows you to send push notifications from Azure Digital Twins to the application for close-to-real time updates. 
 
-ADT explorer is written as a single-page JavaScript application. You can run it locally as a node.js application - see instructions below.
+Azure Digital Twins explorer is written as a single-page JavaScript application. You can run it locally as a node.js application - see instructions below.
 
-ADT explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+Azure Digital Twins explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 ## Requirements
 
@@ -40,27 +40,27 @@ Node.js 10+
 
 ## Getting Started
 
-### Running adt-explorer locally
+### Running Azure Digital Twins explorer locally
 
 1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
     * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-portal)
-1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
-1. Select the **Download ZIP** button to download a .zip file of this sample code to your machine. Unzip the **Azure_Digital_Twins__ADT__explorer.zip** folder, and extract the files.
+1. When running locally, Azure Digital Twins explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run Azure Digital Twins explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
+1. Select the **Download ZIP** button to download a .zip file of this sample code to your machine. Unzip the **Azure_Digital_Twins_explorer.zip** folder, and extract the files.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
 1. From the same command prompt, run `npm run start`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080:
     >  * Linux/Mac (Bash): `PORT=8080 npm run start`
     >  * Windows (cmd): `set PORT=8080 && npm run start`
-    > Note: Your ADT app registration must have a reply URL using the same port you are using - e.g. localhost:7000 if that is the port you are using.
+    > Note: Your Azure Digital Twins app registration must have a reply URL using the same port you are using - e.g. localhost:7000 if that is the port you are using.
 1. Your browser should open and the app should appear.
 
-See below for instructions on how to run adt-explorer using docker.
+See below for instructions on how to run Azure Digital Twins explorer using docker.
 
 ## Quick Start: Create an Example Graph
 
-To create an example graph with adt-explorer connected to a fresh instance of Azure Digital Twins, follow the steps below. The result will be the graph in the screenshot above.
+To create an example graph with Azure Digital Twins explorer connected to a fresh instance of Azure Digital Twins, follow the steps below. The result will be the graph in the screenshot above.
 
-Note: When you click the first command, adt-explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide the URL of your Azure Digital Twins instance, prefixed with "https://". 
+Note: When you click the first command, Azure Digital Twins explorer will open a dialog that prompts you for connection information to your service instance. You will need to provide the URL of your Azure Digital Twins instance, prefixed with "https://". 
 You can find the service URL in the portal overview page for your Azure Digital Twins instance. 
 
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
@@ -72,7 +72,7 @@ In the model panel at the left, click the `upload models` button (cloud icon wit
   * In the file selector box that appears, navigate to the [client/examples](https://github.com/Azure-Samples/digital-twins-explorer/tree/master/client/examples) folder in the repository
   * Select all files with the `*.json` extension and hit ok
 
-Adt-explorer will now upload these model files to your Azure Digital Twins instance
+Azure Digital Twins explorer will now upload these model files to your Azure Digital Twins instance
 
 In the graph view panel (the large space in the middle), select the `import graph` button.
 
@@ -86,17 +86,17 @@ Hit the save button in the upper right corner
 
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/master/media/graph-preview.png" alt="graph preview" width="500"/>
 
-Adt-explorer will now create the requested twins and relationships in the service instance. A dialog will appear to show that it is finished.
+Azure Digital Twins explorer will now create the requested twins and relationships in the service instance. A dialog will appear to show that it is finished.
 
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/master/media/import-success.png" alt="graph import success dialog" width="250"/>
 
 Click on the graph view tab
 
-Click the large query button in the upper right of the screen. This will cause adt-explorer to retrieve all twins and relationships from the service and draw the graph defined by them. 
+Click the large query button in the upper right of the screen. This will cause Azure Digital Twins explorer to retrieve all twins and relationships from the service and draw the graph defined by them. 
 
-For more detailed instructions on adt-explorer features, please see the sections below.
+For more detailed instructions on Azure Digital Twins explorer features, please see the sections below.
 
-## Using adt-explorer
+## Using Azure Digital Twins explorer
 
 ### First run
 
@@ -112,7 +112,7 @@ To continue, you will need to provide the URL of the Azure Digital Twins instanc
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/master/media/sign-in-dialog.png" alt="sign-in dialog" width="250"/>
 
 
-To change the instance URL to connect to another instance of ADT, click on the sign in button in the top right.
+To change the instance URL to connect to another instance of Azure Digital Twins, click on the sign in button in the top right.
 
 ### Uploading Models
 
@@ -127,15 +127,15 @@ The panel will automatically show all available models in your environment on fi
 To upload a model, click on the *Upload a model* button and select one more JSON-formatted model files when prompted.
 
 For each model, you can:
-1. **Delete**: remove the definition from your ADT environment.
+1. **Delete**: remove the definition from your Azure Digital Twins environment.
 1. **View**: see the raw JSON definition of the model.
-1. **Create a new twin**: create a new instance of the model as a twin in the ADT environment. No properties are set as part of this process (aside from name).
+1. **Create a new twin**: create a new instance of the model as a twin in the Azure Digital Twins environment. No properties are set as part of this process (aside from name).
 
 The models shown in the example screenshot are available in the `examples` folder in this repository (`client/examples`). 
 
 ### Creating Twins and Relationships
 
-You can create twins and relationships in adt-explorer. To create more than a few individual twins and relationships, you will probably want to use the **import** feature described below.
+You can create twins and relationships in Azure Digital Twins explorer. To create more than a few individual twins and relationships, you will probably want to use the **import** feature described below.
 
 * To create a twin instance, use the (+) button in any of the model items in the model list. A dialog will open, prompting you for the desired name of the new instance. The name must be unique.
 
@@ -209,24 +209,24 @@ Clicking the settings cog in the top right corner allows the configuration of th
 
 ## Known Limitations
 
-* adt-explorer does not currently handle complex properties or components defined in twins well. You can create or visualize twins using these features, but you may not be able to view or edit their properties
+* Azure Digital Twins explorer does not currently handle complex properties or components defined in twins well. You can create or visualize twins using these features, but you may not be able to view or edit their properties
 * The display of patches in the property inspector is not always correct if you perform multiple patches in a sequence. The changes should be correctly applied to th service twin, though
 
-## Running adt-explorer with Docker
+## Running Azure Digital Twins explorer with Docker
 
 1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
     * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance)
-1. From a command prompt in the root folder, run `docker build -t adt-explorer .`. This will build the Docker image for the ADT explorer.
+1. From a command prompt in the root folder, run `docker build -t adt-explorer .`. This will build the Docker image for the Azure Digital Twins explorer.
 1. From the same command prompt, run `docker run -it -p3000:3000 adt-explorer`.
     > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 adt-explorer`.
-    > A message will appear on the console asking you to login using a code in the Microsoft device login page with your web browser; after doing so the ADT explorer should start.
+    > A message will appear on the console asking you to login using a code in the Microsoft device login page with your web browser; after doing so the Azure Digital Twins explorer should start.
     >  * Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside Docker this information might not be accurate, as other port might have been exposed. Be sure to use
     >  the port you chose before.
 1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the apropriate port, if you changed it).
 
 ## Experimental Features
 
-In addition to local operation, you can also run adt-explorer as a cloud application. In the cloud, you can use push notifications from Azure Digital Twins, sent via the Azure SignalR service, to update your adt-explorer in real time.
+In addition to local operation, you can also run Azure Digital Twins explorer as a cloud application. In the cloud, you can use push notifications from Azure Digital Twins, sent via the Azure SignalR service, to update your Azure Digital Twins explorer in real time.
 
 ### Running in the cloud
 
@@ -317,7 +317,7 @@ Where a view has commands, it's suggested that a dedicated command bar component
 
 ### Pub/Sub
 
-The Golden Layout Component includes a pub/sub message bus for communication between components. This is key part of the ADT Explorer and is used to pass messages between components.
+The Golden Layout Component includes a pub/sub message bus for communication between components. This is key part of the Azure Digital Twins Explorer and is used to pass messages between components.
 
 All events - via publish and subscribe methods - are defined in the `src/services/EventService.js` file. Additional events can be defined by adding to this file.
 
@@ -327,11 +327,11 @@ The pub/sub message bus is not immediately available on application load; howeve
 
 ### Local
 
-When running locally, all requests to the ADT service are proxied through the same local web server used for hosting the client app. This is configured in the `client/src/setupProxy.js` file.
+When running locally, all requests to the Azure Digital Twins service are proxied through the same local web server used for hosting the client app. This is configured in the `client/src/setupProxy.js` file.
 
 ### Cloud
 
 When running in the cloud, Azure Functions hosts three services to support the front end application:
-1. Proxy: this proxies requests through the ADT service (much in the same way as the proxy used when running locally).
-1. SignalR: this allows clients to retrieve credentials to access the SignalR service for live telemetry updates. It also validates that the endpoint and route required to stream information from the ADT service to the ADT Explorer app is in place. If the managed service identity for the Function is configured correctly (i.e. has write permissions on the resource group and can administer the ADT service), then it can create these itself.
-1. EventGrid: this receives messages from the Event Grid to broadcasts them to any listening clients using SignalR. The messages are sent from ADT to the function via ADT endpoint and route.
+1. Proxy: this proxies requests through the Azure Digital Twins service (much in the same way as the proxy used when running locally).
+1. SignalR: this allows clients to retrieve credentials to access the SignalR service for live telemetry updates. It also validates that the endpoint and route required to stream information from the Azure Digital Twins service to the Azure Digital Twins explorer app is in place. If the managed service identity for the Function is configured correctly (i.e. has write permissions on the resource group and can administer the Azure Digital Twins service), then it can create these itself.
+1. EventGrid: this receives messages from the Event Grid to broadcasts them to any listening clients using SignalR. The messages are sent from Azure Digital Twins to the function via Azure Digital Twins endpoint and route.
