@@ -6,7 +6,7 @@ import ReactDOM from "react-dom";
 import { initializeIcons } from "office-ui-fabric-react";
 import { Customizations } from "office-ui-fabric-react/lib/";
 
-import App from "./App";
+import App from "./bractlet-digital-twin/App";
 import { darkFabricTheme } from "./theme/DarkFabricTheme";
 import "./index.scss";
 
