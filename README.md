@@ -10,11 +10,11 @@ description: A code sample for visualizing and managing an Azure Digital Twins i
 urlFragment: digital-twins-explorer
 ---
 
-# Azure Digital Twins explorer
+# Azure Digital Twins Explorer
  
 ## Note to Existing Users: Change in Authentication
 
-**As of 10/30, we have changed authentication in Azure Digital Twins explorer.** Azure Digital Twins explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running Azure Digital Twins explorer (does not have to be the same command prompt).
+**As of 10/30, we have changed authentication in Azure Digital Twins Explorer.** Azure Digital Twins Explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running Azure Digital Twins explorer (does not have to be the same command prompt).
 See below for more information. 
 
 ## Overview
@@ -26,13 +26,13 @@ digital-twins-explorer is a sample application for the [Azure Digital Twins serv
 * Edit properties of twins
 * Run queries against the twins graph 
 
-<img src="./media/digital-twins-explorer.png" alt="Image of digital-twins-explorer"/>
+<img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/main/media/digital-twins-explorer.png" alt="Image of digital-twins-explorer"/>
 
 There is also an experimental set of features that allows you to send push notifications from Azure Digital Twins to the application for close-to-real time updates. 
 
-Azure Digital Twins explorer is written as a single-page JavaScript application. You can run it locally as a node.js application - see instructions below.
+Azure Digital Twins Explorer is written as a single-page JavaScript application. You can run it locally as a node.js application - see instructions below.
 
-Azure Digital Twins explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+Azure Digital Twins Explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 ## Requirements
 
@@ -42,9 +42,9 @@ Node.js 10+
 
 ### Running digital-twins-explorer locally
 
-1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
+1. Set up an Azure Digital Twins service instance and give yourself  permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
     * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-portal)
-1. When running locally, Azure Digital Twins explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run Azure Digital Twins explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
+1. When running locally, Azure Digital Twins Explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run Azure Digital Twins Explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
 1. Select the **Download ZIP** button to download a .zip file of this sample code to your machine. Unzip the **digital-twins-explorer-<branch>.zip** folder, and extract the files. Alternatively, you can clone the repository.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
     >**IMPORTANT!** Due to a dependency on the `npm-force-resolutions` package to mitigate an underlying security issue you will not be able to install under any path that contains a space. For more information, see this GitHub [issue](https://github.com/rogeriochaves/npm-force-resolutions/issues/17).
@@ -206,7 +206,7 @@ Multi-select is also enabled for twin deletion.
 Clicking the settings cog in the top right corner allows the configuration of the following advanced features:
 1. Eager Loading: in the case the twins returned by a query have relationships to twins *not* returned by the query, this feature will load these missing twins before rendering the graph.
 1. Caching: this keeps a local cache of relationships and models in memory to improve query performance. These caches are cleared on any write operations on the relevant components (or on browser refresh).
-1. Console & Output windows: these are hidden by default. The console window enables the use of simple shell functions for workign with the graph. The output window shows a diagnostic trace of operations.
+1. Console & Output windows: these are hidden by default. The console window enables the use of simple shell functions for working with the graph. The output window shows a diagnostic trace of operations.
 1. Number of layers to expand: when double clicking on a node, this number indicates how many layers of relationships to fetch.
 1. Expansion direction: when double clicking on a node, this indicates which kinds of relationships to follow when expanding.
 
@@ -217,20 +217,13 @@ Clicking the settings cog in the top right corner allows the configuration of th
 
 ## Running digital-twins-explorer with Docker
 
-1. Set up an Azure Digital Twins service instance with an Azure Active Directory client app registration. For instructions, please see the following how-to articles:
-    * [Set up an Azure Digital Twins instance](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance)
-    * [Authenticate an Azure Digital Twins client application](https://docs.microsoft.com/azure/digital-twins/how-to-authenticate-client). The important part is the creation of the app registration (client id).
-      > A few important aspects for your app registrations:
-      > * Make sure you add app registrations to the Web platform section of the app registration, not the desktop/mobile section.
-      > * When adding callback URLs to the app registration, please make sure to add `http://localhost:3000`. You can run digital-twins-explorer with a different port (see below), but this is the default.
-      > * Check the **Access Tokens** toggle in the **Implicit Grants** section a few paragraphs below the **Platform Configuration** section on the page. If this toggle is not checked, you will not get authorization tokens.  
-1. From a command prompt in the root folder, run `docker build -t digital-twins-explorer .`. This will build the Docker image for the Azure Digital Twins explorer.
-1. From the same command prompt, run `docker run -it -p3000:3000 digital-twins-explorer`.
-    > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 digital-twins-explorer`
+1. From a command prompt in the root folder, run `docker build -t azure-digital-twins-explorer .`. This will build the Docker image for the Azure Digital Twins Explorer.
+1. From the same command prompt, run `docker run -it -p3000:3000 azure-digital-twins-explorer`.
+    > By default, the app runs on port 3000. To customize the port, change the run command. For example, to use port 8080 run `docker run -it -p8080:3000 azure-digital-twins-explorer`.
+    > A message will appear on the console asking you to login using a code in the Microsoft device login page with your web browser; after doing so the Azure Digital Twins Explorer should start.
     >  * Note: When run successfully the application will display a message showing you the URL & port that you must open to browse the app. When running the app inside Docker this information might not be accurate, as other port might have been exposed. Be sure to use
     >  the port you chose before.
-    >  * Note: Your Azure Digital Twins app registration must have a reply URL using the same port you are using - e.g. `localhost:7000` if that is the port you are using.
-1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the apropriate port, if you changed it) and the app should appear.
+1. You can now open your web browser and browse to `http://localhost:3000` (change `3000` for the appropriate port, if you changed it).
 
 ## Experimental Features
 
