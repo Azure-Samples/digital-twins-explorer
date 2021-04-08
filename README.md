@@ -1,15 +1,3 @@
----
-page_type: sample
-languages:
-- javascript
-- typescript
-products:
-- azure-digital-twins
-name: Azure Digital Twins explorer
-description: A code sample for visualizing and managing an Azure Digital Twins instance
-urlFragment: digital-twins-explorer
----
-
 # Azure Digital Twins Explorer
  
 ## Note to Existing Users: Change in default branch
