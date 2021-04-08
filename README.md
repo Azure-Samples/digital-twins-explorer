@@ -10,11 +10,11 @@ description: A code sample for visualizing and managing an Azure Digital Twins i
 urlFragment: digital-twins-explorer
 ---
 
-# Azure Digital Twins (ADT) explorer
+# Azure Digital Twins explorer
  
 ## Note to Existing Users: Change in Authentication
 
-**As of 10/30, we have changed authentication in adt-explorer.** Adt-explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running adt-explorer (does not have to be the same command prompt).
+**As of 10/30, we have changed authentication in Azure Digital Twins explorer.** Azure Digital Twins explorer will now pick up your login from az login, VS/VS Code, or environment variables. You only need to provide the service URL to connect. The simplest way to login is to run az login at some point in a command prompt before running Azure Digital Twins explorer (does not have to be the same command prompt).
 See below for more information. 
 
 ## Overview
@@ -44,7 +44,7 @@ Node.js 10+
 
 1. Set up an Azure Digital Twins service instance and give yourself appropriate permissions (e.g. *Azure Digital Twins Owner*). For instructions, please see the following how-to article:
     * [Set up an Azure Digital Twins instance and authentication](https://docs.microsoft.com/azure/digital-twins/how-to-set-up-instance-portal)
-1. When running locally, adt-explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run adt-explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
+1. When running locally, Azure Digital Twins explorer will use Azure default credentials. In order to authenticate, you can run, for example, **az login** in any command prompt. When you later run Azure Digital Twins explorer, it will pick up the credentials. Alternatively, you can sign into Visual Studio Code.
 1. Select the **Download ZIP** button to download a .zip file of this sample code to your machine. Unzip the **digital-twins-explorer-<branch>.zip** folder, and extract the files. Alternatively, you can clone the repository.
 1. From a command prompt in the `client/src` folder, run `npm install`. This will retrieve all dependencies
     >**IMPORTANT!** Due to a dependency on the `npm-force-resolutions` package to mitigate an underlying security issue you will not be able to install under any path that contains a space. For more information, see this GitHub [issue](https://github.com/rogeriochaves/npm-force-resolutions/issues/17).
