@@ -53,6 +53,9 @@ export class ConfigurationFormComponent extends Component {
     };
     if (this.validateConfig(config)) {
       this.saveEnvironment(config);
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set("adtUrl", config.appAdtUrl);
+      window.location.search = searchParams.toString();
       eventService.publishConfigure({ type: "end", config });
       this.resetModalState();
     }
