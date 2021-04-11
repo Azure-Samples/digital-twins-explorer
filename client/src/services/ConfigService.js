@@ -21,6 +21,9 @@ class ConfigService {
   getConfig(force) {
     const config = storageService.getLocalStorageObject(StorageKeyName);
     if (config && !force) {
+      const params = new URLSearchParams(window.location.search);
+      const queryParamAppAdtUrl = params.get("adtUrl");
+      config.appAdtUrl = queryParamAppAdtUrl ? queryParamAppAdtUrl : config.appAdtUrl;
       return config;
     }
 
