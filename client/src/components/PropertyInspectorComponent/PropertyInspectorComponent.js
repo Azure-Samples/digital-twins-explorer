@@ -64,6 +64,10 @@ const reTypeDelta = (properties, delta) => {
 
     if (match && match.schema) {
       d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
+      if (d.value === "") {
+        d.op = "remove";
+        delete d.value;
+      }
     }
   }
 
