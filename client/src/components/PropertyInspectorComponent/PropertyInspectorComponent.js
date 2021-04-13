@@ -97,12 +97,27 @@ export class PropertyInspectorComponent extends Component {
     this.initializeModelService();
     this.subscribeSelection();
     this.subscribeTelemetry();
-    eventService.subscribeCreateModel(this.initializeModelService);
-    eventService.subscribeDeleteModel(this.initializeModelService);
+    eventService.subscribeCreateModel(models => {
+      this.initializeModelService();
+      models.forEach(model => {
+        this.updateEditorAfterModelDeleteOrCreate(model["@id"]);
+      });
+    });
+    eventService.subscribeDeleteModel(model => {
+      this.initializeModelService();
+      this.updateEditorAfterModelDeleteOrCreate(model);
+    });
   }
 
   initializeModelService = () => {
     this.modelService = new ModelService();
+  }
+
+  updateEditorAfterModelDeleteOrCreate = async model => {
+    if (this.original && this.original.$metadata.$model === model) {
+      await this.updateModelProperties(model);
+      this.styleTwinInEditorProperties();
+    }
   }
 
   subscribeTelemetry = () => {
@@ -118,18 +133,22 @@ export class PropertyInspectorComponent extends Component {
     });
   }
 
+  updateModelProperties = async model => {
+    let properties = null;
+    try {
+      properties = model === null ? null : await this.modelService.getProperties(model);
+    } catch (exc) {
+      print(`*** Error fetching twin properties: ${exc}`, "error");
+    }
+    this.properties = properties;
+  }
+
   subscribeSelection = () => {
     eventService.subscribeSelection(async payload => {
       if (payload) {
         const { selection, selectionType } = payload;
         if (selectionType === "twin") {
-          let properties = null;
-          try {
-            properties = selection ? await this.modelService.getProperties(selection.$metadata.$model) : null;
-          } catch (exc) {
-            print(`*** Error fetching twin properties: ${exc}`, "error");
-          }
-          this.properties = properties;
+          await this.updateModelProperties(selection ? selection.$metadata.$model : null);
           this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
         } else if (selectionType === "relationship") {
           this.original = this.updated = selection ? selection : null;
@@ -137,16 +156,53 @@ export class PropertyInspectorComponent extends Component {
         this.setState({ changed: false, selection, patch: null, selectionType }, () => {
           if (payload && payload.selection) {
             this.editor.set(this.original);
-            const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
-            if (rootMetaIndex >= 0) {
-              this.editor.node.childs[rootMetaIndex].expand(true);
-            }
+            this.styleTwinInEditorProperties();
           }
         });
       } else {
         this.setState({ changed: false, selection: null, patch: null, selectionType: null });
       }
     });
+  }
+
+  styleTwinInEditorProperties = () => {
+    this.editor.node.childs.forEach(item => {
+      if (!item.field.startsWith("$")) {
+        if (this.properties[item.field]) {
+          this.stylePropertyNodeStyle(item, "", "");
+        } else {
+          this.stylePropertyNodeStyle(item, "yellow", "important");
+        }
+      }
+    });
+    const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
+    if (rootMetaIndex >= 0) {
+      const metadataNode = this.editor.node.childs[rootMetaIndex];
+      metadataNode.expand(true);
+      const modelIndex = metadataNode.childs.findIndex(item => item.field.toLowerCase() === "$model");
+      if (modelIndex >= 0) {
+        if (Object.entries(this.properties).length === 0) {
+          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "red", "important");
+          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "red", "important");
+        } else {
+          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "");
+          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "");
+        }
+      }
+    }
+  }
+
+  stylePropertyNodeStyle = (item, color, important) => {
+    if (item.dom.field) {
+      item.dom.field.style.setProperty("color", color, important);
+      item.dom.value.style.setProperty("color", color, important);
+    }
+    if (item.type === "object") {
+      item.expand(true);
+      item.childs.forEach(child => {
+        this.stylePropertyNodeStyle(child, color, important);
+      });
+    }
   }
 
   showModal = () => {
