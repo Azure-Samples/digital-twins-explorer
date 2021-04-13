@@ -34,6 +34,7 @@ export class ModelViewerComponent extends Component {
 
     this.originalItems = [];
     this.uploadModelRef = React.createRef();
+    this.uploadModelFolderRef = React.createRef();
     this.uploadModelImagesRef = React.createRef();
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
@@ -118,17 +119,18 @@ export class ModelViewerComponent extends Component {
   handleUpload = async evt => {
     const files = evt.target.files;
     this.setState({ isLoading: true, isUploadingModels: true });
-
     print("*** Uploading selected models", "info");
     const list = [];
     try {
       for (const file of files) {
-        print(`- working on ${file.name}`);
-        const dtdl = await readFile(file);
-        if (dtdl.length) {
-          dtdl.forEach(model => list.push(model));
-        } else {
-          list.push(dtdl);
+        if (file.type === "application/json") {
+          print(`- working on ${file.name}`);
+          const dtdl = await readFile(file);
+          if (dtdl.length) {
+            dtdl.forEach(model => list.push(model));
+          } else {
+            list.push(dtdl);
+          }
         }
       }
     } catch (exc) {
@@ -143,6 +145,7 @@ export class ModelViewerComponent extends Component {
     this.setState({ isLoading: false, isUploadingModels: false });
     await this.retrieveModels();
     this.uploadModelRef.current.value = "";
+    this.uploadModelFolderRef.current.value = "";
   }
 
   addModels = async list => {
@@ -296,9 +299,13 @@ export class ModelViewerComponent extends Component {
               buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
+              onUploadModelsFolderClicked={() => this.uploadModelFolderRef.current.click()}
               onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
+            <input id="directory-input" type="file" name="name" className="mv-fileInput"
+              webkitdirectory="" mozdirectory="true" directory=""
+              ref={this.uploadModelFolderRef} onChange={this.handleUpload} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
               ref={this.uploadModelImagesRef} onChange={this.handleUploadOfModelImages} />
           </div>
