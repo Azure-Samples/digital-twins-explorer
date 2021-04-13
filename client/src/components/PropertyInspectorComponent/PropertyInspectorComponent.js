@@ -230,9 +230,9 @@ export class PropertyInspectorComponent extends Component {
         print(patch, "info");
         if (patch.length > 0) {
           await this.patchTwin(delta);
+          this.showModal();
+          this.setState({ changed: false });
         }
-        this.showModal();
-        this.setState({ changed: false });
       } catch (exc) {
         exc.customMessage = "Error in patching twin";
         eventService.publishError(exc);
@@ -245,11 +245,9 @@ export class PropertyInspectorComponent extends Component {
     try {
       print(`*** Patching twin ${this.original.$dtId}`, "info");
       await apiService.updateTwin(this.original.$dtId, res);
-    } catch (exc) {
-      exc.customMessage = "Error in patching twin";
-      eventService.publishError(exc);
+    } finally {
+      this.setState({ isLoading: false });
     }
-    this.setState({ isLoading: false });
   }
 
   onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null
