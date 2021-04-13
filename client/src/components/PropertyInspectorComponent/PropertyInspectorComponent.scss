@@ -199,3 +199,6 @@ div.jsoneditor-value.jsoneditor-number, div.jsoneditor-value.jsoneditor-string {
   border: 1px solid transparent;
 }
 
+div.jsoneditor-value.jsoneditor-empty::after {
+  content: "Unset";
+}

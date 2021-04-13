@@ -206,13 +206,13 @@ export class ModelService {
       case "integer":
       case "long":
       case "float":
-        return isCurrentUndefined ? 0 : current;
+        return isCurrentUndefined ? "" : current;
       case "dtmi:dtdl:instance:Schema:string;2":
       case "string":
-        return isCurrentUndefined ? " " : current.toString();
+        return isCurrentUndefined ? "" : current.toString();
       case "dtmi:dtdl:instance:Schema:boolean;2":
       case "boolean":
-        return isCurrentUndefined ? false : current;
+        return isCurrentUndefined ? "" : current;
       default:
         return isCurrentUndefined ? "" : current;
     }
