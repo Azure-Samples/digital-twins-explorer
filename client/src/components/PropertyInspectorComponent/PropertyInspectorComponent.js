@@ -4,7 +4,7 @@
 import React, { Component } from "react";
 import { TextField } from "office-ui-fabric-react";
 import { JsonEditor as Editor } from "jsoneditor-react";
-import { compare, deepClone } from "fast-json-patch";
+import { applyPatch, compare, deepClone } from "fast-json-patch";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { PropertyInspectorCommandBarComponent } from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
@@ -148,23 +148,27 @@ export class PropertyInspectorComponent extends Component {
   }
 
   subscribeSelection = () => {
-    eventService.subscribeSelection(async payload => {
+    eventService.subscribeSelection(payload => {
       if (payload) {
         const { selection, selectionType } = payload;
-        if (selectionType === "twin") {
-          await this.updateModelProperties(selection ? selection.$metadata.$model : null);
-          this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
-        } else if (selectionType === "relationship") {
-          this.original = this.updated = selection ? selection : null;
-        }
-        this.setState({ changed: false, selection, patch: null, selectionType }, () => {
-          if (payload && payload.selection) {
-            this.editor.set(this.original);
-            this.styleTwinInEditorProperties();
-          }
-        });
+        this.setContent(selection, selectionType, null);
       } else {
         this.setState({ changed: false, selection: null, patch: null, selectionType: null });
+      }
+    });
+  }
+
+  setContent = async (selection, selectionType, patch) => {
+    if (selectionType === "twin") {
+      await this.updateModelProperties(selection ? selection.$metadata.$model : null);
+      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
+    } else if (selectionType === "relationship") {
+      this.original = this.updated = selection ? selection : null;
+    }
+    this.setState({ changed: false, selection, patch, selectionType }, () => {
+      if (selection) {
+        this.editor.set(this.original);
+        this.styleTwinInEditorProperties();
       }
     });
   }
@@ -290,6 +294,10 @@ export class PropertyInspectorComponent extends Component {
         print(patch, "info");
         if (patch.length > 0) {
           await this.patchTwin(delta);
+
+          const { newDocument } = applyPatch(this.original, delta, false, false);
+          this.setContent(newDocument, selectionType, delta);
+
           this.showModal();
           this.setState({ changed: false });
         }
