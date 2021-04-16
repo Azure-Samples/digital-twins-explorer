@@ -4,6 +4,7 @@
 import { ExcelImportPlugin } from "./plugins/ExcelImportPlugin";
 import { JsonImportPlugin } from "./plugins/JsonImportPlugin";
 import { apiService } from "./ApiService";
+import { ModelService } from "./ModelService";
 import { print } from "./LoggingService";
 import { BatchService } from "./BatchService";
 
@@ -38,10 +39,16 @@ class ImportService {
   }
 
   async saveModels(data) {
+    const modelService = new ModelService();
     const currentModels = await apiService.queryModels();
-    const missingModels = data.digitalTwinsModels.filter(x => currentModels.every(y => x["@id"] !== y.model["@id"]));
-    if (missingModels.length > 0) {
-      await apiService.addModels(missingModels);
+    const sortedModelsId = await modelService.getModelIdsForUpload(data.digitalTwinsModels);
+    let sortedModels = sortedModelsId.map(id => data.digitalTwinsModels.filter(model => model["@id"] === id)[0]);
+    sortedModels = sortedModels.filter(model => !currentModels.some(item => item.id === model["@id"]));
+    if (sortedModels.length > 0) {
+      const chunks = modelService.chunkModelsList(sortedModels, 50);
+      for (const chunk of chunks) {
+        await apiService.addModels(chunk);
+      }
     }
   }
 

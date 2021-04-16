@@ -157,7 +157,7 @@ export class ModelViewerComponent extends Component {
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
       if (sortedModels.length > 0) {
-        const chunks = this.chunkModelsList(sortedModels, 6);
+        const chunks = modelService.chunkModelsList(sortedModels, 50);
         for (const chunk of chunks) {
           await this.createModels(chunk);
         }
@@ -179,16 +179,6 @@ export class ModelViewerComponent extends Component {
         exc.customMessage = "Error adding models";
         eventService.publishError(exc);
       });
-  }
-
-  chunkModelsList(array, size) {
-    const chunkedArr = [];
-    let index = 0;
-    while (index < array.length) {
-      chunkedArr.push(array.slice(index, size + index));
-      index += size;
-    }
-    return chunkedArr;
   }
 
   handleUploadOfModelImages = async evt => {
