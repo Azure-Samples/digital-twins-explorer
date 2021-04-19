@@ -267,6 +267,7 @@ export class GraphViewerComponent extends React.Component {
                     }
                   }
 
+                  this.allNodes = this.allNodes.concat(missingTwins);
                   this.cyRef.current.addTwins(missingTwins);
                 } else {
                   presentRels = rels.filter(x =>
