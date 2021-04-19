@@ -83,12 +83,11 @@ export class ModelViewerComponent extends Component {
       item.selected = modelId && item.key === modelId;
       return item;
     });
-    this.originalItems = updatedItems.slice(0, updatedItems.length);
     this.setState({ items: updatedItems });
   }
 
   async retrieveModels() {
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, filterText: "" });
 
     let list = [];
     try {
@@ -273,7 +272,6 @@ export class ModelViewerComponent extends Component {
       }
       return item;
     });
-    this.originalItems = updatedItems.slice(0, updatedItems.length);
     this.setState({ items: updatedItems });
     eventService.publishSelectModel(currentSelectedItem);
   }
