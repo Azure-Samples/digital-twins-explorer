@@ -195,10 +195,10 @@ export class GraphViewerComponent extends React.Component {
         }
       });
     } else {
+      if (this.cyRef.current) {
+        this.cyRef.current.clearTwins();
+      }
       await apiService.query(query, async data => {
-        if (this.cyRef.current) {
-          this.cyRef.current.clearTwins();
-        }
         if (data.twins.length > 0) {
           this.setState({ couldNotDisplay: false, noResults: false, relationshipsOnly: false });
           this.cyRef.current.addTwins(data.twins);
