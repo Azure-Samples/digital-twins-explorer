@@ -31,10 +31,20 @@
   font-weight: 200 !important;
 }
 
+.pi-wrap {
+  min-width: 320px;
+}
+
 .pi-grid {
   display: grid;
   grid-template-rows: auto auto 1fr;
   height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
 
   .pi-title {
     font-size: 10px;
