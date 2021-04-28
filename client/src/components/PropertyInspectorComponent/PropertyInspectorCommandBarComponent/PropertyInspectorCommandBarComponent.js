@@ -15,6 +15,7 @@ export class PropertyInspectorCommandBarComponent extends Component {
     {
       key: "expandTree",
       text: "Expand Tree",
+      ariaLabel: "Expand Tree",
       iconProps: { iconName: "ExploreContent" },
       onClick: () => this.props.onExpand(),
       iconOnly: true,
@@ -23,6 +24,7 @@ export class PropertyInspectorCommandBarComponent extends Component {
     {
       key: "collapseTree",
       text: "Collapse Tree",
+      ariaLabel: "Collapse Tree",
       iconProps: { iconName: "CollapseContent" },
       onClick: () => this.props.onCollapse(),
       iconOnly: true,
@@ -31,6 +33,7 @@ export class PropertyInspectorCommandBarComponent extends Component {
     {
       key: "undo",
       text: "Undo",
+      ariaLabel: "Undo",
       iconProps: { iconName: "Undo" },
       onClick: () => this.props.onUndo(),
       iconOnly: true,
@@ -39,6 +42,7 @@ export class PropertyInspectorCommandBarComponent extends Component {
     {
       key: "redo",
       text: "Redo",
+      ariaLabel: "Redo",
       iconProps: { iconName: "Redo" },
       onClick: () => this.props.onRedo(),
       iconOnly: true,
@@ -47,6 +51,7 @@ export class PropertyInspectorCommandBarComponent extends Component {
     {
       key: "save",
       text: "Patch Twin",
+      ariaLabel: "Patch Twin",
       iconProps: { iconName: "Save" },
       onClick: () => this.props.onSave(),
       iconOnly: true,

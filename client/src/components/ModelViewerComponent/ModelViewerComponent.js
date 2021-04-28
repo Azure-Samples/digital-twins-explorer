@@ -289,12 +289,12 @@ export class ModelViewerComponent extends Component {
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
               onUploadModelsFolderClicked={() => this.uploadModelFolderRef.current.click()}
               onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
-            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
+            <input id="json-file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
             <input id="directory-input" type="file" name="name" className="mv-fileInput"
               webkitdirectory="" mozdirectory="true" directory=""
               ref={this.uploadModelFolderRef} onChange={this.handleUpload} />
-            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
+            <input id="image-file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
               ref={this.uploadModelImagesRef} onChange={this.handleUploadOfModelImages} />
           </div>
           <div>

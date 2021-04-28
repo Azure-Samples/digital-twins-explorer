@@ -26,6 +26,7 @@ export const ModelGraphViewerRelationshipsToggle = ({
           id="relationships-toggle"
           className="rel-toggle"
           checked={showRelationships}
+          ariaLabel="toggle relationships"
           onChange={onRelationshipsToggleChange} />
       </div>
       <div className="rel-key">
@@ -38,8 +39,9 @@ export const ModelGraphViewerRelationshipsToggle = ({
         </svg>
         <span className="rel-title">Inheritances</span>
         <Toggle
-          id="relationships-toggle"
+          id="inheritances-toggle"
           className="rel-toggle"
+          ariaLabel="toggle inheritances"
           checked={showInheritances}
           onChange={onInheritancesToggleChange} />
       </div>
@@ -53,8 +55,9 @@ export const ModelGraphViewerRelationshipsToggle = ({
         </svg>
         <span className="rel-title">Components</span>
         <Toggle
-          id="relationships-toggle"
+          id="components-toggle"
           className="rel-toggle"
+          ariaLabel="toggle components"
           checked={showComponents}
           onChange={onComponentsToggleChange} />
       </div>

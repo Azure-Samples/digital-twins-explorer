@@ -17,6 +17,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModelImages",
       text: "Upload Model Images",
+      ariaLabel: "Upload Model Images",
       iconProps: { iconName: "ImageSearch" },
       onClick: () => this.props.onUploadModelImagesClicked(),
       iconOnly: true,
@@ -25,6 +26,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "downloadModels",
       text: "Download Models",
+      ariaLabel: "Download Models",
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.props.onDownloadModelsClicked(),
       iconOnly: true,
@@ -33,6 +35,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModel",
       text: "Upload a Model",
+      ariaLabel: "Upload a Model",
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.props.onUploadModelClicked(),
       iconOnly: true,
@@ -41,6 +44,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModelsDirectory",
       text: "Upload a directory of Models",
+      ariaLabel: "Upload a directory of Models",
       iconProps: { iconName: "DocumentSet" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,

@@ -82,7 +82,7 @@ export class ModelViewerCreateComponent extends Component {
           <form onSubmit={this.save}>
             <h2 className="heading-2">New Twin Name</h2>
             <TextField required errorMessage={error} id="outlined-required" className="name-input" styles={this.getStyles}
-              value={name} onChange={this.onNameChange} autoFocus />
+              value={name} onChange={this.onNameChange} autoFocus ariaLabel="New twin name" />
             <div className="btn-group">
               <PrimaryButton type="submit" className="modal-button save-button" onClick={this.save}>Save</PrimaryButton>
               <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>

@@ -625,7 +625,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id="model-graph-viewer-nav" className="graph-navigator" />
+          <div id="model-graph-viewer-nav" className="graph-navigator" role="presentation" />
         </div>
         <div id="hidden-text-ruler" ref={this.hiddenTextRuler} />
       </div>

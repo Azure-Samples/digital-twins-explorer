@@ -43,7 +43,7 @@ export class GraphViewerCommandBarComponent extends Component {
   buttonGroupItems = [
     {
       key: "exportGraph",
-      text: "Export Graph",
+      ariaLabel: "Export Graph",
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.onExportGraphClicked(),
       iconOnly: true,
@@ -52,7 +52,7 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "importGraph",
-      text: "Import Graph",
+      ariaLabel: "Import Graph",
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
@@ -61,7 +61,7 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "showTwins",
-      text: "Show All",
+      ariaLabel: "Show All",
       iconProps: { iconName: "RedEye" },
       onClick: () => this.props.onShowAll(),
       iconOnly: true,
@@ -70,7 +70,6 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "showRelationships",
-      text: "Show All Relationships",
       ariaLabel: "show all relationships",
       iconProps: { iconName: "Link" },
       onClick: () => this.props.onShowAllRelationships(),
@@ -148,7 +147,7 @@ export class GraphViewerCommandBarComponent extends Component {
       <Icon iconName="Org" />
       <TextField id="relExpansionLevelField"
         className="command-bar-input configuration-input numeric-input" value={this.state.relExpansionLevel}
-        onChange={this.onExpansionLevelChange} type="number" min="1" max="5" />
+        onChange={this.onExpansionLevelChange} type="number" min="1" max="5" ariaLabel="Select expansion level" role="menuitem" />
     </div>
   )
 
@@ -215,7 +214,7 @@ export class GraphViewerCommandBarComponent extends Component {
             buttonAs={this.renderButton}
             ariaLabel="Use left and right arrow keys to navigate between commands" />
         </div>
-        <input id="file-input" type="file" name="name" className="gc-fileInput" ref={this.importModelRef}
+        <input id="model-file-input" type="file" name="name" className="gc-fileInput" ref={this.importModelRef}
           onChange={this.onImportGraphClicked} />
       </>
     );

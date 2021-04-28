@@ -165,6 +165,7 @@ export class QueryComponent extends Component {
             <div className="qc-label">
               <Dropdown
                 placeholder="Saved Queries"
+                ariaLabel="Saved Queries"
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
@@ -175,7 +176,7 @@ export class QueryComponent extends Component {
             </div>
             <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#queryField">
               <form onSubmit={this.executeQuery}>
-                <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} />
+                <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
               </form>
             </FocusZone>
             <div className="qc-queryControls">

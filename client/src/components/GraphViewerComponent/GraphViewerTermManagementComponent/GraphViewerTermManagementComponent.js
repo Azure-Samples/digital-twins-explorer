@@ -126,6 +126,7 @@ export default class GraphViewerTermManagementComponent extends Component {
             <div className="filter-term" key={`${term.text}-${term.isActive ? "active" : "inactive"}`}>
               <div className={`term-bar ${term.isActive ? "active" : ""}`}>
                 <Toggle className="filter-toggle"
+                  ariaLabel={term.text}
                   checked={term.isActive} onChange={() => this.onTermActiveChange(term)} style={{
                     marginBottom: 0,
                     height: 12,
@@ -137,6 +138,7 @@ export default class GraphViewerTermManagementComponent extends Component {
                     <IconButton
                       onClick={() => this.toggleTermOptions(term)}
                       className="more-icon"
+                      ariaLabel="toggle term options menu"
                       style={{
                         height: 22,
                         width: 22
@@ -156,6 +158,7 @@ export default class GraphViewerTermManagementComponent extends Component {
                   </div>
                   <IconButton
                     onClick={() => this.removeTerm(term)}
+                    ariaLabel="remove filtering term"
                     style={{
                       background: term.isActive ? "#084772" : "#7E7E7E",
                       height: 22,

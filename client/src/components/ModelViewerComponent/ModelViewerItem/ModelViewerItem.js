@@ -51,19 +51,19 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
             <div className="mv_buttonGroup">
-              <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
+              <IconButton iconProps={{ iconName: "Delete" }}
                 title="Delete Model" ariaLabel="Delete Model"
                 className="mv-loadButtons" onClick={onDelete} />
-              <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
+              <IconButton iconProps={{ iconName: "ImageSearch" }}
                 title="Upload Model Image" ariaLabel="Upload Model Image"
                 className="mv-loadButtons" onClick={onHandleModelImage} />
-              <IconButton iconProps={{ iconName: "Info" }} id={item.key}
+              <IconButton iconProps={{ iconName: "Info" }}
                 title="View Model" ariaLabel="View Model"
                 className="mv-loadButtons" onClick={onView} />
-              <IconButton iconProps={{ iconName: "AddTo" }} id={item.key}
+              <IconButton iconProps={{ iconName: "AddTo" }}
                 title="Create a Twin" ariaLabel="Create a Twin"
                 className="mv-loadButtons" onClick={onCreate} />
-              <input id={item.key} type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
+              <input type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
                 ref={uploadModelImageRef} onChange={evt => onSetModelImage(evt, item, uploadModelImageRef)} />
             </div>
           </Stack>

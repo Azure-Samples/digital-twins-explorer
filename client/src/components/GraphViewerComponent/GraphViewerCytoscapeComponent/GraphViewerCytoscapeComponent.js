@@ -836,7 +836,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id={this.navControlId} className="graph-navigator" />
+          <div id={this.navControlId} className="graph-navigator" role="presentation" />
         </div>
       </div>
     );
