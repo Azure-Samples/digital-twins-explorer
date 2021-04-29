@@ -3,7 +3,8 @@
 
 import React from "react";
 import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
-import { IconButton, Stack } from "office-ui-fabric-react";
+import { Stack } from "office-ui-fabric-react";
+import { ModelViewerItemCommandBarComponent } from "../ModelViewerItemCommandBarComponent/ModelViewerCommandBarComponent";
 
 const commonStyles = {
   display: "inline-block",
@@ -51,18 +52,13 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
             <div className="mv_buttonGroup">
-              <IconButton iconProps={{ iconName: "Delete" }}
-                title="Delete Model" ariaLabel="Delete Model"
-                className="mv-loadButtons" onClick={onDelete} />
-              <IconButton iconProps={{ iconName: "ImageSearch" }}
-                title="Upload Model Image" ariaLabel="Upload Model Image"
-                className="mv-loadButtons" onClick={onHandleModelImage} />
-              <IconButton iconProps={{ iconName: "Info" }}
-                title="View Model" ariaLabel="View Model"
-                className="mv-loadButtons" onClick={onView} />
-              <IconButton iconProps={{ iconName: "AddTo" }}
-                title="Create a Twin" ariaLabel="Create a Twin"
-                className="mv-loadButtons" onClick={onCreate} />
+              <ModelViewerItemCommandBarComponent
+                item={item}
+                buttonClass="mv-loadButtons"
+                onDelete={onDelete}
+                onHandleModelImage={onHandleModelImage}
+                onCreate={onCreate}
+                onView={onView} />
               <input type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
                 ref={uploadModelImageRef} onChange={evt => onSetModelImage(evt, item, uploadModelImageRef)} />
             </div>

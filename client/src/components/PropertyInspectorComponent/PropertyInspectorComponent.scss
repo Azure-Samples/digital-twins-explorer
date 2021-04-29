@@ -31,6 +31,10 @@
   font-weight: 200 !important;
 }
 
+.pi-wrap {
+  min-width: 320px;
+}
+
 .pi-grid {
   display: grid;
   grid-template-rows: auto auto 1fr;

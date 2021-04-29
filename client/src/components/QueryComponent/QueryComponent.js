@@ -14,7 +14,7 @@ import { SaveQueryDialogComponent } from "./SaveQueryDialogComponent/SaveQueryDi
 import { ConfirmQueryDialogComponent } from "./ConfirmQueryDialogComponent/ConfirmQueryDialogComponent";
 
 const defaultQuery = "SELECT * FROM digitaltwins";
-
+const ENTER_KEY_CODE = 13;
 export class QueryComponent extends Component {
 
   queryOptions = [
@@ -155,6 +155,13 @@ export class QueryComponent extends Component {
     eventService.publishOverlayQueryResults(!!checked);
   };
 
+  handleOverlayResultsKeyUp = e => {
+    if (e.keyCode === ENTER_KEY_CODE) {
+      eventService.publishOverlayQueryResults(!this.state.isOverlayResultsChecked);
+      this.setState(prevState => ({ isOverlayResultsChecked: !prevState.isOverlayResultsChecked }));
+    }
+  }
+
   render() {
     const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
       showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
@@ -174,13 +181,15 @@ export class QueryComponent extends Component {
                 }}
                 onChange={this.onSelectedQueryChange} />
             </div>
-            <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#queryField">
+            <FocusZone handleTabKey={FocusZoneTabbableElements.all} defaultActiveElement="#queryField">
               <form onSubmit={this.executeQuery}>
                 <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
               </form>
             </FocusZone>
             <div className="qc-queryControls">
-              <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+              <FocusZone onKeyUp={this.handleOverlayResultsKeyUp}>
+                <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+              </FocusZone>
               <DefaultButton className="query-button" onClick={this.executeQuery}>
                 Run Query
               </DefaultButton>
