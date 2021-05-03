@@ -84,7 +84,8 @@ export class PropertyInspectorComponent extends Component {
       selectionType: null,
       changed: false,
       patch: null,
-      isLoading: false
+      isLoading: false,
+      isLoadingSelection: false
     };
     this.editorRef = React.createRef();
     this.properties = null;
@@ -151,9 +152,10 @@ export class PropertyInspectorComponent extends Component {
     eventService.subscribeSelection(payload => {
       if (payload) {
         const { selection, selectionType } = payload;
+        this.setState({ isLoadingSelection: true });
         this.setContent(selection, selectionType, null);
       } else {
-        this.setState({ changed: false, selection: null, patch: null, selectionType: null });
+        this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
       }
     });
   }
@@ -165,12 +167,18 @@ export class PropertyInspectorComponent extends Component {
     } else if (selectionType === "relationship") {
       this.original = this.updated = selection ? selection : null;
     }
-    this.setState({ changed: false, selection, patch, selectionType }, () => {
-      if (selection) {
-        this.editor.set(this.original);
-        this.styleTwinInEditorProperties();
-      }
-    });
+    const { isLoadingSelection } = this.state;
+    if (isLoadingSelection) {
+      this.setState({ changed: false, selection, patch, selectionType }, () => {
+        if (selection) {
+          this.editor.set(this.original);
+          this.styleTwinInEditorProperties();
+        }
+      });
+    } else {
+      this.original = this.updated = selection ? selection : null;
+      this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
+    }
   }
 
   styleTwinInEditorProperties = () => {

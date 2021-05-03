@@ -238,6 +238,7 @@ export class GraphViewerComponent extends React.Component {
 
     const allTwins = [ ...twins ];
     const existingTwins = [];
+
     for (let i = 0; i < expansionLevel; i++) {
       const baselineChunk = (100 - baseline) / expansionLevel;
       const currentTwins = allTwins.filter(x => existingTwins.every(y => y.$dtId !== x.$dtId));
@@ -254,6 +255,9 @@ export class GraphViewerComponent extends React.Component {
           apiService
             .queryRelationshipsPaged(twin.$dtId, async rels => {
               try {
+                if (this.canceled) {
+                  resolve();
+                }
                 let presentRels = rels;
                 if (settingsService.eagerLoading || loadTargets) {
                   const missingTwins = [];
@@ -322,6 +326,8 @@ export class GraphViewerComponent extends React.Component {
         const { selectedNode } = this.state;
         if (data && selectedNode.id === e.selectedNode.id) {
           eventService.publishSelection({ selection: data, selectionType: "twin" });
+        } else {
+          eventService.publishSelection();
         }
       } catch (exc) {
         print(`*** Error fetching data for twin: ${exc}`, "error");
@@ -337,11 +343,16 @@ export class GraphViewerComponent extends React.Component {
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
     } catch (exc) {
+      if (this.canceled) {
+        this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
+        this.clearData();
+      }
       exc.customMessage = "Error fetching data for graph";
       eventService.publishError(exc);
+    } finally {
+      this.canceled = false;
+      this.setState({ isLoading: false, progress: 0 });
     }
-
-    this.setState({ isLoading: false, progress: 0 });
   }
 
   onNodeMouseEnter = async modelId => {
