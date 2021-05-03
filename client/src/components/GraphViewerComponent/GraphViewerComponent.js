@@ -340,17 +340,18 @@ export class GraphViewerComponent extends React.Component {
 
   onNodeDoubleClicked = async e => {
     try {
+      this.canceled = false;
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
     } catch (exc) {
       if (this.canceled) {
         this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
-        this.clearData();
       }
-      exc.customMessage = "Error fetching data for graph";
-      eventService.publishError(exc);
+      if (exc.errorCode !== "user_cancelled") {
+        exc.customMessage = "Error fetching data for graph";
+        eventService.publishError(exc);
+      }
     } finally {
-      this.canceled = false;
       this.setState({ isLoading: false, progress: 0 });
     }
   }

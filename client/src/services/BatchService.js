@@ -15,6 +15,13 @@ export class BatchService {
   }
 
   async run() {
+    const check = results => {
+      const match = results.find(x => typeof x === Error);
+      if (match) {
+        throw match;
+      }
+    };
+
     const promises = [];
     this._count = 0;
     this.update(0);
@@ -26,7 +33,7 @@ export class BatchService {
         await this.refresh();
       }
       if (promises.length === this.maxConcurrentQueries) {
-        await Promise.race(promises.map(p => p.promise));
+        check([ await Promise.race(promises.map(p => p.promise)) ]);
       }
 
       const p = {};
@@ -47,12 +54,12 @@ export class BatchService {
         } catch (e) {
           reject(e);
         }
-      });
+      }).catch(err => err);
 
       promises.push(p);
     }
 
-    await Promise.all(promises.map(p => p.promise));
+    check(await Promise.all(promises.map(p => p.promise)));
     await this.refresh();
     this.update(100);
   }
