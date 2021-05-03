@@ -3,6 +3,7 @@
 
 import React, { Component } from "react";
 import { CommandBar, TextField, Icon, CommandBarButton } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
 import { eventService } from "../../../services/EventService";
 import { settingsService } from "../../../services/SettingsService";
@@ -28,7 +29,7 @@ const dropdownButtonStyles = {
   marginLeft: 10
 };
 
-export class GraphViewerCommandBarComponent extends Component {
+class GraphViewerCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -43,7 +44,8 @@ export class GraphViewerCommandBarComponent extends Component {
   buttonGroupItems = [
     {
       key: "exportGraph",
-      ariaLabel: "Export Graph",
+      text: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.exportGraph"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.exportGraph"),
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.onExportGraphClicked(),
       iconOnly: true,
@@ -52,7 +54,8 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "importGraph",
-      ariaLabel: "Import Graph",
+      text: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.importGraph"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.importGraph"),
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
@@ -61,7 +64,8 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "showTwins",
-      ariaLabel: "Show All",
+      text: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showTwins"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showTwins"),
       iconProps: { iconName: "RedEye" },
       onClick: () => this.props.onShowAll(),
       iconOnly: true,
@@ -70,7 +74,8 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "showRelationships",
-      ariaLabel: "show all relationships",
+      text: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showRelationships.text"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showRelationships.ariaLabel"),
       iconProps: { iconName: "Link" },
       onClick: () => this.props.onShowAllRelationships(),
       iconOnly: true,
@@ -82,8 +87,8 @@ export class GraphViewerCommandBarComponent extends Component {
   expansionModeItems = [
     {
       key: "expansionMode",
-      text: "Expansion Mode",
-      ariaLabel: "select expansion mode",
+      text: this.props.t("graphViewerCommandBarComponent.expansionModeItems.text"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionModeItems.ariaLabel"),
       iconOnly: true,
       iconProps: { iconName: "ModelingView" },
       className: `${this.buttonClass} command-bar-dropdown`,
@@ -92,22 +97,22 @@ export class GraphViewerCommandBarComponent extends Component {
         items: [
           {
             key: REL_TYPE_INCOMING,
-            text: "In",
-            ariaLabel: "In",
+            text: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_INCOMING"),
+            ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_INCOMING"),
             iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_INCOMING ? "CheckMark" : "" },
             onClick: () => this.onSelectedRelTypeChange(REL_TYPE_INCOMING)
           },
           {
             key: REL_TYPE_OUTGOING,
-            text: "Out",
-            ariaLabel: "Out",
+            text: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_OUTGOING"),
+            ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_OUTGOING"),
             iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_OUTGOING ? "CheckMark" : "" },
             onClick: () => this.onSelectedRelTypeChange(REL_TYPE_OUTGOING)
           },
           {
             key: REL_TYPE_ALL,
-            text: "In/Out",
-            ariaLabel: "In/Out",
+            text: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_ALL"),
+            ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionModeItems.subMenuProps.REL_TYPE_ALL"),
             iconProps: { iconName: settingsService.relTypeLoading === REL_TYPE_ALL ? "CheckMark" : "" },
             onClick: () => this.onSelectedRelTypeChange(REL_TYPE_ALL)
           }
@@ -119,8 +124,8 @@ export class GraphViewerCommandBarComponent extends Component {
   expansionLevelItems = [
     {
       key: "expansionLevel",
-      text: "Expansion Level",
-      ariaLabel: "Select number of layers to expand",
+      text: this.props.t("graphViewerCommandBarComponent.expansionLevelItems.text"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionLevelItems.ariaLabel"),
       iconProps: { iconName: "Org" },
       className: this.buttonClass,
       iconOnly: true,
@@ -131,8 +136,7 @@ export class GraphViewerCommandBarComponent extends Component {
   layoutItems = [
     {
       key: "relayout",
-      text: "Run Layout",
-      ariaLabel: "run layout",
+      text: this.props.t("graphViewerCommandBarComponent.layoutItems.ariaLabel"),
       iconOnly: true,
       iconProps: { iconName: "ArrangeSendToBack" },
       onClick: () => this.props.onLayoutClicked(),
@@ -200,19 +204,19 @@ export class GraphViewerCommandBarComponent extends Component {
           <CommandBar className="gv-commandbar button-group"
             farItems={this.buttonGroupItems}
             buttonAs={this.renderButton}
-            ariaLabel="Use left and right arrow keys to navigate between commands" />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
           <CommandBar className="gv-commandbar"
             farItems={this.expansionLevelItems}
             buttonAs={this.renderRelationshipExpansionItem}
-            ariaLabel="Use left and right arrow keys to navigate between commands" />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
           <CommandBar className="gv-commandbar"
             farItems={this.expansionModeItems}
             buttonAs={this.renderButton}
-            ariaLabel="Use left and right arrow keys to navigate between commands" />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
           <CommandBar className="gv-commandbar"
             farItems={this.layoutItems}
             buttonAs={this.renderButton}
-            ariaLabel="Use left and right arrow keys to navigate between commands" />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
         </div>
         <input id="model-file-input" type="file" name="name" className="gc-fileInput" ref={this.importModelRef}
           onChange={this.onImportGraphClicked} />
@@ -221,3 +225,5 @@ export class GraphViewerCommandBarComponent extends Component {
   }
 
 }
+
+export default withTranslation()(GraphViewerCommandBarComponent);

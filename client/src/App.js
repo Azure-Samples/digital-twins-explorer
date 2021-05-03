@@ -14,18 +14,19 @@ import dblclick from "cytoscape-dblclick";
 import popper from "cytoscape-popper";
 import navigator from "cytoscape-navigator";
 import contextMenus from "cytoscape-context-menus";
+import { withTranslation } from "react-i18next";
 
 import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/GoldenLayoutComponent";
-import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
-import { ModelGraphViewerComponent } from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
-import { ModelViewerComponent } from "./components/ModelViewerComponent/ModelViewerComponent";
-import { PropertyInspectorComponent } from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
+import GraphViewerComponent from "./components/GraphViewerComponent/GraphViewerComponent";
+import ModelGraphViewerComponent from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
+import ModelViewerComponent from "./components/ModelViewerComponent/ModelViewerComponent";
+import PropertyInspectorComponent from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
-import { QueryComponent } from "./components/QueryComponent/QueryComponent";
+import QueryComponent from "./components/QueryComponent/QueryComponent";
 import { ImportComponent } from "./components/ImportComponent/ImportComponent";
 import { ExportComponent } from "./components/ExportComponent/ExportComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
-import { AppCommandBar } from "./components/AppCommandBar/AppCommandBar";
+import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
 import { ErrorMessageComponent } from "./components/ErrorMessageComponent/ErrorMessage";
 import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 
@@ -67,7 +68,7 @@ class App extends Component {
             type: "stack",
             content: [
               {
-                title: "QUERY EXPLORER",
+                title: this.props.t("app.goldenLayoutConfig.queryComponent"),
                 isClosable: false,
                 type: "react-component",
                 component: "queryComponent",
@@ -85,7 +86,7 @@ class App extends Component {
             height: 100,
             content: [
               {
-                title: "MODELS",
+                title: this.props.t("app.goldenLayoutConfig.modelViewer"),
                 isClosable: false,
                 width: 15,
                 type: "react-component",
@@ -99,7 +100,7 @@ class App extends Component {
                 width: 85,
                 content: [
                   {
-                    title: "TWIN GRAPH",
+                    title: this.props.t("app.goldenLayoutConfig.graph"),
                     type: "react-component",
                     isClosable: false,
                     component: "graph",
@@ -111,7 +112,7 @@ class App extends Component {
                     }
                   },
                   {
-                    title: "MODEL GRAPH",
+                    title: this.props.t("app.goldenLayoutConfig.modelGraphViewer"),
                     type: "react-component",
                     isClosable: false,
                     component: "modelGraphViewer",
@@ -137,7 +138,7 @@ class App extends Component {
       name: "Console",
       row: 2,
       config: {
-        title: "CONSOLE",
+        title: this.props.t("optionalComponents.console"),
         type: "react-component",
         component: "consoleComponent",
         id: "consoleComponent"
@@ -148,7 +149,7 @@ class App extends Component {
       name: "Output",
       row: 2,
       config: {
-        title: "OUTPUT",
+        title: this.props.t("optionalComponents.output"),
         type: "react-component",
         component: "outputComponent",
         id: "outputComponent"
@@ -157,14 +158,14 @@ class App extends Component {
   ]
 
   importComponentConfig = {
-    title: "IMPORT",
+    title: this.props.t("importComponentConfig.title"),
     type: "react-component",
     component: "importComponent",
     id: "importComponent"
   }
 
   exportComponentConfig = {
-    title: "EXPORT",
+    title: this.props.t("exportComponentConfig.title"),
     type: "react-component",
     component: "exportComponent",
     id: "exportComponent"
@@ -235,7 +236,7 @@ class App extends Component {
 
   renderErrorPage = () => (
     <div className="error-page">
-      <span>Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue.</span>
+      <span>{this.props.t("errorPage")}</span>
     </div>)
 
   render() {
@@ -286,4 +287,4 @@ class App extends Component {
 
 }
 
-export default App;
+export default withTranslation()(App);

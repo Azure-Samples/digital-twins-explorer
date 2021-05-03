@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
+import { withTranslation } from "react-i18next";
 import { CommandBar } from "office-ui-fabric-react";
-
-export class PropertyInspectorCommandBarComponent extends Component {
+class PropertyInspectorCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -14,8 +14,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
   farItems = [
     {
       key: "expandTree",
-      text: "Expand Tree",
-      ariaLabel: "Expand Tree",
+      text: this.props.t("propertyInspectorCommandBarComponent.farItems.expandTree"),
+      ariaLabel: this.props.t("propertyInspectorCommandBarComponent.farItems.expandTree"),
       iconProps: { iconName: "ExploreContent" },
       onClick: () => this.props.onExpand(),
       iconOnly: true,
@@ -23,8 +23,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
     },
     {
       key: "collapseTree",
-      text: "Collapse Tree",
-      ariaLabel: "Collapse Tree",
+      text: this.props.t("propertyInspectorCommandBarComponent.farItems.collapseTree"),
+      ariaLabel: this.props.t("propertyInspectorCommandBarComponent.farItems.collapseTree"),
       iconProps: { iconName: "CollapseContent" },
       onClick: () => this.props.onCollapse(),
       iconOnly: true,
@@ -32,8 +32,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
     },
     {
       key: "undo",
-      text: "Undo",
-      ariaLabel: "Undo",
+      text: this.props.t("propertyInspectorCommandBarComponent.farItems.undo"),
+      ariaLabel: this.props.t("propertyInspectorCommandBarComponent.farItems.undo"),
       iconProps: { iconName: "Undo" },
       onClick: () => this.props.onUndo(),
       iconOnly: true,
@@ -41,8 +41,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
     },
     {
       key: "redo",
-      text: "Redo",
-      ariaLabel: "Redo",
+      text: this.props.t("propertyInspectorCommandBarComponent.farItems.redo"),
+      ariaLabel: this.props.t("propertyInspectorCommandBarComponent.farItems.redo"),
       iconProps: { iconName: "Redo" },
       onClick: () => this.props.onRedo(),
       iconOnly: true,
@@ -50,8 +50,8 @@ export class PropertyInspectorCommandBarComponent extends Component {
     },
     {
       key: "save",
-      text: "Patch Twin",
-      ariaLabel: "Patch Twin",
+      text: this.props.t("propertyInspectorCommandBarComponent.farItems.save"),
+      ariaLabel: this.props.t("propertyInspectorCommandBarComponent.farItems.save"),
       iconProps: { iconName: "Save" },
       onClick: () => this.props.onSave(),
       iconOnly: true,
@@ -66,12 +66,14 @@ export class PropertyInspectorCommandBarComponent extends Component {
 
     return (
       <div className="pi-command-bar">
-        <div className="pi-title">Properties</div>
+        <div className="pi-title">{this.props.t("propertyInspectorCommandBarComponent.commandBar.title")}</div>
         <CommandBar
           farItems={this.farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands" />
+          ariaLabel={this.props.t("propertyInspectorCommandBarComponent.commandBar.ariaLabel")} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(PropertyInspectorCommandBarComponent);

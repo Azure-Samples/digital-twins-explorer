@@ -3,9 +3,11 @@
 
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
+
 import ModelViewerDeleteAllModelsComponent from "../ModelViewerDeleteAllModelsComponent/ModelViewerDeleteAllModelsComponent";
 
-export class ModelViewerCommandBarComponent extends Component {
+class ModelViewerCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -16,8 +18,8 @@ export class ModelViewerCommandBarComponent extends Component {
   farItems = [
     {
       key: "uploadModelImages",
-      text: "Upload Model Images",
-      ariaLabel: "Upload Model Images",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelImages.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelImages.text"),
       iconProps: { iconName: "ImageSearch" },
       onClick: () => this.props.onUploadModelImagesClicked(),
       iconOnly: true,
@@ -25,8 +27,8 @@ export class ModelViewerCommandBarComponent extends Component {
     },
     {
       key: "downloadModels",
-      text: "Download Models",
-      ariaLabel: "Download Models",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.downloadModels.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.downloadModels.text"),
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.props.onDownloadModelsClicked(),
       iconOnly: true,
@@ -34,8 +36,8 @@ export class ModelViewerCommandBarComponent extends Component {
     },
     {
       key: "uploadModel",
-      text: "Upload a Model",
-      ariaLabel: "Upload a Model",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModel.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModel.text"),
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.props.onUploadModelClicked(),
       iconOnly: true,
@@ -43,8 +45,8 @@ export class ModelViewerCommandBarComponent extends Component {
     },
     {
       key: "uploadModelsDirectory",
-      text: "Upload a directory of Models",
-      ariaLabel: "Upload a directory of Models",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelsDirectory.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelsDirectory.text"),
       iconProps: { iconName: "DocumentSet" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,
@@ -52,8 +54,8 @@ export class ModelViewerCommandBarComponent extends Component {
     },
     {
       key: "deleteModels",
-      text: "Delete All Models",
-      ariaLabel: "delete all models",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.deleteModels.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.deleteModels.ariaLabel"),
       iconProps: { iconName: "Delete" },
       onClick: () => this.delete.current.open(),
       iconOnly: true,
@@ -67,10 +69,12 @@ export class ModelViewerCommandBarComponent extends Component {
         <CommandBar
           items={this.items}
           farItems={this.farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands" />
+          ariaLabel={this.props.t("modelViewerCommandBarComponent.render.ariaLabel")} />
         <ModelViewerDeleteAllModelsComponent ref={this.delete} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(ModelViewerCommandBarComponent);

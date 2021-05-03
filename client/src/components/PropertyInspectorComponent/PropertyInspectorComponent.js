@@ -5,9 +5,10 @@ import React, { Component } from "react";
 import { TextField } from "office-ui-fabric-react";
 import { JsonEditor as Editor } from "jsoneditor-react";
 import { applyPatch, compare, deepClone } from "fast-json-patch";
+import { withTranslation } from "react-i18next";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
-import { PropertyInspectorCommandBarComponent } from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
+import PropertyInspectorCommandBarComponent from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
 import { PropertyInspectorPatchInformationComponent }
   from "./PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent";
 import { print } from "../../services/LoggingService";
@@ -74,7 +75,7 @@ const reTypeDelta = (properties, delta) => {
   return delta;
 };
 
-export class PropertyInspectorComponent extends Component {
+class PropertyInspectorComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -93,6 +94,7 @@ export class PropertyInspectorComponent extends Component {
     this.original = null;
     this.updated = null;
     this.modelService = null;
+    this.jsonEditorEmptyValue = this.props.t("propertyInspectorComponent.jsonEditorEmptyValue");
   }
 
   get editor() {
@@ -338,7 +340,7 @@ export class PropertyInspectorComponent extends Component {
   render() {
     const { showModal, selection, changed, patch, isLoading, selectionType } = this.state;
     return (
-      <div className="pi-gridWrapper">
+      <div className="pi-gridWrapper" style={{"--json-editor-empty-value": this.jsonEditorEmptyValue}}>
         <div className="pi-grid">
           <PropertyInspectorCommandBarComponent buttonClass="pi-toolbarButtons"
             changed={changed}
@@ -349,7 +351,7 @@ export class PropertyInspectorComponent extends Component {
             onUndo={() => this.onUndo()}
             onRedo={() => this.onRedo()}
             onSave={() => this.onSave()} />
-          <TextField className="pi-filter" onChange={this.onSearchChange} placeholder="Search" />
+          <TextField className="pi-filter" onChange={this.onSearchChange} placeholder={this.props.t("propertyInspectorComponent.searchPlaceholder")} />
           <div className="pi-editor">
             {selection && <Editor
               ref={this.editorRef}
@@ -369,3 +371,5 @@ export class PropertyInspectorComponent extends Component {
   }
 
 }
+
+export default withTranslation()(PropertyInspectorComponent);

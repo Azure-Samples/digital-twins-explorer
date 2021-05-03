@@ -4,6 +4,7 @@
 import React, { Component } from "react";
 import { TextField, Dropdown, DefaultButton, Icon, IconButton,
   FocusZone, FocusZoneTabbableElements, Checkbox } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
 import { print } from "../../services/LoggingService";
 import { eventService } from "../../services/EventService";
@@ -14,8 +15,9 @@ import { SaveQueryDialogComponent } from "./SaveQueryDialogComponent/SaveQueryDi
 import { ConfirmQueryDialogComponent } from "./ConfirmQueryDialogComponent/ConfirmQueryDialogComponent";
 
 const defaultQuery = "SELECT * FROM digitaltwins";
+
 const ENTER_KEY_CODE = 13;
-export class QueryComponent extends Component {
+class QueryComponent extends Component {
 
   queryOptions = [
     { key: "query", text: "Query" },
@@ -165,14 +167,15 @@ export class QueryComponent extends Component {
   render() {
     const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
       showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
+
     return (
       <>
         <div className="qc-grid">
           <div className="qc-queryBox">
             <div className="qc-label">
               <Dropdown
-                placeholder="Saved Queries"
-                ariaLabel="Saved Queries"
+                placeholder={this.props.t("queryComponent.savedQueries")}
+                ariaLabel={this.props.t("queryComponent.savedQueries")}
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
@@ -188,12 +191,12 @@ export class QueryComponent extends Component {
             </FocusZone>
             <div className="qc-queryControls">
               <FocusZone onKeyUp={this.handleOverlayResultsKeyUp}>
-                <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+                <Checkbox label={this.props.t("queryComponent.overlayResults")} checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
               </FocusZone>
               <DefaultButton className="query-button" onClick={this.executeQuery}>
-                Run Query
+                {this.props.t("queryComponent.defaultButton")}
               </DefaultButton>
-              <IconButton className="query-save-button" iconProps={{ iconName: "Save" }} title="Save" ariaLabel="Save query"
+              <IconButton className="query-save-button" iconProps={{ iconName: this.props.t("queryComponent.iconButton") }} title={this.props.t("queryComponent.iconButton")} ariaLabel="Save query"
                 onClick={this.saveQueryButtonClicked} />
             </div>
           </div>
@@ -201,12 +204,12 @@ export class QueryComponent extends Component {
         <SaveQueryDialogComponent isVisible={showSaveQueryModal}
           onConfirm={this.saveQuery} onCancel={this.cancelSaveQuery}
           onChange={this.onChangeQueryName} query={newQueryName} />
-        <ConfirmQueryDialogComponent title="Query Already Exists"
-          description="Saving this query will overwrite the existing one."
+        <ConfirmQueryDialogComponent title={this.props.t("queryComponent.confirmQueryDialogComponent1.title")}
+          description={this.props.t("queryComponent.confirmQueryDialogComponent1.description")}
           action="Confirm" isVisible={showConfirmOverwriteModal}
           onConfirm={this.overwriteQuery} onCancel={this.cancelSaveQuery}
           defaultActiveElementId="deleteQueryField" />
-        <ConfirmQueryDialogComponent title="Are you sure?"
+        <ConfirmQueryDialogComponent title={this.props.t("queryComponent.confirmQueryDialogComponent2.title")}
           action="Delete" isVisible={showConfirmDeleteModal}
           onConfirm={this.confirmDeleteQuery} onCancel={this.cancelDeleteQuery} />
       </>
@@ -214,3 +217,5 @@ export class QueryComponent extends Component {
   }
 
 }
+
+export default withTranslation()(QueryComponent);

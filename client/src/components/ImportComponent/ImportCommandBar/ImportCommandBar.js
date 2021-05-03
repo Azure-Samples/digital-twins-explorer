@@ -3,8 +3,9 @@
 
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
-export class ImportCommandBar extends Component {
+class ImportCommandBar extends Component {
 
   farItems = [
     {
@@ -25,9 +26,11 @@ export class ImportCommandBar extends Component {
       <div>
         <CommandBar
           farItems={this.farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands" />
+          ariaLabel={this.props.t("importCommandBar.ariaLabel")} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(ImportCommandBar);

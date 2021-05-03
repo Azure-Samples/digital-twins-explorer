@@ -34,7 +34,7 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect, onSetModelImage, onUpdateModelImage, modelImage, isSelected }) => {
+const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect, onSetModelImage, onUpdateModelImage, modelImage, isSelected }) => {
   const uploadModelImageRef = React.createRef();
 
   const onHandleModelImage = () => {
@@ -69,3 +69,5 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
     </div>
   );
 };
+
+export default ModelViewerItem;

@@ -1,4 +1,6 @@
 import React from "react";
+import { withTranslation } from "react-i18next";
+
 import {
   IconButton,
   Stack,
@@ -21,7 +23,8 @@ const GraphViewerFilteringComponent = ({
   onUpdateHighlightingTerm,
   highlightingTerms,
   filteringTerms,
-  onSwitchFilters
+  onSwitchFilters,
+  t
 }) => (
   <>
     <div className="gc-controls">
@@ -29,38 +32,38 @@ const GraphViewerFilteringComponent = ({
         <div className="controls_buttonGroup">
           <IconButton
             iconProps={{ iconName: "Add" }}
-            title="Zoom in"
-            ariaLabel="Zoom in"
+            title={t("graphViewerFilteringComponent.zoomIn")}
+            ariaLabel={t("graphViewerFilteringComponent.zoomIn")}
             onClick={onZoomIn}
             className="control-loadButtons" />
           <IconButton
             iconProps={{ iconName: "CalculatorSubtract" }}
-            title="Zoom out"
-            ariaLabel="Zoom out"
+            title={t("graphViewerFilteringComponent.zoomOut")}
+            ariaLabel={t("graphViewerFilteringComponent.zoomOut")}
             onClick={onZoomOut}
             className="control-loadButtons" />
         </div>
         <div className="controls_singleButton">
           <IconButton
             iconProps={{ iconName: "FitPage" }}
-            title="Center"
-            ariaLabel="Center"
+            title={t("graphViewerFilteringComponent.center")}
+            ariaLabel={t("graphViewerFilteringComponent.center")}
             onClick={onCenter}
             className="control-loadButtons" />
         </div>
         <div className="controls_singleButton">
           <IconButton
             iconProps={{ iconName: "ZoomToFit" }}
-            title="Zoom to fit"
-            ariaLabel="Zoom to fit"
+            title={t("graphViewerFilteringComponent.zoomToFit")}
+            ariaLabel={t("graphViewerFilteringComponent.zoomToFit")}
             onClick={onZoomToFit}
             className="control-loadButtons" />
         </div>
         <div className="controls_singleButton filter_button">
           <IconButton
             iconProps={{ iconName: "Filter" }}
-            title="Toggle model filter drawer"
-            ariaLabel="Toggle model filter drawer"
+            title={t("graphViewerFilteringComponent.filter")}
+            ariaLabel={t("graphViewerFilteringComponent.filter")}
             className="control-loadButtons"
             onClick={toggleFilter} />
         </div>
@@ -69,14 +72,14 @@ const GraphViewerFilteringComponent = ({
     <div className="gc-filter-contents">
       <div>
         <Pivot onLinkClick={onSwitchFilters}>
-          <PivotItem headerText="Filter" key="filter">
+          <PivotItem headerText={t("graphViewerFilteringComponent.header1")} key="filter">
             <GraphViewerTermManagementComponent
               onAddFilteringTerm={onAddFilteringTerm}
               onRemoveFilteringTerm={onRemoveFilteringTerm}
               onUpdateTerm={onUpdateFilteringTerm}
               terms={filteringTerms} />
           </PivotItem>
-          <PivotItem headerText="Highlight" key="highlight">
+          <PivotItem headerText={t("graphViewerFilteringComponent.header2")} key="highlight">
             <GraphViewerTermManagementComponent
               onAddFilteringTerm={onAddHighlightingTerm}
               onRemoveFilteringTerm={onRemoveHighlightingTerm}
@@ -89,4 +92,5 @@ const GraphViewerFilteringComponent = ({
   </>
 );
 
-export default GraphViewerFilteringComponent;
+
+export default withTranslation()(GraphViewerFilteringComponent);

@@ -13,10 +13,11 @@ import { ModelService } from "../../services/ModelService";
 import "./ModelGraphViewerComponent.scss";
 import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
 import { Icon } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 import { DETAIL_MIN_WIDTH } from "../../services/Constants";
-import { ModelGraphViewerCommandBarComponent } from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
+import ModelGraphViewerCommandBarComponent from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
 
-export class ModelGraphViewerComponent extends React.Component {
+class ModelGraphViewerComponent extends React.Component {
 
   constructor(props) {
     super(props);
@@ -612,7 +613,7 @@ export class ModelGraphViewerComponent extends React.Component {
             <Icon
               className="toggle-icon"
               iconName={modelDetailIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              aria-label="Toggle model details"
+              aria-label={this.props.t("modelGraphViewerComponent.toggleIcon")}
               role="button"
               title="Toggle model details" />
           </div>
@@ -628,3 +629,5 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
 }
+
+export default withTranslation()(ModelGraphViewerComponent);

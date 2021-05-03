@@ -4,14 +4,15 @@
 import React from "react";
 import { Icon } from "office-ui-fabric-react";
 
-import { GraphViewerCommandBarComponent } from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
+import GraphViewerCommandBarComponent from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
 import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
 import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
-import { GraphViewerRelationshipDeleteComponent } from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
-import { PropertyInspectorComponent } from "../PropertyInspectorComponent/PropertyInspectorComponent";
+import GraphViewerRelationshipDeleteComponent from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
+import PropertyInspectorComponent from "../PropertyInspectorComponent/PropertyInspectorComponent";
 import GraphViewerFilteringComponent from "./GraphViewerFilteringComponent/GraphViewerFilteringComponent";
+import { withTranslation } from "react-i18next";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { apiService } from "../../services/ApiService";
@@ -24,7 +25,7 @@ import { REL_TYPE_OUTGOING, DETAIL_MIN_WIDTH } from "../../services/Constants";
 import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
-export class GraphViewerComponent extends React.Component {
+class GraphViewerComponent extends React.Component {
 
   constructor(props) {
     super(props);
@@ -792,7 +793,7 @@ export class GraphViewerComponent extends React.Component {
               <Icon
                 className="alert--close"
                 iconName="ChromeClose"
-                aria-label="Close alert"
+                aria-label={this.props.t("graphViewerComponent.alertCloseIcon")}
                 role="button"
                 onClick={() => this.setState({ couldNotDisplay: false })}
                 title="Close alert" />
@@ -817,9 +818,10 @@ export class GraphViewerComponent extends React.Component {
             <Icon
               className="toggle-icon"
               iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              aria-label="Toggle property inspector"
+              onClick={this.togglePropertyInspector}
+              aria-label={this.props.t("graphViewerComponent.toggleIcon")}
               role="button"
-              title="Toggle property inspector" />
+              title={this.props.t("graphViewerComponent.toggleIcon")} />
           </div>
           <PropertyInspectorComponent />
           {propertyInspectorIsOpen && (
@@ -833,3 +835,5 @@ export class GraphViewerComponent extends React.Component {
   }
 
 }
+
+export default withTranslation()(GraphViewerComponent);

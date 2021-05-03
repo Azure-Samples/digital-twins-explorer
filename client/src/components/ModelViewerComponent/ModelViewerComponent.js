@@ -3,8 +3,9 @@
 
 import React, { Component } from "react";
 import { TextField, Selection, SelectionMode, SelectionZone } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
-import { ModelViewerCommandBarComponent } from "./ModelViewerCommandBarComponent/ModelViewerCommandBarComponent";
+import ModelViewerCommandBarComponent from "./ModelViewerCommandBarComponent/ModelViewerCommandBarComponent";
 import { ModelViewerViewComponent } from "./ModelViewerViewComponent/ModelViewerViewComponent";
 import { ModelViewerCreateComponent } from "./ModelViewerCreateComponent/ModelViewerCreateComponent";
 import { ModelViewerDeleteComponent } from "./ModelViewerDeleteComponent/ModelViewerDeleteComponent";
@@ -12,7 +13,7 @@ import { ModelViewerUpdateModelImageComponent } from "./ModelViewerUpdateModelIm
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { readFile, sortArray } from "../../utils/utilities";
 import { print } from "../../services/LoggingService";
-import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
+import ModelViewerItem from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
@@ -20,7 +21,7 @@ import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
 
-export class ModelViewerComponent extends Component {
+class ModelViewerComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -299,7 +300,7 @@ export class ModelViewerComponent extends Component {
           </div>
           <div>
             <TextField className="mv-filter" onChange={this.onFilterChanged} styles={this.getStyles}
-              placeholder="Search" value={filterText} />
+              placeholder={this.props.t("modelViewerCommandBarComponent.searchPlaceholder")} value={filterText} />
           </div>
           <div data-is-scrollable="true" className="mv-modelListWrapper">
             <SelectionZone selection={new Selection({ selectionMode: SelectionMode.single })}>
@@ -318,9 +319,9 @@ export class ModelViewerComponent extends Component {
           </div>
           {isLoading && <LoaderComponent />}
         </div>
-        <ModelViewerViewComponent ref={this.viewRef} />
-        <ModelViewerCreateComponent ref={this.createRef} />
-        <ModelViewerDeleteComponent ref={this.deleteRef} />
+        <ModelViewerViewComponent ref={this.viewRef} t={this.props.t} />
+        <ModelViewerCreateComponent ref={this.createRef} t={this.props.t} />
+        <ModelViewerDeleteComponent ref={this.deleteRef} t={this.props.t} />
         <ModelViewerUpdateModelImageComponent
           ref={this.updateModelImageRef}
           onDelete={this.onDeleteModelImage}
@@ -330,3 +331,5 @@ export class ModelViewerComponent extends Component {
   }
 
 }
+
+export default withTranslation()(ModelViewerComponent);

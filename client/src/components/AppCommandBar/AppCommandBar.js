@@ -3,6 +3,7 @@
 
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react/lib/";
+import { withTranslation } from "react-i18next";
 
 import { ConfigurationFormComponent } from "../ConfigurationFormComponent/ConfigurationFormComponent";
 import { PreferencesFormComponent } from "../PreferencesFormComponent/PreferencesFormComponent";
@@ -12,7 +13,7 @@ import DeleteAllTwinsComponent from "./DeleteAllTwinsComponent/DeleteAllTwinsCom
 
 import "./AppCommandBar.scss";
 
-export class AppCommandBar extends Component {
+class AppCommandBar extends Component {
 
   constructor(props) {
     super(props);
@@ -21,8 +22,8 @@ export class AppCommandBar extends Component {
       farItems: [
         {
           key: "deleteTwins",
-          text: "Delete All Twins",
-          ariaLabel: "delete all twins",
+          text: this.props.t("appCommandBar.deleteTwins.text"),
+          ariaLabel: this.props.t("appCommandBar.deleteTwins.ariaLabel"),
           iconProps: { iconName: "Delete" },
           onClick: () => this.delete.current.open(),
           iconOnly: true,
@@ -30,8 +31,8 @@ export class AppCommandBar extends Component {
         },
         {
           key: "signIn",
-          text: "Azure Digital Twins URL",
-          ariaLabel: "azure digital twins url",
+          text: this.props.t("appCommandBar.signIn.text"),
+          ariaLabel: this.props.t("appCommandBar.signIn.ariaLabel"),
           iconOnly: true,
           iconProps: { iconName: "Signin" },
           split: true,
@@ -40,8 +41,8 @@ export class AppCommandBar extends Component {
         },
         {
           key: "settings",
-          text: "Settings",
-          ariaLabel: "settings",
+          text: this.props.t("appCommandBar.settings.text"),
+          ariaLabel: this.props.t("appCommandBar.settings.ariaLabel"),
           iconOnly: true,
           iconProps: { iconName: "Settings" },
           onClick: () => this.togglePreferencesModal(),
@@ -73,15 +74,18 @@ export class AppCommandBar extends Component {
       <div className="app-commandbar-container">
         <CommandBar
           farItems={farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands"
+          ariaLabel={this.props.t("appCommandBar.commandBar.ariaLabel")}
           className="app-commandbar" />
-        <ConfigurationFormComponent />
+        <ConfigurationFormComponent t={this.props.t} />
         <PreferencesFormComponent
           toggleOptionalComponent={this.props.toggleOptionalComponent}
-          optionalComponentsState={this.props.optionalComponentsState} />
-        <DeleteAllTwinsComponent ref={this.delete} />
+          optionalComponentsState={this.props.optionalComponentsState}
+          t={this.props.t} />
+        <DeleteAllTwinsComponent ref={this.delete} t={this.props.t} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(AppCommandBar);

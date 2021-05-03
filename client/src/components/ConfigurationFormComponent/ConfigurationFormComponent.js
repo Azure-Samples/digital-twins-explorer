@@ -180,7 +180,7 @@ export class ConfigurationFormComponent extends Component {
           isCircularNavigation
           defaultActiveElement="#appClientIdField">
           <form onSubmit={this.saveConfigurationsSettings}>
-            <h2 className="heading-2">Azure Digital Twins URL</h2>
+            <h2 className="heading-2">{this.props.t("configurationFormComponent.heading")}</h2>
             <div className="select-settings">
               <Dropdown
                 placeholder="Selected Environment"
@@ -194,24 +194,24 @@ export class ConfigurationFormComponent extends Component {
               <TextField
                 required
                 id="appAdtUrlField"
-                label="Azure Digital Twins URL"
+                label={this.props.t("configurationFormComponent.appAdtUrlField")}
                 className="configuration-input"
                 styles={this.getStyles}
                 value={appAdtUrl}
                 onChange={this.onAppAdtUrlChange} />
             </div>
-            <p>Configuration data is saved in local storage.</p>
+            <p> {this.props.t("configurationFormComponent.detail")}</p>
             <div className="btn-group">
               <PrimaryButton
                 type="submit"
                 className="modal-button save-button"
                 onClick={this.saveConfigurationsSettings}>
-                Save
+                {this.props.t("configurationFormComponent.saveButton")}
               </PrimaryButton>
               <DefaultButton
                 className="modal-button cancel-button"
                 onClick={this.closeConfigurationSettings}>
-                Cancel
+                {this.props.t("configurationFormComponent.cancelButton")}
               </DefaultButton>
             </div>
           </form>

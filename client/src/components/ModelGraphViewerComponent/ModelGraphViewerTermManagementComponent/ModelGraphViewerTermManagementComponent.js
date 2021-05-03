@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { eventService } from "../../../services/EventService";
 import { IconButton, Label, TextField, Checkbox, Toggle } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
+import { eventService } from "../../../services/EventService";
 
 const addIconStyle = {
   background: "#0078d4",
@@ -13,7 +14,7 @@ const addIconStyle = {
   cursor: "pointer"
 };
 
-export default class ModelGraphViewerTermManagementComponent extends Component {
+class ModelGraphViewerTermManagementComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -23,28 +24,28 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
     this.menuItems = [
       {
         key: "addSuperTypes",
-        text: "Add Supertype",
-        ariaLabel: "add supertype"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.superTypes.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.superTypes.ariaLabel")
       },
       {
         key: "addSubTypes",
-        text: "Add Subtypes",
-        ariaLabel: "add subtypes"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addSubTypes.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addSubTypes.ariaLabel")
       },
       {
         key: "addOutgoingRelationships",
-        text: "Add Outgoing Relationships",
-        ariaLabel: "add outgoing relationships"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addOutgoingRelationships.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addOutgoingRelationships.ariaLabel")
       },
       {
         key: "matchDtmi",
-        text: "Match DTMI",
-        ariaLabel: "match dtmi"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDtmi.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDtmi.ariaLabel")
       },
       {
         key: "matchDisplayName",
-        text: "Match Display Name",
-        ariaLabel: "match display name"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDisplayName.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDisplayName.ariaLabel")
       }
     ];
   }
@@ -218,3 +219,5 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
   }
 
 }
+
+export default withTranslation()(ModelGraphViewerTermManagementComponent);

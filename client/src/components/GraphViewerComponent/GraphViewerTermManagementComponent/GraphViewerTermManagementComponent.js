@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withTranslation } from "react-i18next";
 import { IconButton, Label, TextField, Checkbox, Toggle } from "office-ui-fabric-react";
 
 const addIconStyle = {
@@ -12,7 +13,7 @@ const addIconStyle = {
   cursor: "pointer"
 };
 
-export default class GraphViewerTermManagementComponent extends Component {
+class GraphViewerTermManagementComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -22,8 +23,8 @@ export default class GraphViewerTermManagementComponent extends Component {
     this.menuItems = [
       {
         key: "addOutgoingRelationships",
-        text: "Add Outgoing Relationships",
-        ariaLabel: "add outgoing relationships"
+        text: this.props.t("graphViewerTermManagementComponent.menuItems.text"),
+        ariaLabel: this.props.t("graphViewerTermManagementComponent.menuItems.ariaLabel")
       }
     ];
   }
@@ -111,7 +112,7 @@ export default class GraphViewerTermManagementComponent extends Component {
               className="mgv-filter"
               onChange={this.onTermChanged}
               onKeyDown={this.handleKeyDown}
-              placeholder="Match term"
+              placeholder={this.props.t("graphViewerTermManagementComponent.textFieldPlaceholder")}
               value={filterTerm}
               disabled={terms.length >= 6}
               iconProps={{
@@ -180,3 +181,5 @@ export default class GraphViewerTermManagementComponent extends Component {
   }
 
 }
+
+export default withTranslation()(GraphViewerTermManagementComponent);
