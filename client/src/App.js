@@ -229,6 +229,10 @@ class App extends Component {
         this.setState({ [c.id]: false });
       });
     }
+    const el = tab.element;
+    if (el) {
+      el.attr("tabindex", 0);
+    }
   }
 
   goldenLayoutComponentError = (error, componentStack) =>

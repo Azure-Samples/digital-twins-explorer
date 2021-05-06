@@ -33,7 +33,7 @@
 
 .mv-modelListWrapper {
   display: block;
-  height: 100%;
+  height: calc(100% - 100px);
   width: 100%;
   overflow: overlay;
   background-color: $backgroundColor2;
