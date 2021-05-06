@@ -137,6 +137,7 @@ class GraphViewerCommandBarComponent extends Component {
     {
       key: "relayout",
       text: this.props.t("graphViewerCommandBarComponent.layoutItems.ariaLabel"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.layoutItems.ariaLabel"),
       iconOnly: true,
       iconProps: { iconName: "ArrangeSendToBack" },
       onClick: () => this.props.onLayoutClicked(),

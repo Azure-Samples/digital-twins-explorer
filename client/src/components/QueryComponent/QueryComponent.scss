@@ -247,3 +247,15 @@
 .ms-Button-flexContainer{
   width: 100%;
 }
+
+.drop-down-text-box {
+  .ms-TextField-fieldGroup {
+    border: none;
+    margin: 0;
+    height: 30px;
+    &:focus {
+      outline: none;
+      border: none;
+    }
+  }
+}

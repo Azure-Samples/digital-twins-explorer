@@ -179,6 +179,7 @@ class QueryComponent extends Component {
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
+                role="presentation"
                 styles={{
                   dropdown: { width: 200 }
                 }}
