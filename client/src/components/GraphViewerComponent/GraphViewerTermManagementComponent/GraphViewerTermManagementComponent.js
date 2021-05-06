@@ -139,7 +139,7 @@ class GraphViewerTermManagementComponent extends Component {
                     <IconButton
                       onClick={() => this.toggleTermOptions(term)}
                       className="more-icon"
-                      ariaLabel="toggle term options menu"
+                      ariaLabel={this.props.t("graphViewerTermManagementComponent.toggleTermsOptions")}
                       style={{
                         height: 22,
                         width: 22
@@ -159,7 +159,7 @@ class GraphViewerTermManagementComponent extends Component {
                   </div>
                   <IconButton
                     onClick={() => this.removeTerm(term)}
-                    ariaLabel="remove filtering term"
+                    ariaLabel={this.props.t("graphViewerTermManagementComponent.removeFiltering")}
                     style={{
                       background: term.isActive ? "#084772" : "#7E7E7E",
                       height: 22,

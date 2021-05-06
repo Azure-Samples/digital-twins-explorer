@@ -3,8 +3,9 @@
 
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
-export class ModelViewerItemCommandBarComponent extends Component {
+class ModelViewerItemCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -14,7 +15,7 @@ export class ModelViewerItemCommandBarComponent extends Component {
   farItems = [
     {
       key: `deleteModel-${this.props.item.key}`,
-      ariaLabel: "Delete Model",
+      ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.deleteModels"),
       iconProps: { iconName: "Delete" },
       onClick: () => this.props.onDelete(),
       iconOnly: true,
@@ -22,7 +23,7 @@ export class ModelViewerItemCommandBarComponent extends Component {
     },
     {
       key: `uploadModelImages-${this.props.item.key}`,
-      ariaLabel: "Upload Model Image",
+      ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.uploadModel"),
       iconProps: { iconName: "ImageSearch" },
       onClick: () => this.props.onHandleModelImage(),
       iconOnly: true,
@@ -30,7 +31,7 @@ export class ModelViewerItemCommandBarComponent extends Component {
     },
     {
       key: `viewModel-${this.props.item.key}`,
-      ariaLabel: "View Model",
+      ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.viewModel"),
       iconProps: { iconName: "Info" },
       onClick: () => this.props.onView(),
       iconOnly: true,
@@ -38,7 +39,7 @@ export class ModelViewerItemCommandBarComponent extends Component {
     },
     {
       key: `createTwin-${this.props.item.key}`,
-      ariaLabel: "Create a Twin",
+      ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.createTwin"),
       iconProps: { iconName: "AddTo" },
       onClick: () => this.props.onCreate(),
       iconOnly: true,
@@ -56,8 +57,10 @@ export class ModelViewerItemCommandBarComponent extends Component {
           }
         }}
         farItems={this.farItems}
-        ariaLabel="Use left and right arrow keys to navigate between commands" />
+        ariaLabel={this.props.t("modelViewerItemCommandBarComponent.ariaLabel")} />
     );
   }
 
 }
+
+export default withTranslation()(ModelViewerItemCommandBarComponent);

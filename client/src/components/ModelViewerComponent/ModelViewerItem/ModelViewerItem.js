@@ -4,7 +4,7 @@
 import React from "react";
 import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
 import { Stack } from "office-ui-fabric-react";
-import { ModelViewerItemCommandBarComponent } from "../ModelViewerItemCommandBarComponent/ModelViewerCommandBarComponent";
+import ModelViewerItemCommandBarComponent from "../ModelViewerItemCommandBarComponent/ModelViewerCommandBarComponent";
 
 const commonStyles = {
   display: "inline-block",

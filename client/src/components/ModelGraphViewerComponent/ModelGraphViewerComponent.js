@@ -5,7 +5,7 @@ import React from "react";
 
 import { ModelGraphViewerCytoscapeComponent, ModelGraphViewerCytoscapeLayouts } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
-import { ModelGraphViewerRelationshipsToggle } from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
+import ModelGraphViewerRelationshipsToggle from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";

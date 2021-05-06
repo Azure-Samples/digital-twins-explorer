@@ -99,6 +99,8 @@
             "ariaLabel": "add outgoing relationships",
             "text": "Add Outgoing Relationships"
         },
+        "toggleTermsOptions": "toggle term options menu",
+        "removeFiltering": "remove filtering term",
         "textFieldPlaceholder": "Match term"
     },
     "importCommandBar":{
@@ -127,6 +129,11 @@
             "header2": "Highlight"
         }
     },
+    "modelGraphViewerRelationshipsToggle":{
+        "componentsToggle": "toggle components",
+        "inheritancesToggle": "toggle inheritances",
+        "relationshipsToggle": "toggle relationships"
+    },
     "modelGraphViewerTermManagementComponent":{
         "menuItems": {
             "superTypes": {
@@ -149,7 +156,9 @@
                 "text": "Match Display Name",
                 "ariaLabel": "match display name"
             }
-        }
+        },
+        "removeFiltering": "remove filtering term",
+        "termOptions": "toggle filter menu"
     },
     "modelViewerCommandBarComponent": {
         "farItems": {
@@ -158,7 +167,7 @@
             },
             "downloadModels": {
                 "text":"Download Models",
-                "ariaLabel": "delete all models"
+                "ariaLabel": "download all models"
             },
             "uploadModel": {
                 "text":"Upload a Model"
@@ -190,6 +199,15 @@
         "uploadModelImage": "Upload Model Image",
         "viewModel": "View Model",
         "createTwin": "Create a Twin"
+    },
+    "modelViewerItemCommandBarComponent": {
+        "farItems": {
+            "createTwin": "Create a Twin",
+            "deleteModels": "Delete Model",
+            "uploadModel": "Upload Model Image",
+            "viewModel": "View Model"
+        },
+        "ariaLabel":"Use left and right arrow keys to navigate between commands"
     },
     "modelViewerViewComponent": {
         "heading": "Model Information",
