@@ -86,7 +86,8 @@ export class PropertyInspectorComponent extends Component {
       changed: false,
       patch: null,
       isLoading: false,
-      isLoadingSelection: false
+      isLoadingSelection: false,
+      schema: null
     };
     this.editorRef = React.createRef();
     this.properties = null;
@@ -176,9 +177,11 @@ export class PropertyInspectorComponent extends Component {
     } else if (selectionType === "relationship") {
       this.original = this.updated = selection ? selection : null;
     }
+
     const { isLoadingSelection } = this.state;
     if (isLoadingSelection) {
-      this.setState({ changed: false, selection, patch, selectionType }, () => {
+      const schema = selectionType === "twin" ? this.generateSchema() : null;
+      this.setState({ changed: false, selection, patch, selectionType, schema }, () => {
         if (selection) {
           this.editor.set(this.original);
           this.styleTwinInEditorProperties();
@@ -188,6 +191,32 @@ export class PropertyInspectorComponent extends Component {
       this.original = this.updated = selection ? selection : null;
       this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
     }
+  }
+
+  generateSchema = () => {
+    const schema = toJsonSchema(this.original);
+    this.setObjectPropertiesSchema(this.properties, schema);
+    return schema;
+  }
+
+  setObjectPropertiesSchema = (obj, schema) => {
+    Object.getOwnPropertyNames(obj).forEach(propertyName => {
+      const property = this.properties[propertyName];
+      if (!propertyName.startsWith("$") && property && property.writable) {
+        switch (property.schema.type) {
+          case "Object":
+            this.setObjectPropertiesSchema(property.schema, schema.properties[propertyName]);
+            break;
+          case "Enum":
+            schema.properties[propertyName] = {
+              "enum": property.schema.values.map(option => option.value)
+            };
+            break;
+          default:
+            break;
+        }
+      }
+    });
   }
 
   styleTwinInEditorProperties = () => {
@@ -346,7 +375,7 @@ export class PropertyInspectorComponent extends Component {
   onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null
 
   render() {
-    const { showModal, selection, changed, patch, isLoading, selectionType } = this.state;
+    const { showModal, selection, changed, patch, isLoading, selectionType, schema } = this.state;
     return (
       <div className="pi-gridWrapper">
         <div className="pi-grid">
@@ -363,6 +392,7 @@ export class PropertyInspectorComponent extends Component {
           <div className="pi-editor">
             {selection && <Editor
               ref={this.editorRef}
+              schema={schema}
               mainMenuBar={false}
               enableTransform={false}
               enableSort={false}

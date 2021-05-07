@@ -41,7 +41,8 @@ const inferSchema = vertex => {
       values: [ ...schemaEdge.toVertex.getOutgoing("dtmi:dtdl:property:enumValues;2").map(edge => ({
         name: getPropertyName(edge.toVertex),
         value: edge.toVertex.getAttributeValue("dtmi:dtdl:property:enumValue;2")
-      })) ]
+      })) ],
+      valueSchema: schemaEdge.toVertex.getAttributeValue("dtmi:dtdl:property:valueSchema;2")
     };
   }
 
