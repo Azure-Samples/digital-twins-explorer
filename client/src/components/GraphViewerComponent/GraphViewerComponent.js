@@ -813,11 +813,10 @@ export class GraphViewerComponent extends React.Component {
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
         <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${propInspectorDetailWidth}%` : 0}}>
-          <div className="pi-toggle">
+          <div className="pi-toggle" onClick={this.togglePropertyInspector}>
             <Icon
               className="toggle-icon"
               iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              onClick={this.togglePropertyInspector}
               aria-label="Toggle property inspector"
               role="button"
               title="Toggle property inspector" />
