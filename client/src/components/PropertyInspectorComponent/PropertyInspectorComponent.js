@@ -84,10 +84,12 @@ export class PropertyInspectorComponent extends Component {
       selectionType: null,
       changed: false,
       patch: null,
-      isLoading: false
+      isLoading: false,
+      isLoadingSelection: false
     };
     this.editorRef = React.createRef();
     this.properties = null;
+    this.isDefined = null;
     this.original = null;
     this.updated = null;
     this.modelService = null;
@@ -137,23 +139,30 @@ export class PropertyInspectorComponent extends Component {
     });
   }
 
-  updateModelProperties = async model => {
+  updateModelProperties = async modelId => {
     let properties = null;
+    let isDefined = false;
     try {
-      properties = model === null ? null : await this.modelService.getProperties(model);
+      if (modelId) {
+        const model = await this.modelService.getModel(modelId);
+        properties = model.componentProperties;
+        isDefined = model.isDefined;
+      }
     } catch (exc) {
       print(`*** Error fetching twin properties: ${exc}`, "error");
     }
     this.properties = properties;
+    this.isDefined = isDefined;
   }
 
   subscribeSelection = () => {
     eventService.subscribeSelection(payload => {
       if (payload) {
         const { selection, selectionType } = payload;
+        this.setState({ isLoadingSelection: true });
         this.setContent(selection, selectionType, null);
       } else {
-        this.setState({ changed: false, selection: null, patch: null, selectionType: null });
+        this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
       }
     });
   }
@@ -165,12 +174,18 @@ export class PropertyInspectorComponent extends Component {
     } else if (selectionType === "relationship") {
       this.original = this.updated = selection ? selection : null;
     }
-    this.setState({ changed: false, selection, patch, selectionType }, () => {
-      if (selection) {
-        this.editor.set(this.original);
-        this.styleTwinInEditorProperties();
-      }
-    });
+    const { isLoadingSelection } = this.state;
+    if (isLoadingSelection) {
+      this.setState({ changed: false, selection, patch, selectionType }, () => {
+        if (selection) {
+          this.editor.set(this.original);
+          this.styleTwinInEditorProperties();
+        }
+      });
+    } else {
+      this.original = this.updated = selection ? selection : null;
+      this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
+    }
   }
 
   styleTwinInEditorProperties = () => {
@@ -189,12 +204,12 @@ export class PropertyInspectorComponent extends Component {
       metadataNode.expand(true);
       const modelIndex = metadataNode.childs.findIndex(item => item.field.toLowerCase() === "$model");
       if (modelIndex >= 0) {
-        if (Object.entries(this.properties).length === 0) {
-          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "red", "important");
-          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "red", "important");
-        } else {
+        if (this.isDefined) {
           metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "");
           metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "");
+        } else {
+          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "red", "important");
+          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "red", "important");
         }
       }
     }

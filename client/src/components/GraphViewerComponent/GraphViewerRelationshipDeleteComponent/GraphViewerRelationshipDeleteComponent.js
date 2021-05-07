@@ -22,26 +22,31 @@ export class GraphViewerRelationshipDeleteComponent extends Component {
   }
 
   async deleteSelected() {
-    const { selectedEdge } = this.props;
-    const { source } = selectedEdge;
-    let { id } = selectedEdge;
-    id = id.split("_").pop();
-    this.setState({ isLoading: true });
-    print(`*** Deleting relationship ${id}`, "info");
+    const { selectedEdges } = this.props;
+    if (selectedEdges) {
+      this.setState({ isLoading: true });
+      await Promise.all(selectedEdges.map(this.deleteRelationship));
+      this.setState({ isLoading: false });
+    }
+  }
+
+  async deleteRelationship(edge) {
     try {
+      const { source } = edge;
+      let { id } = edge;
+      id = id.split("_").pop();
+      print(`*** Deleting relationship ${id}`, "info");
       await apiService.deleteRelationship(source, id);
       eventService.publishDeleteRelationship({ $sourceId: source, $relationshipId: id });
     } catch (exc) {
       exc.customMessage = "Error deleting relationship";
       eventService.publishError(exc);
     }
-
-    this.setState({ isLoading: false });
   }
 
   open() {
-    const { selectedEdge } = this.props;
-    if (!selectedEdge) {
+    const { selectedEdges } = this.props;
+    if (!selectedEdges || selectedEdges.length === 0) {
       return;
     }
 
