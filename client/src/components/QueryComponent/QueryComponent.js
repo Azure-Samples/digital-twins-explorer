@@ -48,7 +48,6 @@ export class QueryComponent extends Component {
 
   clearAfterEnvironmentChange = () => {
     this.setState({
-      queries: [],
       selectedQuery: defaultQuery,
       selectedQueryKey: null,
       queryKeyToBeRemoved: "",

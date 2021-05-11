@@ -4,7 +4,7 @@
 import React, { Component } from "react";
 import { TextField } from "office-ui-fabric-react";
 import { JsonEditor as Editor } from "jsoneditor-react";
-import { compare, deepClone } from "fast-json-patch";
+import { applyPatch, compare, deepClone } from "fast-json-patch";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { PropertyInspectorCommandBarComponent } from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
@@ -64,6 +64,10 @@ const reTypeDelta = (properties, delta) => {
 
     if (match && match.schema) {
       d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
+      if (d.value === "") {
+        d.op = "remove";
+        delete d.value;
+      }
     }
   }
 
@@ -80,10 +84,12 @@ export class PropertyInspectorComponent extends Component {
       selectionType: null,
       changed: false,
       patch: null,
-      isLoading: false
+      isLoading: false,
+      isLoadingSelection: false
     };
     this.editorRef = React.createRef();
     this.properties = null;
+    this.isDefined = null;
     this.original = null;
     this.updated = null;
     this.modelService = null;
@@ -97,12 +103,27 @@ export class PropertyInspectorComponent extends Component {
     this.initializeModelService();
     this.subscribeSelection();
     this.subscribeTelemetry();
-    eventService.subscribeCreateModel(this.initializeModelService);
-    eventService.subscribeDeleteModel(this.initializeModelService);
+    eventService.subscribeCreateModel(models => {
+      this.initializeModelService();
+      models.forEach(model => {
+        this.updateEditorAfterModelDeleteOrCreate(model["@id"]);
+      });
+    });
+    eventService.subscribeDeleteModel(model => {
+      this.initializeModelService();
+      this.updateEditorAfterModelDeleteOrCreate(model);
+    });
   }
 
   initializeModelService = () => {
     this.modelService = new ModelService();
+  }
+
+  updateEditorAfterModelDeleteOrCreate = async model => {
+    if (this.original && this.original.$metadata.$model === model) {
+      await this.updateModelProperties(model);
+      this.styleTwinInEditorProperties();
+    }
   }
 
   subscribeTelemetry = () => {
@@ -118,35 +139,93 @@ export class PropertyInspectorComponent extends Component {
     });
   }
 
+  updateModelProperties = async modelId => {
+    let properties = null;
+    let isDefined = false;
+    try {
+      if (modelId) {
+        const model = await this.modelService.getModel(modelId);
+        properties = model.componentProperties;
+        isDefined = model.isDefined;
+      }
+    } catch (exc) {
+      print(`*** Error fetching twin properties: ${exc}`, "error");
+    }
+    this.properties = properties;
+    this.isDefined = isDefined;
+  }
+
   subscribeSelection = () => {
-    eventService.subscribeSelection(async payload => {
+    eventService.subscribeSelection(payload => {
       if (payload) {
         const { selection, selectionType } = payload;
-        if (selectionType === "twin") {
-          let properties = null;
-          try {
-            properties = selection ? await this.modelService.getProperties(selection.$metadata.$model) : null;
-          } catch (exc) {
-            print(`*** Error fetching twin properties: ${exc}`, "error");
-          }
-          this.properties = properties;
-          this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
-        } else if (selectionType === "relationship") {
-          this.original = this.updated = selection ? selection : null;
-        }
-        this.setState({ changed: false, selection, patch: null, selectionType }, () => {
-          if (payload && payload.selection) {
-            this.editor.set(this.original);
-            const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
-            if (rootMetaIndex >= 0) {
-              this.editor.node.childs[rootMetaIndex].expand(true);
-            }
-          }
-        });
+        this.setState({ isLoadingSelection: true });
+        this.setContent(selection, selectionType, null);
       } else {
-        this.setState({ changed: false, selection: null, patch: null, selectionType: null });
+        this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
       }
     });
+  }
+
+  setContent = async (selection, selectionType, patch) => {
+    if (selectionType === "twin") {
+      await this.updateModelProperties(selection ? selection.$metadata.$model : null);
+      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
+    } else if (selectionType === "relationship") {
+      this.original = this.updated = selection ? selection : null;
+    }
+    const { isLoadingSelection } = this.state;
+    if (isLoadingSelection) {
+      this.setState({ changed: false, selection, patch, selectionType }, () => {
+        if (selection) {
+          this.editor.set(this.original);
+          this.styleTwinInEditorProperties();
+        }
+      });
+    } else {
+      this.original = this.updated = selection ? selection : null;
+      this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
+    }
+  }
+
+  styleTwinInEditorProperties = () => {
+    this.editor.node.childs.forEach(item => {
+      if (!item.field.startsWith("$")) {
+        if (this.properties[item.field]) {
+          this.stylePropertyNodeStyle(item, "", "");
+        } else {
+          this.stylePropertyNodeStyle(item, "yellow", "important");
+        }
+      }
+    });
+    const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
+    if (rootMetaIndex >= 0) {
+      const metadataNode = this.editor.node.childs[rootMetaIndex];
+      metadataNode.expand(true);
+      const modelIndex = metadataNode.childs.findIndex(item => item.field.toLowerCase() === "$model");
+      if (modelIndex >= 0) {
+        if (this.isDefined) {
+          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "");
+          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "");
+        } else {
+          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "red", "important");
+          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "red", "important");
+        }
+      }
+    }
+  }
+
+  stylePropertyNodeStyle = (item, color, important) => {
+    if (item.dom.field) {
+      item.dom.field.style.setProperty("color", color, important);
+      item.dom.value.style.setProperty("color", color, important);
+    }
+    if (item.type === "object") {
+      item.expand(true);
+      item.childs.forEach(child => {
+        this.stylePropertyNodeStyle(child, color, important);
+      });
+    }
   }
 
   showModal = () => {
@@ -230,9 +309,13 @@ export class PropertyInspectorComponent extends Component {
         print(patch, "info");
         if (patch.length > 0) {
           await this.patchTwin(delta);
+
+          const { newDocument } = applyPatch(this.original, delta, false, false);
+          this.setContent(newDocument, selectionType, delta);
+
+          this.showModal();
+          this.setState({ changed: false });
         }
-        this.showModal();
-        this.setState({ changed: false });
       } catch (exc) {
         exc.customMessage = "Error in patching twin";
         eventService.publishError(exc);
@@ -245,11 +328,9 @@ export class PropertyInspectorComponent extends Component {
     try {
       print(`*** Patching twin ${this.original.$dtId}`, "info");
       await apiService.updateTwin(this.original.$dtId, res);
-    } catch (exc) {
-      exc.customMessage = "Error in patching twin";
-      eventService.publishError(exc);
+    } finally {
+      this.setState({ isLoading: false });
     }
-    this.setState({ isLoading: false });
   }
 
   onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null

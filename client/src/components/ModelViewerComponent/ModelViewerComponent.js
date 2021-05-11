@@ -34,6 +34,7 @@ export class ModelViewerComponent extends Component {
 
     this.originalItems = [];
     this.uploadModelRef = React.createRef();
+    this.uploadModelFolderRef = React.createRef();
     this.uploadModelImagesRef = React.createRef();
     this.createRef = React.createRef();
     this.viewRef = React.createRef();
@@ -82,12 +83,11 @@ export class ModelViewerComponent extends Component {
       item.selected = modelId && item.key === modelId;
       return item;
     });
-    this.originalItems = updatedItems.slice(0, updatedItems.length);
     this.setState({ items: updatedItems });
   }
 
   async retrieveModels() {
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, filterText: "" });
 
     let list = [];
     try {
@@ -118,17 +118,18 @@ export class ModelViewerComponent extends Component {
   handleUpload = async evt => {
     const files = evt.target.files;
     this.setState({ isLoading: true, isUploadingModels: true });
-
     print("*** Uploading selected models", "info");
     const list = [];
     try {
       for (const file of files) {
-        print(`- working on ${file.name}`);
-        const dtdl = await readFile(file);
-        if (dtdl.length) {
-          dtdl.forEach(model => list.push(model));
-        } else {
-          list.push(dtdl);
+        if (file.type === "application/json") {
+          print(`- working on ${file.name}`);
+          const dtdl = await readFile(file);
+          if (dtdl.length) {
+            dtdl.forEach(model => list.push(model));
+          } else {
+            list.push(dtdl);
+          }
         }
       }
     } catch (exc) {
@@ -143,6 +144,7 @@ export class ModelViewerComponent extends Component {
     this.setState({ isLoading: false, isUploadingModels: false });
     await this.retrieveModels();
     this.uploadModelRef.current.value = "";
+    this.uploadModelFolderRef.current.value = "";
   }
 
   addModels = async list => {
@@ -154,7 +156,7 @@ export class ModelViewerComponent extends Component {
       sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
       if (sortedModels.length > 0) {
-        const chunks = this.chunkModelsList(sortedModels, 6);
+        const chunks = modelService.chunkModelsList(sortedModels, 50);
         for (const chunk of chunks) {
           await this.createModels(chunk);
         }
@@ -176,16 +178,6 @@ export class ModelViewerComponent extends Component {
         exc.customMessage = "Error adding models";
         eventService.publishError(exc);
       });
-  }
-
-  chunkModelsList(array, size) {
-    const chunkedArr = [];
-    let index = 0;
-    while (index < array.length) {
-      chunkedArr.push(array.slice(index, size + index));
-      index += size;
-    }
-    return chunkedArr;
   }
 
   handleUploadOfModelImages = async evt => {
@@ -280,7 +272,6 @@ export class ModelViewerComponent extends Component {
       }
       return item;
     });
-    this.originalItems = updatedItems.slice(0, updatedItems.length);
     this.setState({ items: updatedItems });
     eventService.publishSelectModel(currentSelectedItem);
   }
@@ -296,9 +287,13 @@ export class ModelViewerComponent extends Component {
               buttonClass="mv-toolbarButtons"
               onDownloadModelsClicked={() => this.retrieveModels()}
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
+              onUploadModelsFolderClicked={() => this.uploadModelFolderRef.current.click()}
               onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
+            <input id="directory-input" type="file" name="name" className="mv-fileInput"
+              webkitdirectory="" mozdirectory="true" directory=""
+              ref={this.uploadModelFolderRef} onChange={this.handleUpload} />
             <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
               ref={this.uploadModelImagesRef} onChange={this.handleUploadOfModelImages} />
           </div>
