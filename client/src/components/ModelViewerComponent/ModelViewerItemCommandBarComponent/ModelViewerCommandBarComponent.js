@@ -5,6 +5,13 @@ import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
 import { withTranslation } from "react-i18next";
 
+const buttonStyles = {
+  fontSize: 14,
+  fontWeight: 600,
+  "&:focus": {
+    background: "#efefef"
+  }
+};
 class ModelViewerItemCommandBarComponent extends Component {
 
   constructor(props) {
@@ -12,38 +19,34 @@ class ModelViewerItemCommandBarComponent extends Component {
     this.buttonClass = this.props.buttonClass;
   }
 
-  farItems = [
+  overflowItems = [
     {
       key: `deleteModel-${this.props.item.key}`,
+      text: this.props.t("modelViewerItemCommandBarComponent.farItems.deleteModels"),
       ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.deleteModels"),
-      iconProps: { iconName: "Delete" },
       onClick: () => this.props.onDelete(),
-      iconOnly: true,
-      className: this.buttonClass
+      style: buttonStyles
     },
     {
       key: `uploadModelImages-${this.props.item.key}`,
+      text: this.props.t("modelViewerItemCommandBarComponent.farItems.uploadModel"),
       ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.uploadModel"),
-      iconProps: { iconName: "ImageSearch" },
       onClick: () => this.props.onHandleModelImage(),
-      iconOnly: true,
-      className: this.buttonClass
+      style: buttonStyles
     },
     {
       key: `viewModel-${this.props.item.key}`,
+      text: this.props.t("modelViewerItemCommandBarComponent.farItems.viewModel"),
       ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.viewModel"),
-      iconProps: { iconName: "Info" },
       onClick: () => this.props.onView(),
-      iconOnly: true,
-      className: this.buttonClass
+      style: buttonStyles
     },
     {
       key: `createTwin-${this.props.item.key}`,
+      text: this.props.t("modelViewerItemCommandBarComponent.farItems.createTwin"),
       ariaLabel: this.props.t("modelViewerItemCommandBarComponent.farItems.createTwin"),
-      iconProps: { iconName: "AddTo" },
       onClick: () => this.props.onCreate(),
-      iconOnly: true,
-      className: this.buttonClass
+      style: buttonStyles
     }
   ];
 
@@ -56,7 +59,8 @@ class ModelViewerItemCommandBarComponent extends Component {
             height: 22
           }
         }}
-        farItems={this.farItems}
+        overflowItems={this.overflowItems}
+        calloutProps={{ style: { background: "red" }}}
         ariaLabel={this.props.t("modelViewerItemCommandBarComponent.ariaLabel")} />
     );
   }
