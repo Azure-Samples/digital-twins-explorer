@@ -113,6 +113,7 @@ export class PropertyInspectorComponent extends Component {
       this.initializeModelService();
       this.updateEditorAfterModelDeleteOrCreate(model);
     });
+    eventService.subscribeImport(() => this.initializeModelService());
   }
 
   initializeModelService = () => {
@@ -189,6 +190,10 @@ export class PropertyInspectorComponent extends Component {
   }
 
   styleTwinInEditorProperties = () => {
+    if (!this.editor || !this.editor.node) {
+      return;
+    }
+
     this.editor.node.childs.forEach(item => {
       if (!item.field.startsWith("$")) {
         if (this.properties[item.field]) {
