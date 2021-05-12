@@ -24,7 +24,7 @@
     "http-proxy-middleware": "^1.0.3",
     "jsoneditor": "^8.6.1",
     "jsoneditor-react": "^3.1.0",
-    "jsonld-graph": "^5.0.1",
+    "jsonld-graph": "^3.0.10",
     "jsonlint": "^1.6.3",
     "msal": "^1.2.1",
     "office-ui-fabric-react": "^7.117.4",
