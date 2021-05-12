@@ -28,7 +28,6 @@ export class Sandbox extends React.Component {
       );
 
       if (hasParts.length === 0) {
-        return;
       } else {
         const twinParts = hasParts.filter(
           (hasPart) => hasPart.$dtId !== twin.$dtId
@@ -45,6 +44,8 @@ export class Sandbox extends React.Component {
     const ahus = await apiService.queryTwins(
       "SELECT * FROM DIGITALTWINS DT WHERE IS_OF_MODEL(DT,'dtmi:brick:v1_2_0:Air_Handling_Unit;2')"
     );
+    console.log(ahus);
+
     const returnedAHUs = await this.getRelationshipsRecursively(ahus);
 
     this.setState({ ahuSchedule: returnedAHUs });
@@ -59,11 +60,13 @@ export class Sandbox extends React.Component {
         <button className="query-button" onClick={this.getAHUs}>
           Generate AHU Schedule
         </button>
-        {this.state.ahuSchedule.length > 0 ? (
-          <Schedule ahuSchedule={this.state.ahuSchedule} />
-        ) : (
-          ""
-        )}
+        <div className="equipment-schedule--table">
+          {this.state.ahuSchedule.length > 0 ? (
+            <Schedule ahuSchedule={this.state.ahuSchedule} />
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     );
   }

@@ -1,3 +1,65 @@
+// Definitions from __definitions.scss from Valinor
+
+// Global variables
+$color--white: #ffffff;
+$color--black: #000000;
+
+$color--gray1: #404040;
+$color--gray2: #666666;
+$color--gray3: #999999;
+$color--gray4: #cccccc;
+$color--gray5: #f2f2f2;
+
+// New definitions
+$color--charcoal: #4c516a;
+$color__gray--lighter: #fafbfd;
+$color__gray--light: #f5f7fb;
+$color__gray--less-light: #edf0f8;
+$color__gray--medium-light: #ebeff6;
+$color__gray--medium: #9a9eb2;
+$color__gray--medium-dark: #d5dbec;
+$color__gray--dark: #808080;
+$color__gray--table-border: #e4e8ee;
+$color__gray--dark-theme-table-border: rgba(#e8e8e8, 0.09);
+$color--shadow-charcoal: #00183e;
+$color--hover-charcoal: darken($color--charcoal, 20%);
+$color--hover__gray--medium: darken($color__gray--medium, 20%);
+$color--dropzone-gray: #dbdee5;
+$color--gray--light-admin: #ccced8;
+$color--gray--switch-to: #f1f3f8;
+$color--gray--display-cell: #6c738f;
+
+$color--mint: #e4f9f3;
+$color--light-green: #cdf1e6;
+$color--green: #00cc8f;
+$color--shadow-green: #0f7758;
+$color--valid-green: #e5faf4;
+$color--pale-green: #f5fffc;
+
+$color--blue-water: #41a8e9;
+$color--blue-waste: #788ac3;
+$color--blue: #416ce9;
+$color--light-blue: #c4d3ff;
+$color--medium-blue: #94b0ff;
+$color--blue-gray: #b9c3e1;
+$color--light-blue-gray: #e3e8f8;
+$color--blue-electricity: #57d2f2;
+
+$color--violet: #6328eb;
+$color--purple: #886cff;
+$color--purple-gray: #788ac3;
+$color--red: #fb4e77;
+$color--red--bright: #ff1010;
+$color--pink: #fd95ae;
+
+$color--orange: #ffa70d;
+$color--orange-yellow: #ffcc00;
+$color--yellow: #ffd630;
+$color--warn-yellow: #fffae6;
+
+// transition
+$transition: 0.25s ease;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -10,4 +72,40 @@ body {
 
 .equipment-schedule--wrapper {
   padding: 40px;
+
+  .equipment-schedule--table {
+    margin: 40px 0px;
+
+    table {
+      border: 1px solid $color__gray--table-border;
+      border-collapse: collapse;
+
+      th {
+        border: 1px solid $color__gray--table-border;
+        background: $color__gray--light;
+        padding: 4px;
+        text-align: center;
+      }
+
+      td {
+        border: 1px solid $color__gray--table-border;
+        padding: 4px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+button.query-button {
+  padding: 6px 10px;
+  background-color: $color--blue;
+  color: $color--white;
+  font-weight: 600;
+  border-radius: 2px;
+}
+
+button.query-button:hover {
+  cursor: pointer;
+  background-color: darken($color--blue, 10%);
+  transition: $transition;
 }

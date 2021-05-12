@@ -1,12 +1,34 @@
 import React from "react";
+import NumberFormat from "react-number-format";
 
 function ScheduleRow(props) {
   return (
     <tr>
       <td>{props.ahu.$dtId}</td>
-      <td>{props.ahu.design_flow_rate}</td>
-      <td>{props.ahu.design_outdoor_air_flow_rate}</td>
-      <td>{props.ahu.hasPart[0].hasPart[0].motor_power}</td>
+      <td>
+        <NumberFormat
+          value={props.ahu.design_flow_rate}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={0}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.design_outdoor_air_flow_rate}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={0}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[0].hasPart[0].motor_power}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={0}
+        />
+      </td>
       <td>
         {
           (props.ahu.hasPart[0].hasPart[0].hasPart[0].$metadata.$model = "dtmi:brick:v1_2_0:Fan_VFD;2"
@@ -14,13 +36,62 @@ function ScheduleRow(props) {
             : "FALSE")
         }
       </td>
-      <td>{props.ahu.hasPart[1].grand_sensible_energy}</td>
-      <td>{props.ahu.hasPart[1].total_energy}</td>
-      <td>{props.ahu.hasPart[1].entering_air_temperature}</td>
-      <td>{props.ahu.hasPart[1].leaving_air_temperature}</td>
-      <td>{props.ahu.hasPart[1].entering_water_temperature}</td>
-      <td>{props.ahu.hasPart[1].leaving_water_temperature}</td>
-      <td>{props.ahu.hasPart[1].water_flow_rate}</td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].grand_sensible_energy}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={0}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].total_energy}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={0}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].entering_air_temperature}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={1}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].leaving_air_temperature}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={1}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].entering_water_temperature}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={1}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].leaving_water_temperature}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={1}
+        />
+      </td>
+      <td>
+        <NumberFormat
+          value={props.ahu.hasPart[1].water_flow_rate}
+          displayType={"text"}
+          thousandSeparator={true}
+          decimalScale={2}
+        />
+      </td>
     </tr>
   );
 }
