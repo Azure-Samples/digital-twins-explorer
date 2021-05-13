@@ -96,9 +96,9 @@ export class ModelService {
 
   async getRelationships(sourceModelId, targetModelId) {
     await this.initialize();
-    const sourceModel = this.getModel(sourceModelId);
+    const sourceModel = await this.getModel(sourceModelId);
     if (targetModelId) {
-      const targetModel = this.getModel(targetModelId);
+      const targetModel = await this.getModel(targetModelId);
       return sourceModel
         .relationships
         .filter(x => x.target === REL_TARGET_ANY || x.target === targetModelId || targetModel.bases.some(y => y === x.target))
@@ -109,23 +109,23 @@ export class ModelService {
 
   async getModelById(sourceModelId) {
     await this.initialize();
-    return this.getModel(sourceModelId);
+    return await this.getModel(sourceModelId);
   }
 
   async getProperties(sourceModelId) {
     await this.initialize();
-    const sourceModel = this.getModel(sourceModelId);
+    const sourceModel = await this.getModel(sourceModelId);
     return this._getChildComponentProperties(sourceModel);
   }
 
   async getTelemetries(sourceModelId) {
     await this.initialize();
-    return this.getModel(sourceModelId).telemetries;
+    return await this.getModel(sourceModelId).telemetries;
   }
 
   async getBases(modelId) {
     await this.initialize();
-    const sourceModel = this.getModel(modelId);
+    const sourceModel = await this.getModel(modelId);
     return sourceModel.bases;
   }
 
@@ -157,7 +157,7 @@ export class ModelService {
 
   async createPayload(modelId) {
     await this.initialize();
-    const model = this.getModel(modelId);
+    const model = await this.getModel(modelId);
     const payload = {
       $metadata: {
         $model: modelId
@@ -206,13 +206,13 @@ export class ModelService {
       case "integer":
       case "long":
       case "float":
-        return isCurrentUndefined ? 0 : current;
+        return isCurrentUndefined ? "" : current;
       case "dtmi:dtdl:instance:Schema:string;2":
       case "string":
-        return isCurrentUndefined ? " " : current.toString();
+        return isCurrentUndefined ? "" : current.toString();
       case "dtmi:dtdl:instance:Schema:boolean;2":
       case "boolean":
-        return isCurrentUndefined ? false : current;
+        return isCurrentUndefined ? "" : current;
       default:
         return isCurrentUndefined ? "" : current;
     }
@@ -226,6 +226,7 @@ export class ModelService {
         id: model.id,
         displayName: model.getAttributeValue("dtmi:dtdl:property:displayName;2"),
         properties: [],
+        componentProperties: [],
         relationships: [],
         telemetries: [],
         bases: [],
@@ -236,32 +237,14 @@ export class ModelService {
     });
   }
 
-  getModel(modelId) {
-    const contents = { properties: [], relationships: [], telemetries: [], bases: [], components: [] };
-    const model = this.modelGraph.getVertex(modelId);
-    if (model) {
-      this._mapModel(model, contents);
-    }
-
-    return contents;
-  }
-
-  getModels = async modelIds => {
+  async getModel(modelId) {
     await this.initialize();
-    return modelIds.map(id => {
-      const model = this.modelGraph.getVertex(id);
-      const contents = {
-        id: model.id,
-        displayName: model.getAttributeValue("dtmi:dtdl:property:displayName;2"),
-        properties: [],
-        relationships: [],
-        telemetries: [],
-        bases: [],
-        components: []
-      };
-      this._mapModel(model, contents);
-      return contents;
-    });
+    return this._getModel(modelId);
+  }
+
+  async getModels(modelIds) {
+    await this.initialize();
+    return modelIds.map(id => this._getModel(id));
   }
 
   addModels = async models => {
@@ -306,6 +289,16 @@ export class ModelService {
     }
   }
 
+  chunkModelsList(array, size) {
+    const chunkedArr = [];
+    let index = 0;
+    while (index < array.length) {
+      chunkedArr.push(array.slice(index, size + index));
+      index += size;
+    }
+    return chunkedArr;
+  }
+
   _addReferencedModels(vertice, sortedModels, checkedList) {
     if (checkedList.some(id => id === vertice.id)) {
       return;
@@ -324,6 +317,26 @@ export class ModelService {
     sortedModels.push(vertice.id);
   }
 
+  _getModel(modelId) {
+    const contents = {
+      properties: [],
+      componentProperties: [],
+      relationships: [],
+      telemetries: [],
+      bases: [],
+      components: [],
+      isDefined: false
+    };
+    const model = this.modelGraph.getVertex(modelId);
+    if (model) {
+      contents.id = model.id;
+      this._mapModel(model, contents);
+    } else {
+      contents.id = modelId;
+    }
+    return contents;
+  }
+
   _mapModel(vertex, contents) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
 
@@ -331,6 +344,7 @@ export class ModelService {
       contents.displayName = getModelDisplayName(vertex);
     }
     contents.description = getModelDescription(vertex);
+    contents.isDefined = true;
 
     vertex
       .getOutgoing("dtmi:dtdl:property:contents;2")
@@ -363,7 +377,7 @@ export class ModelService {
         }
 
         if (x.toVertex.isType("dtmi:dtdl:class:Component;2")) {
-          const component = this.getModel(inferSchema(x.toVertex));
+          const component = this._getModel(inferSchema(x.toVertex));
           component.name = getPropertyName(x.toVertex);
           component.schema = inferSchema(x.toVertex);
           safeAdd(contents.components, component);
@@ -377,6 +391,8 @@ export class ModelService {
         contents.bases.push(x.toVertex.id);
         this._mapModel(x.toVertex, contents);
       });
+
+    contents.componentProperties = this._getChildComponentProperties(contents);
   }
 
   _getChildComponentProperties(component) {

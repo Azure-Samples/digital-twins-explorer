@@ -35,6 +35,12 @@
   display: grid;
   grid-template-rows: auto auto 1fr;
   height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
 
   .pi-title {
     font-size: 10px;
@@ -199,3 +205,6 @@ div.jsoneditor-value.jsoneditor-number, div.jsoneditor-value.jsoneditor-string {
   border: 1px solid transparent;
 }
 
+div.jsoneditor-value.jsoneditor-empty::after {
+  content: "Unset";
+}

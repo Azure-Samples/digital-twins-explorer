@@ -113,10 +113,10 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       },
       {
         id: "delete-edge",
-        content: "Delete relationship",
+        content: "Delete relationship(s)",
         selector: "edge",
-        onClickFunction: e => {
-          this.props.onConfirmRelationshipDelete(e);
+        onClickFunction: () => {
+          this.props.onConfirmRelationshipDelete();
         },
         hasTrailingDivider: true
       },
@@ -522,7 +522,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   onEdgeSelected = e => {
     const { onEdgeClicked } = this.props;
     if (onEdgeClicked) {
-      onEdgeClicked(e.target.data());
+      const cy = this.graphControl;
+      const selectedEdges = cy.edges().filter(edge => edge.selected());
+      onEdgeClicked(e.target.data(), selectedEdges);
     }
     this.contextMenuIsOpen = false;
   }

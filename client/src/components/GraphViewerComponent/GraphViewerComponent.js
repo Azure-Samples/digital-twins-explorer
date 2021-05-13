@@ -33,7 +33,7 @@ export class GraphViewerComponent extends React.Component {
       isLoading: false,
       selectedNode: null,
       selectedNodes: null,
-      selectedEdge: null,
+      selectedEdges: null,
       layout: "Klay",
       hideMode: "hide-selected",
       canShowAll: false,
@@ -195,10 +195,10 @@ export class GraphViewerComponent extends React.Component {
         }
       });
     } else {
+      if (this.cyRef.current) {
+        this.cyRef.current.clearTwins();
+      }
       await apiService.query(query, async data => {
-        if (this.cyRef.current) {
-          this.cyRef.current.clearTwins();
-        }
         if (data.twins.length > 0) {
           this.setState({ couldNotDisplay: false, noResults: false, relationshipsOnly: false });
           this.cyRef.current.addTwins(data.twins);
@@ -238,6 +238,7 @@ export class GraphViewerComponent extends React.Component {
 
     const allTwins = [ ...twins ];
     const existingTwins = [];
+
     for (let i = 0; i < expansionLevel; i++) {
       const baselineChunk = (100 - baseline) / expansionLevel;
       const currentTwins = allTwins.filter(x => existingTwins.every(y => y.$dtId !== x.$dtId));
@@ -254,6 +255,9 @@ export class GraphViewerComponent extends React.Component {
           apiService
             .queryRelationshipsPaged(twin.$dtId, async rels => {
               try {
+                if (this.canceled) {
+                  resolve();
+                }
                 let presentRels = rels;
                 if (settingsService.eagerLoading || loadTargets) {
                   const missingTwins = [];
@@ -267,6 +271,7 @@ export class GraphViewerComponent extends React.Component {
                     }
                   }
 
+                  this.allNodes = this.allNodes.concat(missingTwins);
                   this.cyRef.current.addTwins(missingTwins);
                 } else {
                   presentRels = rels.filter(x =>
@@ -299,8 +304,8 @@ export class GraphViewerComponent extends React.Component {
     }
   }
 
-  onEdgeClicked = async e => {
-    this.setState({ selectedEdge: e });
+  onEdgeClicked = async (e, selectedEdges) => {
+    this.setState({ selectedEdges: selectedEdges.map(edge => edge.data()) });
     const relationship = await apiService.getRelationship(e.source, e.relationshipId);
     eventService.publishSelection({ selection: relationship.body, selectionType: "relationship" });
   }
@@ -317,10 +322,13 @@ export class GraphViewerComponent extends React.Component {
     } else if (e.selectedNode) {
       try {
         const data = await apiService.getTwinById(e.selectedNode.id);
+
         // Get latest
         const { selectedNode } = this.state;
         if (data && selectedNode.id === e.selectedNode.id) {
           eventService.publishSelection({ selection: data, selectionType: "twin" });
+        } else {
+          eventService.publishSelection();
         }
       } catch (exc) {
         print(`*** Error fetching data for twin: ${exc}`, "error");
@@ -333,14 +341,20 @@ export class GraphViewerComponent extends React.Component {
 
   onNodeDoubleClicked = async e => {
     try {
+      this.canceled = false;
       await this.getRelationshipsData([ { $dtId: e.id } ], 10, true, false,
         settingsService.relTypeLoading, settingsService.relExpansionLevel);
     } catch (exc) {
-      exc.customMessage = "Error fetching data for graph";
-      eventService.publishError(exc);
+      if (this.canceled) {
+        this.setState({ selectedNode: null, selectedNodes: null, selectedEdges: null });
+      }
+      if (exc.errorCode !== "user_cancelled") {
+        exc.customMessage = "Error fetching data for graph";
+        eventService.publishError(exc);
+      }
+    } finally {
+      this.setState({ isLoading: false, progress: 0 });
     }
-
-    this.setState({ isLoading: false, progress: 0 });
   }
 
   onNodeMouseEnter = async modelId => {
@@ -357,7 +371,7 @@ export class GraphViewerComponent extends React.Component {
   };
 
   onControlClicked = () => {
-    this.setState({ selectedNode: null, selectedNodes: null, selectedEdge: null });
+    this.setState({ selectedNode: null, selectedNodes: null, selectedEdges: null });
     eventService.publishSelection();
 
     const { highlightingTerms, filteringTerms } = this.state;
@@ -482,11 +496,10 @@ export class GraphViewerComponent extends React.Component {
     });
   }
 
-  onConfirmRelationshipDelete = ({ target: node }) => {
-    if (node && node.data()) {
-      this.setState({ selectedEdge: node.data() }, () => {
-        this.deleteRel.current.open();
-      });
+  onConfirmRelationshipDelete = () => {
+    const { selectedEdges } = this.state;
+    if (selectedEdges) {
+      this.deleteRel.current.open();
     }
   }
 
@@ -667,7 +680,7 @@ export class GraphViewerComponent extends React.Component {
     const {
       selectedNode,
       selectedNodes,
-      selectedEdge,
+      selectedEdges,
       query,
       layout,
       hideMode,
@@ -677,7 +690,7 @@ export class GraphViewerComponent extends React.Component {
     return (
       <>
         <GraphViewerCommandBarComponent className="gc-commandbar" buttonClass="gc-toolbarButtons" ref={this.commandRef}
-          selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} selectedEdge={selectedEdge}
+          selectedNode={selectedNode} selectedNodes={selectedNodes} query={query}
           layouts={Object.keys(GraphViewerCytoscapeLayouts)} layout={layout} hideMode={hideMode}
           onRelationshipCreate={this.onRelationshipCreate}
           onShowAllRelationships={this.onShowAllRelationships}
@@ -701,7 +714,7 @@ export class GraphViewerComponent extends React.Component {
         <GraphViewerRelationshipViewerComponent selectedNode={selectedNode} ref={this.view} />
         <GraphViewerTwinDeleteComponent selectedNode={selectedNode} selectedNodes={selectedNodes} query={query} ref={this.delete}
           onDelete={this.onTwinDelete} onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
-        <GraphViewerRelationshipDeleteComponent selectedEdge={selectedEdge} ref={this.deleteRel} />
+        <GraphViewerRelationshipDeleteComponent selectedEdges={selectedEdges} ref={this.deleteRel} />
       </>
     );
   }
@@ -800,11 +813,10 @@ export class GraphViewerComponent extends React.Component {
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
         <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${propInspectorDetailWidth}%` : 0}}>
-          <div className="pi-toggle">
+          <div className="pi-toggle" onClick={this.togglePropertyInspector}>
             <Icon
               className="toggle-icon"
               iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              onClick={this.togglePropertyInspector}
               aria-label="Toggle property inspector"
               role="button"
               title="Toggle property inspector" />

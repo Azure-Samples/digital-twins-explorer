@@ -39,6 +39,14 @@ export class ModelViewerCommandBarComponent extends Component {
       className: this.buttonClass
     },
     {
+      key: "uploadModelsDirectory",
+      text: "Upload a directory of Models",
+      iconProps: { iconName: "DocumentSet" },
+      onClick: () => this.props.onUploadModelsFolderClicked(),
+      iconOnly: true,
+      className: this.buttonClass
+    },
+    {
       key: "deleteModels",
       text: "Delete All Models",
       ariaLabel: "delete all models",
