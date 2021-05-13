@@ -140,7 +140,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   removeRelationships(relationships) {
     relationships.forEach(x => {
-      this.graphControl.$id(`${x.sourceId}_${x.relationshipName}`).remove();
+      this.graphControl.$id(`${x.sourceId}_${x.targetId}_${x.relationshipName}`).remove();
     });
   }
 
