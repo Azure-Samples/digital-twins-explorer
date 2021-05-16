@@ -247,6 +247,10 @@ export class PropertyInspectorComponent extends Component {
       return { field: true, value: true };
     }
 
+    if (node && selectionType === "relationship") {
+      return { field: false, value: false };
+    }
+
     if (node && selectionType === "twin") {
       let current = this.properties;
       for (const p of node.path) {
