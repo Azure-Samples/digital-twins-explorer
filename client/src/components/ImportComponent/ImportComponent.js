@@ -69,6 +69,7 @@ export class ImportComponent extends Component {
 
   closeModal = () => {
     this.setState({ showImportModal: false }, () => {
+      eventService.publishModelsUpdate();
       eventService.publishCloseComponent("importComponent");
     });
   }
