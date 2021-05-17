@@ -514,6 +514,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         cy.$id(getUniqueRelationshipId(rel)).toggleClass("opaque", false);
       });
     }
+    if (this.selectedNodes.length === 0) {
+      this.clearSelection();
+    }
   }
 
   onEdgeSelected = e => {
