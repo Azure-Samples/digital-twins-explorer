@@ -163,7 +163,11 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
         const backgroundImage = this.getBackgroundImage(modelId);
         if (backgroundImage) {
           cy.elements(`node[id="${modelId}"]`).style({
-            "background-image": `url(${this.getBackgroundImage(modelId)})`,
+            "background-image": `url(${backgroundImage})`,
+            ...modelWithImageStyle
+          });
+        } else {
+          cy.elements(`node[id="${modelId}"]`).style({
             ...modelWithImageStyle
           });
         }
@@ -187,10 +191,17 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   updateModelIcon(modelId) {
     const cy = this.graphControl;
-    cy.elements(`node[id="${modelId}"]`).style({
-      "background-image": `url(${this.getBackgroundImage(modelId)})`,
-      ...modelWithImageStyle
-    });
+    const backgroundImage = this.getBackgroundImage(modelId);
+    if (backgroundImage) {
+      cy.elements(`node[id="${modelId}"]`).style({
+        "background-image": `url(${backgroundImage})`,
+        ...modelWithImageStyle
+      });
+    } else {
+      cy.elements(`node[id="${modelId}"]`).style({
+        ...modelWithImageStyle
+      });
+    }
   }
 
   onNodeSelected = ({ target: node }) => {

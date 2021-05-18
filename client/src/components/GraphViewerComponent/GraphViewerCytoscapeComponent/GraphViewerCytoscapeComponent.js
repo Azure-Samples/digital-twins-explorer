@@ -7,7 +7,7 @@ import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import _uniqueId from "lodash/uniqueId";
 
-import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, navigationOptions } from "./config";
+import { colors, graphStyles, dagreOptions, colaOptions, klayOptions, fcoseOptions, modelWithImageStyle, navigationOptions } from "./config";
 import { getUniqueRelationshipId, addNavigator } from "../../../utils/utilities";
 import { settingsService } from "../../../services/SettingsService";
 
@@ -419,12 +419,18 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       }
       for (const t of Object.keys(mtypes)) {
         const { backgroundColor, backgroundImage } = mtypes[t];
-        cy.elements(`node[modelId="${t}"]`).style({
-          "background-color": backgroundColor,
-          "background-image": `url(${backgroundImage})`,
-          "background-fit": "cover",
-          "background-clip": "node"
-        });
+        if (backgroundImage) {
+          cy.elements(`node[modelId="${t}"]`).style({
+            "background-color": backgroundColor,
+            "background-image": `url(${backgroundImage})`,
+            ...modelWithImageStyle
+          });
+        } else {
+          cy.elements(`node[modelId="${t}"]`).style({
+            "background-color": backgroundColor,
+            ...modelWithImageStyle
+          });
+        }
       }
 
       // Color relationships by label
@@ -449,9 +455,17 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   updateModelIcon(modelId) {
     const cy = this.graphControl;
-    cy.elements(`node[modelId="${modelId}"]`).style({
-      "background-image": `url(${this.getBackgroundImage(modelId)})`
-    });
+    const backgroundImage = this.getBackgroundImage(modelId);
+    if (backgroundImage) {
+      cy.elements(`node[modelId="${modelId}"]`).style({
+        "background-image": `url(${backgroundImage})`,
+        ...modelWithImageStyle
+      });
+    } else {
+      cy.elements(`node[modelId="${modelId}"]`).style({
+        ...modelWithImageStyle
+      });
+    }
   }
 
   onNodeSelected = ({ target: node }) => {

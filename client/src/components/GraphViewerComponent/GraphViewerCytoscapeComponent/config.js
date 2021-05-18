@@ -355,3 +355,8 @@ export const navigationOptions = {
   removeCustomContainer: true, // destroy the container specified by user on plugin destroy
   rerenderDelay: 500 // ms to throttle rerender updates to the panzoom for performance
 };
+
+export const modelWithImageStyle = {
+  "background-fit": "cover",
+  "background-clip": "node"
+};

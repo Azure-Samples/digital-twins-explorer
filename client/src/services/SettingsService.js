@@ -67,10 +67,7 @@ class SettingsService {
     storageService.setLocalStorageObject(EnvStorageKeyName, envs);
   }
 
-  getModelImage = modelId => {
-    const image = storageService.getLocalStoragePrimitive(modelId);
-    return image ? image : "";
-  }
+  getModelImage = modelId => storageService.getLocalStoragePrimitive(modelId);
 
   setModelImage = (modelId, dataString) => storageService.setLocalStorageObject(modelId, dataString);
 
