@@ -42,7 +42,7 @@ const inferSchema = vertex => {
         name: getPropertyName(edge.toVertex),
         value: edge.toVertex.getAttributeValue("dtmi:dtdl:property:enumValue;2")
       })) ],
-      valueSchema: schemaEdge.toVertex.getAttributeValue("dtmi:dtdl:property:valueSchema;2")
+      valueSchema: "string"
     };
   }
 
@@ -182,7 +182,6 @@ export class ModelService {
         return current;
       }
       const schemaType = schema.type ?? schema["@type"];
-      const enumValues = schema.values ?? schema.enumValues;
       const objectProperties = {};
       switch (schemaType) {
         case "Object":
@@ -191,7 +190,7 @@ export class ModelService {
           }
           return objectProperties;
         case "Enum":
-          return enumValues.length > 0 ? enumValues[0].value ?? enumValues[0].enumValue : this.getPropertyDefaultValue(schema.valueSchema, current);
+          return isCurrentUndefined ? this.getPropertyDefaultValue(schema.valueSchema, current) : current;
         case "Map":
         default:
           return isCurrentUndefined ? {} : current;
@@ -257,36 +256,6 @@ export class ModelService {
     const model = this.modelGraph.getVertex(modelId);
     if (model) {
       this.modelGraph.removeVertex(model);
-    }
-  }
-
-  validateTwinPatch(properties, delta) {
-    let errors = "";
-    for (const d of delta) {
-      const parts = d.path.split("/").filter(x => x);
-      let match = properties;
-      for (const p of parts) {
-        match = match[p];
-        if (!match) {
-          break;
-        }
-      }
-
-      if (match && match.schema) {
-        switch (match.schema.type) {
-          case "Enum":
-            if (!match.schema.values.some(y => y.value === d.value)) {
-              const validValues = match.schema.values.map(y => y.value);
-              errors += `Invalid value "${d.value}" for "${d.path}". Valid values are: "${validValues}".\n`;
-            }
-            break;
-          default:
-            break;
-        }
-      }
-    }
-    if (errors !== "") {
-      throw new Error(errors);
     }
   }
 

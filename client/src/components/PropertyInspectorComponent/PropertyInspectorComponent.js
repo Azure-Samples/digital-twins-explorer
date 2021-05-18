@@ -65,7 +65,7 @@ const reTypeDelta = (properties, delta) => {
 
     if (match && match.schema) {
       d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
-      if (d.value === "") {
+      if (!d.value) {
         d.op = "remove";
         delete d.value;
       }
@@ -194,9 +194,13 @@ export class PropertyInspectorComponent extends Component {
   }
 
   generateSchema = () => {
-    const schema = toJsonSchema(this.original);
-    this.setObjectPropertiesSchema(this.properties, schema);
-    return schema;
+    if (this.properties && this.original) {
+      const schema = toJsonSchema(this.original);
+      this.setObjectPropertiesSchema(this.properties, schema);
+      return schema;
+    }
+
+    return null;
   }
 
   setObjectPropertiesSchema = (obj, schema) => {
@@ -339,9 +343,7 @@ export class PropertyInspectorComponent extends Component {
       const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x =>
         deltaFromDefaults.some(y => y.path === x.path)
           || deltaFromDefaults.some(y => y.path.startsWith(`${x.path}/`))));
-      const modelService = new ModelService();
       try {
-        modelService.validateTwinPatch(this.properties, delta);
         this.setState({ patch: delta });
         const patch = JSON.stringify(delta, null, 2);
         print("*** PI Changes:", "info");
