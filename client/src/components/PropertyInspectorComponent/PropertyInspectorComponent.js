@@ -4,7 +4,8 @@
 import React, { Component } from "react";
 import { TextField } from "office-ui-fabric-react";
 import { JsonEditor as Editor } from "jsoneditor-react";
-import { applyPatch, compare, deepClone } from "fast-json-patch";
+import { compare, deepClone } from "fast-json-patch";
+import toJsonSchema from "to-json-schema";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { PropertyInspectorCommandBarComponent } from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
@@ -319,8 +320,8 @@ export class PropertyInspectorComponent extends Component {
         if (patch.length > 0) {
           await this.patchTwin(delta);
 
-          const { newDocument } = applyPatch(this.original, delta, false, false);
-          this.setContent(newDocument, selectionType, delta);
+          const newData = await apiService.getTwinById(this.original.$dtId);
+          this.setContent(newData, selectionType, delta);
 
           this.showModal();
           this.setState({ changed: false });
