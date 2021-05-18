@@ -72,7 +72,7 @@ export class ModelService {
       this.modelGraph = new JsonldGraph([
         { uri: "dtmi:dtdl:context;2", context }
       ]);
-      await this.modelGraph.load(models.map(x => x.model));
+      await this._loadGraph(models.map(x => x.model));
     }
   }
 
@@ -80,7 +80,7 @@ export class ModelService {
     this.modelGraph = new JsonldGraph([
       { uri: "dtmi:dtdl:context;2", context }
     ]);
-    await this.modelGraph.load(models);
+    await this._loadGraph(models);
   }
 
   async getModelIdsForUpload(models) {
@@ -299,6 +299,11 @@ export class ModelService {
     return chunkedArr;
   }
 
+  async _loadGraph(models) {
+    await this.modelGraph.load(models);
+    models.forEach(x => this.modelGraph.getVertex(x["@id"]).addAttributeValue("is_defined", true));
+  }
+
   _addReferencedModels(vertice, sortedModels, checkedList) {
     if (checkedList.some(id => id === vertice.id)) {
       return;
@@ -344,7 +349,7 @@ export class ModelService {
       contents.displayName = getModelDisplayName(vertex);
     }
     contents.description = getModelDescription(vertex);
-    contents.isDefined = true;
+    contents.isDefined = vertex.hasAttributeValue("is_defined", true);
 
     vertex
       .getOutgoing("dtmi:dtdl:property:contents;2")

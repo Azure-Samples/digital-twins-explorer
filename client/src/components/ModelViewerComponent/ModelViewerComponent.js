@@ -75,6 +75,10 @@ export class ModelViewerComponent extends Component {
     eventService.subscribeModelSelectionUpdatedInGraph(modelId => {
       this.updateModelItemSelection(modelId);
     });
+
+    eventService.subscribeModelsUpdate(() => {
+      this.retrieveModels();
+    });
   }
 
   updateModelItemSelection(modelId) {

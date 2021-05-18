@@ -114,7 +114,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
           target: x.targetId,
           label: x.relationshipName,
           relationshipId: x.relationshipId,
-          id: `${x.sourceId}_${x.relationshipName}`
+          id: `${x.sourceId}_${x.targetId}_${x.relationshipName}`
         },
         classes: relationshipClassName
       }))
@@ -140,7 +140,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   removeRelationships(relationships) {
     relationships.forEach(x => {
-      this.graphControl.$id(`${x.sourceId}_${x.relationshipName}`).remove();
+      this.graphControl.$id(`${x.sourceId}_${x.targetId}_${x.relationshipName}`).remove();
     });
   }
 
@@ -155,10 +155,8 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
 
   doLayout(progressCallback) {
     const cy = this.graphControl;
-
     cy.batch(() => {
       const el = cy.nodes("*");
-
       // Add model images
       for (let i = 0; i < el.length; i++) {
         const modelId = el[i].data("id");

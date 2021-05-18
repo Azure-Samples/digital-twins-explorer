@@ -69,7 +69,7 @@ class SettingsService {
 
   getModelImage = modelId => {
     const image = storageService.getLocalStoragePrimitive(modelId);
-    return image ? image : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+    return image ? image : "";
   }
 
   setModelImage = (modelId, dataString) => storageService.setLocalStorageObject(modelId, dataString);

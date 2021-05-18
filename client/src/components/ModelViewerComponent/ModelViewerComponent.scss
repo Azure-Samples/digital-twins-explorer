@@ -9,6 +9,8 @@
 }
 
 .mv-grid {
+  display: flex;
+  flex-direction: column;
   font-size: 12px;
   font-family: $fontFamilyMain;
   font-weight: 200;

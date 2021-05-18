@@ -104,6 +104,10 @@
   width: 0px;
 }
 
+.jsoneditor-tree .jsoneditor-value, .jsoneditor-tree .jsoneditor-field {
+  user-select: all;
+}
+
 .jsoneditor-tree > colgroup > col:first-child {
   width: 0px;
 }
