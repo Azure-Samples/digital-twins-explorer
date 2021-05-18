@@ -18,7 +18,7 @@ class ExportService {
     const bs = new BatchService({
       items: data.digitalTwinsGraph.digitalTwins,
       action: (twin, resolve) => {
-        apiService.queryRelationshipsPaged(twin.$dtId, rels => {
+        apiService.queryRelationshipsPaged([ twin.$dtId ], rels => {
           const presentRels = rels.filter(x =>
             data.digitalTwinsGraph.digitalTwins.some(y => y.$dtId === x.$sourceId)
               && data.digitalTwinsGraph.digitalTwins.some(y => y.$dtId === x.$targetId));

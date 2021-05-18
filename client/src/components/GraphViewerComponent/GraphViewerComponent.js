@@ -244,16 +244,17 @@ export class GraphViewerComponent extends React.Component {
       const currentTwins = allTwins.filter(x => existingTwins.every(y => y.$dtId !== x.$dtId));
       existingTwins.push(...currentTwins);
 
+      const twinsChunks = this.modelService.chunkModelsList(currentTwins, 100);
       const bs = new BatchService({
         refresh: () => this.cyRef.current.doLayout(),
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
-        items: currentTwins,
-        action: (twin, resolve, reject) => {
+        items: twinsChunks,
+        action: (twinsList, resolve, reject) => {
           if (this.canceled) {
             resolve();
           }
           apiService
-            .queryRelationshipsPaged(twin.$dtId, async rels => {
+            .queryRelationshipsPaged(twinsList.map(twin => twin.$dtId), async rels => {
               try {
                 if (this.canceled) {
                   resolve();

@@ -55,7 +55,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     print(`Outgoing relationships for ${nodeId}`, "warning");
     let outgoingRelationships = null;
     try {
-      outgoingRelationships = await apiService.queryRelationships(nodeId);
+      outgoingRelationships = await apiService.queryRelationships([ nodeId ]);
     } catch (exc) {
       exc.customMessage = `Error in retrieving outgoing relationships for ${nodeId}`;
       eventService.publishError(exc);
@@ -69,7 +69,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     print(`Incoming relationships for ${nodeId}`, "warning");
     let incomingRelationships = null;
     try {
-      incomingRelationships = await apiService.queryRelationships(nodeId, REL_TYPE_INCOMING);
+      incomingRelationships = await apiService.queryRelationships([ nodeId ], REL_TYPE_INCOMING);
     } catch (exc) {
       exc.customMessage = `Error in retrieving incoming relationships for ${nodeId}`;
       eventService.publishError(exc);
