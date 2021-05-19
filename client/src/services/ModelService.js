@@ -40,7 +40,8 @@ const inferSchema = vertex => {
       type: "Enum",
       values: [ ...schemaEdge.toVertex.getOutgoing("dtmi:dtdl:property:enumValues;2").map(edge => ({
         name: getPropertyName(edge.toVertex),
-        value: edge.toVertex.getAttributeValue("dtmi:dtdl:property:enumValue;2")
+        value: edge.toVertex.getAttributeValue("dtmi:dtdl:property:enumValue;2"),
+        displayName: edge.toVertex.getAttributeValue("dtmi:dtdl:property:displayName;2")
       })) ],
       valueSchema: "string"
     };

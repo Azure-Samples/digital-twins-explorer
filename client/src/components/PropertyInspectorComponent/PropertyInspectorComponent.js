@@ -65,7 +65,12 @@ const reTypeDelta = (properties, delta) => {
 
     if (match && match.schema) {
       d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
-      if (!d.value) {
+      if (d.value) {
+        if (match.schema.type === "Enum") {
+          d.value = match.schema.values.filter(option =>
+            option.displayName ? option.displayName === d.value : option.name === d.value)[0].value;
+        }
+      } else {
         d.op = "remove";
         delete d.value;
       }
@@ -181,6 +186,7 @@ export class PropertyInspectorComponent extends Component {
     const { isLoadingSelection } = this.state;
     if (isLoadingSelection) {
       const schema = selectionType === "twin" ? this.generateSchema() : null;
+      this.setEnumPropertiesValues();
       this.setState({ changed: false, selection, patch, selectionType, schema }, () => {
         if (selection) {
           this.editor.set(this.original);
@@ -191,6 +197,18 @@ export class PropertyInspectorComponent extends Component {
       this.original = this.updated = selection ? selection : null;
       this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
     }
+  }
+
+  setEnumPropertiesValues = () => {
+    Object.getOwnPropertyNames(this.original).forEach(propertyName => {
+      const property = this.properties[propertyName];
+      if (!propertyName.startsWith("$") && property && property.schema.type === "Enum") {
+        if (this.original[propertyName] !== "") {
+          const propertyOption = property.schema.values.filter(option => option.value === this.original[propertyName])[0];
+          this.original[propertyName] = propertyOption.displayName ? propertyOption.displayName : propertyOption.name;
+        }
+      }
+    });
   }
 
   generateSchema = () => {
@@ -213,7 +231,8 @@ export class PropertyInspectorComponent extends Component {
             break;
           case "Enum":
             schema.properties[propertyName] = {
-              "enum": property.schema.values.map(option => option.value)
+              "enum": property.schema.values.map(option =>
+                option.displayName ? option.displayName : option.name)
             };
             break;
           default:
