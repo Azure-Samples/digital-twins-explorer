@@ -202,7 +202,7 @@ export class PropertyInspectorComponent extends Component {
   setEnumPropertiesValues = () => {
     Object.getOwnPropertyNames(this.original).forEach(propertyName => {
       const property = this.properties[propertyName];
-      if (!propertyName.startsWith("$") && property && property.schema.type === "Enum") {
+      if (!propertyName.startsWith("$") && property && property.schema && property.schema.type && property.schema.type === "Enum") {
         if (this.original[propertyName] !== "") {
           const propertyOption = property.schema.values.filter(option => option.value === this.original[propertyName])[0];
           this.original[propertyName] = propertyOption.displayName ? propertyOption.displayName : propertyOption.name;
