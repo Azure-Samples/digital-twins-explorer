@@ -202,13 +202,13 @@ class ApiService {
   async deleteTwinRelationships(twinId, skipIncoming = false) {
     await this.initialize();
 
-    const rels = await this.queryRelationships(twinId, REL_TYPE_OUTGOING);
+    const rels = await this.queryRelationships([ twinId ], REL_TYPE_OUTGOING);
     for (const r of rels) {
       await this.deleteRelationship(twinId, r.$relationshipId);
     }
 
     if (!skipIncoming) {
-      const incRels = await this.queryRelationships(twinId, REL_TYPE_INCOMING);
+      const incRels = await this.queryRelationships([ twinId ], REL_TYPE_INCOMING);
       for (const r of incRels) {
         await this.deleteRelationship(r.$sourceId, r.$relationshipId);
       }
