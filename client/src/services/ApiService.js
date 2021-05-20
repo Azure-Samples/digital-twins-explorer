@@ -119,36 +119,24 @@ class ApiService {
     return await this.client.updateDigitalTwin(twinId, patch);
   }
 
-  async queryRelationshipsPaged(twinId, callback, type = REL_TYPE_OUTGOING) {
+  async queryRelationshipsPaged(twinIds, callback, type = REL_TYPE_OUTGOING) {
     await this.initialize();
 
     const operations = type === REL_TYPE_ALL ? [ REL_TYPE_OUTGOING, REL_TYPE_INCOMING ] : [ type ];
     for (let i = 0; i < operations.length; i++) {
       const op = operations[i];
       const isFinalOp = i === operations.length - 1;
-      const baseOperationName = `list${op === REL_TYPE_INCOMING ? "Incoming" : ""}Relationships`;
-
+      const basePropertyName = op === REL_TYPE_INCOMING ? "$targetId" : "$sourceId";
       let count = 1;
-      for await (const page of this.client[baseOperationName](twinId).byPage()) {
-        print(`Ran query for relationships for twin ${twinId}, page ${count++}:`, "info");
+      const twinIdsList = twinIds.map(twinId => `'${twinId}'`);
+      const query = `SELECT * FROM RELATIONSHIPS r WHERE r.${basePropertyName} IN [${twinIdsList.join(",")}]`;
+      for await (const page of this.client.queryTwins(query).byPage()) {
+        print(`Ran query for relationships for twins ${twinIds}, page ${count++}:`, "info");
         print(JSON.stringify(page, null, 2), "info");
-
-        // The response type for the incoming relationships doesn't match the outgoing call so we'll remap it
-        if (op === REL_TYPE_INCOMING) {
-          page.value.forEach(x => {
-            [ "sourceId", "relationshipId", "relationshipName", "relationshipLink" ]
-              .filter(y => !!x[y])
-              .forEach(y => {
-                x[`$${y}`] = x[y];
-                delete x[y];
-              });
-            x.$targetId = twinId;
-          });
-        }
 
         // Indicate to the caller that we're not done in the case where we are calling multiple operations
         const callbackResponse = [ ...page.value ];
-        if (page.nextLink || !isFinalOp) {
+        if (page.continuationToken || !isFinalOp) {
           callbackResponse.nextLink = true;
         }
 
@@ -157,9 +145,9 @@ class ApiService {
     }
   }
 
-  async queryRelationships(twinId, type = REL_TYPE_OUTGOING) {
+  async queryRelationships(twinIds, type = REL_TYPE_OUTGOING) {
     const list = [];
-    await this.queryRelationshipsPaged(twinId, items => items.forEach(x => list.push(x)), type);
+    await this.queryRelationshipsPaged(twinIds, items => items.forEach(x => list.push(x)), type);
 
     return list;
   }
@@ -214,13 +202,13 @@ class ApiService {
   async deleteTwinRelationships(twinId, skipIncoming = false) {
     await this.initialize();
 
-    const rels = await this.queryRelationships(twinId, REL_TYPE_OUTGOING);
+    const rels = await this.queryRelationships([ twinId ], REL_TYPE_OUTGOING);
     for (const r of rels) {
       await this.deleteRelationship(twinId, r.$relationshipId);
     }
 
     if (!skipIncoming) {
-      const incRels = await this.queryRelationships(twinId, REL_TYPE_INCOMING);
+      const incRels = await this.queryRelationships([ twinId ], REL_TYPE_INCOMING);
       for (const r of incRels) {
         await this.deleteRelationship(r.$sourceId, r.$relationshipId);
       }
@@ -370,30 +358,37 @@ class CachedApiService extends ApiService {
     return await super.deleteRelationship(twinId, relationshipId);
   }
 
-  async queryRelationshipsPaged(twinId, callback, type = REL_TYPE_OUTGOING) {
+  async queryRelationshipsPaged(twinIds, callback, type = REL_TYPE_OUTGOING) {
     if (!settingsService.caching) {
       this.clearCache();
-      await super.queryRelationshipsPaged(twinId, callback, type);
+      await super.queryRelationshipsPaged(twinIds, callback, type);
       return;
     }
 
-    let results = this.cache.relationships[twinId];
-    if (results && results[type]) {
-      callback(results[type]);
-      return;
+    const pendingTwins = [];
+    let relationshipsResult = [];
+    twinIds.forEach(twinId => {
+      const results = this.cache.relationships[twinId];
+      if (results && results[type]) {
+        relationshipsResult = relationshipsResult.concat(results[type]);
+      } else {
+        pendingTwins.push(twinId);
+      }
+
+      if (!results) {
+        this.cache.relationships[twinId] = {};
+      }
+    });
+
+    if (pendingTwins.length > 0) {
+      await super.queryRelationshipsPaged(pendingTwins, items => {
+        items.forEach(x => relationshipsResult.push(x));
+        pendingTwins.forEach(twinId => {
+          this.cache.relationships[twinId][type] = items.filter(item => item.$sourceId === twinId);
+        });
+      }, type);
     }
-
-    if (!results) {
-      this.cache.relationships[twinId] = {};
-    }
-
-    results = [];
-    await super.queryRelationshipsPaged(twinId, async items => {
-      items.forEach(x => results.push(x));
-      await callback(items);
-    }, type);
-
-    this.cache.relationships[twinId][type] = results;
+    await callback(relationshipsResult);
   }
 
   clearCache() {

@@ -24,16 +24,17 @@ export class BatchService {
 
     const promises = [];
     this._count = 0;
+    let completed = 0;
     this.update(0);
 
     for (let i = 0; i < this._items.length; i++) {
       const item = this._items[i];
 
-      if (i % this.refreshSize === 0) {
-        await this.refresh();
-      }
       if (promises.length === this.maxConcurrentQueries) {
         check([ await Promise.race(promises.map(p => p.promise)) ]);
+        if (++completed % this.refreshSize === 0) {
+          await this.refresh();
+        }
       }
 
       const p = {};

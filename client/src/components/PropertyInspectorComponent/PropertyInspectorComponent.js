@@ -4,7 +4,8 @@
 import React, { Component } from "react";
 import { TextField } from "office-ui-fabric-react";
 import { JsonEditor as Editor } from "jsoneditor-react";
-import { applyPatch, compare, deepClone } from "fast-json-patch";
+import { compare, deepClone } from "fast-json-patch";
+import toJsonSchema from "to-json-schema";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { PropertyInspectorCommandBarComponent } from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
@@ -64,7 +65,12 @@ const reTypeDelta = (properties, delta) => {
 
     if (match && match.schema) {
       d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
-      if (d.value === "") {
+      if (d.value) {
+        if (match.schema.type === "Enum") {
+          d.value = match.schema.values.filter(option =>
+            option.displayName ? option.displayName === d.value : option.name === d.value)[0].value;
+        }
+      } else {
         d.op = "remove";
         delete d.value;
       }
@@ -85,7 +91,8 @@ export class PropertyInspectorComponent extends Component {
       changed: false,
       patch: null,
       isLoading: false,
-      isLoadingSelection: false
+      isLoadingSelection: false,
+      schema: null
     };
     this.editorRef = React.createRef();
     this.properties = null;
@@ -175,9 +182,12 @@ export class PropertyInspectorComponent extends Component {
     } else if (selectionType === "relationship") {
       this.original = this.updated = selection ? selection : null;
     }
+
     const { isLoadingSelection } = this.state;
     if (isLoadingSelection) {
-      this.setState({ changed: false, selection, patch, selectionType }, () => {
+      const schema = selectionType === "twin" ? this.generateSchema() : null;
+      this.setEnumPropertiesValues();
+      this.setState({ changed: false, selection, patch, selectionType, schema }, () => {
         if (selection) {
           this.editor.set(this.original);
           this.styleTwinInEditorProperties();
@@ -187,6 +197,49 @@ export class PropertyInspectorComponent extends Component {
       this.original = this.updated = selection ? selection : null;
       this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
     }
+  }
+
+  setEnumPropertiesValues = () => {
+    Object.getOwnPropertyNames(this.original).forEach(propertyName => {
+      const property = this.properties[propertyName];
+      if (!propertyName.startsWith("$") && property && property.schema && property.schema.type && property.schema.type === "Enum") {
+        if (this.original[propertyName] !== "") {
+          const propertyOption = property.schema.values.filter(option => option.value === this.original[propertyName])[0];
+          this.original[propertyName] = propertyOption.displayName ? propertyOption.displayName : propertyOption.name;
+        }
+      }
+    });
+  }
+
+  generateSchema = () => {
+    if (this.properties && this.original) {
+      const schema = toJsonSchema(this.original);
+      this.setObjectPropertiesSchema(this.properties, schema);
+      return schema;
+    }
+
+    return null;
+  }
+
+  setObjectPropertiesSchema = (obj, schema) => {
+    Object.getOwnPropertyNames(obj).forEach(propertyName => {
+      const property = this.properties[propertyName];
+      if (!propertyName.startsWith("$") && property && property.writable) {
+        switch (property.schema.type) {
+          case "Object":
+            this.setObjectPropertiesSchema(property.schema, schema.properties[propertyName]);
+            break;
+          case "Enum":
+            schema.properties[propertyName] = {
+              "enum": property.schema.values.map(option =>
+                option.displayName ? option.displayName : option.name)
+            };
+            break;
+          default:
+            break;
+        }
+      }
+    });
   }
 
   styleTwinInEditorProperties = () => {
@@ -309,9 +362,7 @@ export class PropertyInspectorComponent extends Component {
       const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x =>
         deltaFromDefaults.some(y => y.path === x.path)
           || deltaFromDefaults.some(y => y.path.startsWith(`${x.path}/`))));
-      const modelService = new ModelService();
       try {
-        modelService.validateTwinPatch(this.properties, delta);
         this.setState({ patch: delta });
         const patch = JSON.stringify(delta, null, 2);
         print("*** PI Changes:", "info");
@@ -319,8 +370,8 @@ export class PropertyInspectorComponent extends Component {
         if (patch.length > 0) {
           await this.patchTwin(delta);
 
-          const { newDocument } = applyPatch(this.original, delta, false, false);
-          this.setContent(newDocument, selectionType, delta);
+          const newData = await apiService.getTwinById(this.original.$dtId);
+          this.setContent(newData, selectionType, delta);
 
           this.showModal();
           this.setState({ changed: false });
@@ -345,7 +396,7 @@ export class PropertyInspectorComponent extends Component {
   onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null
 
   render() {
-    const { showModal, selection, changed, patch, isLoading, selectionType } = this.state;
+    const { showModal, selection, changed, patch, isLoading, selectionType, schema } = this.state;
     return (
       <div className="pi-gridWrapper">
         <div className="pi-grid">
@@ -362,6 +413,7 @@ export class PropertyInspectorComponent extends Component {
           <div className="pi-editor">
             {selection && <Editor
               ref={this.editorRef}
+              schema={schema}
               mainMenuBar={false}
               enableTransform={false}
               enableSort={false}

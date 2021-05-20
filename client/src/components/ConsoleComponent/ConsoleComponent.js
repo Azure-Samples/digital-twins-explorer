@@ -117,7 +117,7 @@ export class ConsoleComponent extends Component {
   getRelationships = async (arg1, type) => {
     if (arg1) {
       try {
-        const edgeList = await apiService.queryRelationships(arg1, type);
+        const edgeList = await apiService.queryRelationships([ arg1 ], type);
         if (edgeList !== null) {
           if (edgeList.length <= 0) {
             this.pushToStdout(`*** No relationships found.`);
