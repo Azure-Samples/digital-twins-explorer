@@ -39,7 +39,8 @@ const applyDefaultValues = (properties, selection) => {
       continue;
     }
 
-    if (selection[p]) {
+    // eslint-disable-next-line no-undefined
+    if (selection[p] !== null && selection[p] !== undefined) {
       continue;
     }
 
@@ -64,8 +65,24 @@ const reTypeDelta = (properties, delta) => {
     }
 
     if (match && match.schema) {
-      d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
-      if (d.value) {
+      let isRemoveOp = false;
+
+      if (d.value === null) {
+        isRemoveOp = true;
+      } else {
+        d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
+      }
+
+      if (([ "dtmi:dtdl:instance:Schema:string;2", "string" ].includes(match.schema))) {
+        if (d.value === null) {
+          isRemoveOp = true;
+        }
+      } else if (d.value === null || d.value === "") {
+        isRemoveOp = true;
+      }
+
+      // eslint-disable-next-line no-negated-condition
+      if (!isRemoveOp) {
         if (match.schema.type === "Enum") {
           d.value = match.schema.values.filter(option =>
             option.displayName ? option.displayName === d.value : option.name === d.value)[0].value;
