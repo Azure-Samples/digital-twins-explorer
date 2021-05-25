@@ -12,13 +12,13 @@ urlFragment: digital-twins-explorer
 
 # Azure Digital Twins Explorer
 
-**Azure Digital Twins Explorer** is a tool for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance, and visualize and interact with its data.
+**Azure Digital Twins Explorer** is a developer tool for the [Azure Digital Twins service](https://docs.microsoft.com/azure/digital-twins/overview). It lets you connect to an Azure Digital Twins instance to understand, visualize and modify your digital twin data.
 
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/main/media/digital-twins-explorer.png" alt="Image of digital-twins-explorer"/>
 
-Azure Digital Twins Explorer is written as a single-page JavaScript application. This repository holds the code for the hosted version of Azure Digital Twins Explorer, which is accessible through the [Azure portal](https://portal.azure.com). You can also run the application locally as a node.js application.
+Azure Digital Twins Explorer is written as a single-page JavaScript application. This repository holds the code for the hosted version of Azure Digital Twins Explorer, which is accessible through the [Azure portal](https://portal.azure.com) and at [explorer.digitaltwins.azure.net](explorer.digitaltwins.azure.net). You can also run the application locally as a node.js application.
 
-This README includes:
+This README contains information and guidance specific to hosting this codebase locally, including:
 * [Instructions to run the sample locally](#run-azure-digital-twins-explorer-locally)
 * [Instructions to run the sample as a Docker application](#run-azure-digital-twins-explorer-with-docker)
 * [Sign in information for the first run of the sample](#sign-in-on-first-run)
@@ -26,9 +26,11 @@ This README includes:
 * [Extensibility points](#extensibility-points)
 * [Services](#services)
 
-For general documentation on the Azure Digital Twins Explorer tool, and for specific instructions on how to use each of its features, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview): 
+For general documentation on the Azure Digital Twins Explorer features for both the hosted version and local codebase, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview): 
 * Concepts: Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
 * How-to: Use Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
+
+
 
 Azure Digital Twins Explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
