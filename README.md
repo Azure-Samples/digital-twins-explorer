@@ -26,9 +26,9 @@ This README includes:
 * [Extensibility points](#extensibility-points)
 * [Services](#services)
 
-For general documentation on the Azure Digital Twins Explorer tool, and for specific instructions on how to use each of its features, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview):
-* [Concepts: Azure Digital Twins Explorer](https://docs.microsoft.com/azure/digital-twins/concepts-azure-digital-twins-explorer)
-* [How-to: Use Azure Digital Twins Explorer](https://docs.microsoft.com/azure/digital-twins/how-to-use-azure-digital-twins-explorer)
+For general documentation on the Azure Digital Twins Explorer tool, and for specific instructions on how to use each of its features, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview): 
+* Concepts: Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
+* How-to: Use Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
 
 Azure Digital Twins Explorer is licensed under the MIT license. Please see the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
