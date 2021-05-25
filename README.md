@@ -25,7 +25,6 @@ This README includes:
 * [Experimental features](#experimental-features)
 * [Extensibility points](#extensibility-points)
 * [Services](#services)
-* [Known limitations](#known-limitations)
 
 For general documentation on the Azure Digital Twins Explorer tool, and for specific instructions on how to use each of its features, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview):
 * [Concepts: Azure Digital Twins Explorer](https://docs.microsoft.com/azure/digital-twins/concepts-azure-digital-twins-explorer)
@@ -80,7 +79,7 @@ To change the instance URL to connect to another instance of Azure Digital Twins
  
 ## Experimental features
 
-In addition to local operation, you can also run digital-twins-explorer as a cloud application. In the cloud, you can use push notifications from Azure Digital Twins, sent via the Azure SignalR service, to update your digital-twins-explorer in real time.
+In addition to local operation, you can also run Azure Digital Twins Explorer as a cloud application. In the cloud, you can use push notifications from Azure Digital Twins, sent via the Azure SignalR service, to update your digital-twins-explorer in real time.
 
 ### Running in the cloud
 
@@ -190,8 +189,3 @@ When running in the cloud, Azure Functions hosts three services to support the f
 1. EventGrid: this receives messages from the Event Grid to broadcasts them to any listening clients using SignalR. The messages are sent from Azure Digital Twins to the function via Azure Digital Twins endpoint and route.
 
 > NOTE: If you have hosting the application somewhere other than Azure Functions. Then we recommend you add the Content Security Policy to you environment as defined in the `proxies.json` file.
-
- ## Known limitations
-
-* Azure Digital Twins Explorer does not currently handle complex properties or components defined in twins well. You can create or visualize twins using these features, but you may not be able to view or edit their properties
-* The display of patches in the property inspector is not always correct if you perform multiple patches in a sequence. The changes should be correctly applied to the service twin, though.
