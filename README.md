@@ -27,8 +27,8 @@ This README contains information and guidance specific to hosting this codebase 
 * [Services](#services)
 
 For general documentation on the Azure Digital Twins Explorer features for both the hosted version and local codebase, see the [Azure Digital Twins documentation](https://docs.microsoft.com/azure/digital-twins/overview): 
-* Concepts: Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
-* How-to: Use Azure Digital Twins Explorer [COMING SOON BY 5/26/21]
+* [Concepts: Azure Digital Twins Explorer](https://docs.microsoft.com/azure/digital-twins/concepts-azure-digital-twins-explorer)
+* [How-to: Use Azure Digital Twins Explorer](https://docs.microsoft.com/azure/digital-twins/how-to-use-azure-digital-twins-explorer)
 
 
 
