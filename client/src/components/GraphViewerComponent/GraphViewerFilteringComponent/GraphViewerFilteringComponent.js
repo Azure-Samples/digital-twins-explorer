@@ -42,7 +42,7 @@ const GraphViewerFilteringComponent = ({
         </div>
         <div className="controls_singleButton">
           <IconButton
-            iconProps={{ iconName: "FitPage" }}
+            iconProps={{ iconName: "SetToCenter" }}
             title="Center"
             ariaLabel="Center"
             onClick={onCenter}

@@ -41,7 +41,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModelsDirectory",
       text: "Upload a directory of Models",
-      iconProps: { iconName: "BulkUpload" },
+      iconProps: { iconName: "BulkUploadFolder" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,
       className: this.buttonClass
