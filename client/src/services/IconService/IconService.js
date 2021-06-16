@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 import { initializeIcons, registerIcons } from "office-ui-fabric-react";
 import { ReactComponent as BulkUploadFolder } from '../../assets/BulkUploadFolder.svg';
 import { ReactComponent as ExpansionDirection } from '../../assets/ExpansionDirection.svg';
@@ -14,22 +13,20 @@ const initIcons = () => {
     const iconStyles = {
         width: '16px',
         height: '16px',
-    }
+    };
 
     const customIcons = {
         icons: {
             'BulkUploadFolder': <BulkUploadFolder className="ms-Button-icon iconBlue" style={iconStyles} />,
             'ExpansionDirection': <ExpansionDirection className="ms-Button-icon iconWhite" style={iconStyles} />,
-            'ExpansionLevel': <ExpansionLevel className="ms-Button-icon iconWhite" style={iconStyles}/>,
+            'ExpansionLevel': <ExpansionLevel className="ms-Button-icon iconWhite" style={iconStyles} />,
             'SetToCenter': <SetToCenter className="ms-Button-icon" style={iconStyles} />,
             'ChooseLayout': <ChooseLayout className="ms-Button-icon iconWhite" style={iconStyles} />
         }
-    }
+    };
 
     // Register custom icons to fabric
     registerIcons(customIcons);
-}
+};
 
 export default initIcons;
-
-
