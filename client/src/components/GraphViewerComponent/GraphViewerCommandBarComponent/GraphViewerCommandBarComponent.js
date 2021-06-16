@@ -43,7 +43,7 @@ export class GraphViewerCommandBarComponent extends Component {
   buttonGroupItems = [
     {
       key: "exportGraph",
-      text: "Export Graph",
+      text: "Export graph",
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.onExportGraphClicked(),
       iconOnly: true,
@@ -52,7 +52,7 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "importGraph",
-      text: "Import Graph",
+      text: "Import graph",
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
@@ -120,7 +120,7 @@ export class GraphViewerCommandBarComponent extends Component {
   expansionLevelItems = [
     {
       key: "expansionLevel",
-      text: "Expansion Level",
+      text: "Expansion level",
       ariaLabel: "Select number of layers to expand",
       iconProps: { iconName: "Org" },
       className: this.buttonClass,

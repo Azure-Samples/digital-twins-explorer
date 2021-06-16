@@ -55,7 +55,7 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
                 title="Delete Model" ariaLabel="Delete Model"
                 className="mv-loadButtons" onClick={onDelete} />
               <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
-                title="Upload Model Image" ariaLabel="Upload Model Image"
+                title="Upload Model image" ariaLabel="Upload Model image"
                 className="mv-loadButtons" onClick={onHandleModelImage} />
               <IconButton iconProps={{ iconName: "Info" }} id={item.key}
                 title="View Model" ariaLabel="View Model"
