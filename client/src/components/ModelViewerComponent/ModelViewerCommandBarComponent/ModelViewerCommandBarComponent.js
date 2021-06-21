@@ -16,16 +16,16 @@ export class ModelViewerCommandBarComponent extends Component {
   farItems = [
     {
       key: "uploadModelImages",
-      text: "Upload Model Images",
-      iconProps: { iconName: "ImageSearch" },
+      text: "Upload Model images",
+      iconProps: { iconName: "Photo2Add" },
       onClick: () => this.props.onUploadModelImagesClicked(),
       iconOnly: true,
       className: this.buttonClass
     },
     {
       key: "downloadModels",
-      text: "Download Models",
-      iconProps: { iconName: "CloudDownload" },
+      text: "Refresh Models",
+      iconProps: { iconName: "Refresh" },
       onClick: () => this.props.onDownloadModelsClicked(),
       iconOnly: true,
       className: this.buttonClass
@@ -33,7 +33,7 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModel",
       text: "Upload a Model",
-      iconProps: { iconName: "CloudUpload" },
+      iconProps: { iconName: "Upload" },
       onClick: () => this.props.onUploadModelClicked(),
       iconOnly: true,
       className: this.buttonClass
@@ -41,14 +41,14 @@ export class ModelViewerCommandBarComponent extends Component {
     {
       key: "uploadModelsDirectory",
       text: "Upload a directory of Models",
-      iconProps: { iconName: "DocumentSet" },
+      iconProps: { iconName: "BulkUploadFolder" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,
       className: this.buttonClass
     },
     {
       key: "deleteModels",
-      text: "Delete All Models",
+      text: "Delete all Models",
       ariaLabel: "delete all models",
       iconProps: { iconName: "Delete" },
       onClick: () => this.delete.current.open(),

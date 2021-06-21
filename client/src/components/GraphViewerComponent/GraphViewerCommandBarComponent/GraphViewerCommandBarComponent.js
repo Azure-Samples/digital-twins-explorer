@@ -43,7 +43,7 @@ export class GraphViewerCommandBarComponent extends Component {
   buttonGroupItems = [
     {
       key: "exportGraph",
-      text: "Export Graph",
+      text: "Export graph",
       iconProps: { iconName: "CloudDownload" },
       onClick: () => this.onExportGraphClicked(),
       iconOnly: true,
@@ -52,7 +52,7 @@ export class GraphViewerCommandBarComponent extends Component {
     },
     {
       key: "importGraph",
-      text: "Import Graph",
+      text: "Import graph",
       iconProps: { iconName: "CloudUpload" },
       onClick: () => this.importModelRef.current.click(),
       iconOnly: true,
@@ -83,10 +83,10 @@ export class GraphViewerCommandBarComponent extends Component {
   expansionModeItems = [
     {
       key: "expansionMode",
-      text: "Expansion Mode",
-      ariaLabel: "select expansion mode",
+      text: "Expansion direction",
+      ariaLabel: "select expansion direction",
       iconOnly: true,
-      iconProps: { iconName: "ModelingView" },
+      iconProps: { iconName: "ExpansionDirection" },
       className: `${this.buttonClass} command-bar-dropdown`,
       style: dropdownButtonStyles,
       subMenuProps: {
@@ -120,9 +120,9 @@ export class GraphViewerCommandBarComponent extends Component {
   expansionLevelItems = [
     {
       key: "expansionLevel",
-      text: "Expansion Level",
+      text: "Expansion level",
       ariaLabel: "Select number of layers to expand",
-      iconProps: { iconName: "Org" },
+      iconProps: { iconName: "ExpansionLevel" },
       className: this.buttonClass,
       iconOnly: true,
       style: singleButtonStyles
@@ -132,10 +132,10 @@ export class GraphViewerCommandBarComponent extends Component {
   layoutItems = [
     {
       key: "relayout",
-      text: "Run Layout",
-      ariaLabel: "run layout",
+      text: "Choose layout",
+      ariaLabel: "choose layout",
       iconOnly: true,
-      iconProps: { iconName: "ArrangeSendToBack" },
+      iconProps: { iconName: "ChooseLayout" },
       onClick: () => this.props.onLayoutClicked(),
       className: this.buttonClass,
       subMenuProps: {},
@@ -145,7 +145,7 @@ export class GraphViewerCommandBarComponent extends Component {
 
   renderRelationshipExpansionItem = () => (
     <div className="expansion-level-option">
-      <Icon iconName="Org" />
+      <Icon iconName="ExpansionLevel" />
       <TextField id="relExpansionLevelField"
         className="command-bar-input configuration-input numeric-input" value={this.state.relExpansionLevel}
         onChange={this.onExpansionLevelChange} type="number" min="1" max="5" />

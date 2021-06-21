@@ -1,0 +1,13 @@
+// Apply color change to custom icons when parent ms-Button is hovered
+.ms-Button:hover .ms-Button-icon{
+    &.iconBlue{
+        path {
+            fill: #106ebe;
+        }
+    }
+     &.iconWhite{
+        path {
+            fill: #ffffff;
+        }
+    }
+}
