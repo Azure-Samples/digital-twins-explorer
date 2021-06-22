@@ -33,7 +33,7 @@
         },
         "deleteTwins": {
             "ariaLabel": "delete all twins",
-            "text": "Delete All Twins"
+            "text": "Delete all Twins"
         },
         "signIn": {
             "ariaLabel": "azure digital twins url",
@@ -68,17 +68,17 @@
             "exportGraph": "Export Graph",
             "importGraph": "Import Graph",
             "showRelationships": {
-                "text": "Show All Relationships",
+                "text": "Show all relationships",
                 "ariaLabel": "show all relationships"
             },
-            "showTwins": "Show All"
+            "showTwins": "Show all"
         },
         "expansionLevelItems": {
             "ariaLabel": "Select number of layers to expand",
-            "text": "Expansion Level"
+            "text": "Expansion level"
         },
         "expansionModeItems": {
-            "text": "Expansion Mode",
+            "text": "Expansion mode",
             "ariaLabel": "select expansion mode",
             "subMenuProps": {
                 "REL_TYPE_ALL": "In/Out",
@@ -88,7 +88,7 @@
         },
         "layoutItems": {
             "ariaLabel": "run layout",
-            "text": "Run Layout"
+            "text": "Run layout"
         },
         "render": {
             "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
@@ -112,7 +112,7 @@
     "graphViewerTermManagementComponent": {
         "menuItems": {
             "ariaLabel": "add outgoing relationships",
-            "text": "Add Outgoing Relationships"
+            "text": "Add outgoing relationships"
         },
         "toggleTermsOptions": "toggle term options menu",
         "removeFiltering": "remove filtering term",
@@ -124,7 +124,7 @@
     },
     "modelGraphViewerCommandBarComponent": {
         "layoutItems": {
-            "text": "Run Layout",
+            "text": "Run layout",
             "ariaLabel": "run layout"
         },
         "render": {
@@ -153,15 +153,15 @@
     "modelGraphViewerTermManagementComponent":{
         "menuItems": {
             "superTypes": {
-                "text": "Add Supertype",
+                "text": "Add supertype",
                 "ariaLabel": "add supertype"
             },
             "addSubTypes": {
-                "text": "Add Subtypes",
+                "text": "Add subtypes",
                 "ariaLabel": "add subtypes"
             },
             "addOutgoingRelationships": {
-                "text": "Add Outgoing Targets",
+                "text": "Add outgoing targets",
                 "ariaLabel": "add outgoing targets"
             },
             "matchDtmi": {
@@ -169,7 +169,7 @@
                 "ariaLabel": "match dtmi"
             },
             "matchDisplayName": {
-                "text": "Match Display Name",
+                "text": "Match display name",
                 "ariaLabel": "match display name"
             }
         },
@@ -179,7 +179,7 @@
     "modelViewerCommandBarComponent": {
         "farItems": {
             "deleteModels": {
-                "text":"Delete All Models"
+                "text":"Delete all Models"
             },
             "downloadModels": {
                 "text":"Download Models",
@@ -192,7 +192,7 @@
                 "text":"Upload a directory of Models"
             },
             "uploadModelImages": {
-                "text":"Upload Model Images"
+                "text":"Upload Model images"
             }
         },
         "render": {
@@ -202,7 +202,7 @@
     },
     "modelViewerCreateComponent": {
         "cancelButton": "Cancel",
-        "heading": "New Twin Name",
+        "heading": "New Twin name",
         "saveButton": "Save"
     },
     "modelViewerDeleteComponent" : {
@@ -212,7 +212,7 @@
     },
     "modelViewerItem": {
         "deleteModel": "Delete Model",
-        "uploadModelImage": "Upload Model Image",
+        "uploadModelImage": "Upload Model image",
         "viewModel": "View Model",
         "createTwin": "Create a Twin"
     },
@@ -220,7 +220,7 @@
         "farItems": {
             "createTwin": "Create a Twin",
             "deleteModels": "Delete Model",
-            "uploadModel": "Upload Model Image",
+            "uploadModel": "Upload Model image",
             "viewModel": "View Model"
         },
         "ariaLabel":"Use left and right arrow keys to navigate between commands"
