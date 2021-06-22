@@ -3,6 +3,7 @@
 
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react/lib/";
+import { withTranslation } from "react-i18next";
 
 import { ConfigurationFormComponent } from "../ConfigurationFormComponent/ConfigurationFormComponent";
 import { PreferencesFormComponent } from "../PreferencesFormComponent/PreferencesFormComponent";
@@ -11,18 +12,31 @@ import { eventService } from "../../services/EventService";
 import DeleteAllTwinsComponent from "./DeleteAllTwinsComponent/DeleteAllTwinsComponent";
 
 import "./AppCommandBar.scss";
+import { KeyboardShortcutsComponents } from "../KeyboardShortcutsComponents/KeyboardShortcutsComponents";
 
-export class AppCommandBar extends Component {
+class AppCommandBar extends Component {
 
   constructor(props) {
     super(props);
     this.delete = React.createRef();
+    this.configure = React.createRef();
+    this.preferences = React.createRef();
+    this.keyboard = React.createRef();
     this.state = {
       farItems: [
         {
+          key: "keyboardShortcuts",
+          text: this.props.t("appCommandBar.keyboardShortcuts.text"),
+          ariaLabel: this.props.t("appCommandBar.keyboardShortcuts.ariaLabel"),
+          iconProps: { iconName: "KeyboardClassic" },
+          onClick: () => this.keyboard.current.open(),
+          iconOnly: true,
+          className: "app-toolbarButtons"
+        },
+        {
           key: "deleteTwins",
-          text: "Delete All Twins",
-          ariaLabel: "delete all twins",
+          text: this.props.t("appCommandBar.deleteTwins.text"),
+          ariaLabel: this.props.t("appCommandBar.deleteTwins.ariaLabel"),
           iconProps: { iconName: "Delete" },
           onClick: () => this.delete.current.open(),
           iconOnly: true,
@@ -30,8 +44,8 @@ export class AppCommandBar extends Component {
         },
         {
           key: "signIn",
-          text: "Azure Digital Twins URL",
-          ariaLabel: "azure digital twins url",
+          text: this.props.t("appCommandBar.signIn.text"),
+          ariaLabel: this.props.t("appCommandBar.signIn.ariaLabel"),
           iconOnly: true,
           iconProps: { iconName: "Signin" },
           split: true,
@@ -40,8 +54,8 @@ export class AppCommandBar extends Component {
         },
         {
           key: "settings",
-          text: "Settings",
-          ariaLabel: "settings",
+          text: this.props.t("appCommandBar.settings.text"),
+          ariaLabel: this.props.t("appCommandBar.settings.ariaLabel"),
           iconOnly: true,
           iconProps: { iconName: "Settings" },
           onClick: () => this.togglePreferencesModal(),
@@ -54,7 +68,7 @@ export class AppCommandBar extends Component {
   updateAdtUrlSettings = async () => {
     try {
       const { appAdtUrl } = await configService.getConfig();
-      await eventService.publishConfigure({ type: "start", appAdtUrl });
+      this.configure.current.loadConfigurationSettings({ type: "start", appAdtUrl });
     } catch (exc) {
       if (exc.errorCode !== "user_cancelled") {
         exc.customMessage = "Error on saving settings";
@@ -64,7 +78,7 @@ export class AppCommandBar extends Component {
   }
 
   togglePreferencesModal = () => {
-    eventService.publishPreferences();
+    this.preferences.current.loadExistingSettings();
   }
 
   render() {
@@ -73,15 +87,21 @@ export class AppCommandBar extends Component {
       <div className="app-commandbar-container">
         <CommandBar
           farItems={farItems}
-          ariaLabel="Use left and right arrow keys to navigate between commands"
+          ariaLabel={this.props.t("appCommandBar.commandBar.ariaLabel")}
           className="app-commandbar" />
-        <ConfigurationFormComponent />
-        <PreferencesFormComponent
+        <ConfigurationFormComponent t={this.props.t} ref={this.configure} />
+        <PreferencesFormComponent ref={this.preferences}
+          toggleHighContrastMode={this.props.toggleHighContrastMode}
           toggleOptionalComponent={this.props.toggleOptionalComponent}
-          optionalComponentsState={this.props.optionalComponentsState} />
-        <DeleteAllTwinsComponent ref={this.delete} />
+          optionalComponentsState={this.props.optionalComponentsState}
+          contrast={this.props.contrast}
+          t={this.props.t} />
+        <DeleteAllTwinsComponent ref={this.delete} t={this.props.t} />
+        <KeyboardShortcutsComponents ref={this.keyboard} t={this.props.t} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(AppCommandBar);

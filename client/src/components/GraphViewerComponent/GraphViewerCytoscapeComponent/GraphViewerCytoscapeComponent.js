@@ -20,6 +20,8 @@ export const GraphViewerCytoscapeLayouts = {
   "fCoSE": fcoseOptions,
   "Klay": klayOptions
 };
+const SPACE_KEY_CODE = 32;
+const ENTER_KEY_CODE = 13;
 
 export class GraphViewerCytoscapeComponent extends React.Component {
 
@@ -36,17 +38,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.isFetchingTwinData = false;
     this.canRenderPopper = false;
     this.contextMenuIsOpen = false;
+    this.contextNode = null;
+    this.contextEdge = null;
     this.contextMenuItems = [
-      {
-        id: "header-1",
-        content: "Hide:",
-        selector: "node, edge",
-        disabled: true,
-        onClickFunction: e => {
-          e.preventDefault();
-        },
-        hasTrailingDivider: true
-      },
       {
         id: "hide-edge",
         content: "Hide relationship",
@@ -67,17 +61,28 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         selector: "node",
         onClickFunction: e => {
           this.props.onHide();
-          this.hideSelectedTwins(e);
+          if (e) {
+            const { target: node } = e;
+            this.hideSelectedTwins(node.id());
+          } else if (this.contextNode) {
+            this.hideSelectedTwins(this.contextNode);
+          }
         },
         hasTrailingDivider: true
       },
       {
         id: "hide-selected-with-children",
-        content: "Hide selected + Children",
+        content: "Hide selected + children",
         selector: "node",
         onClickFunction: e => {
           this.props.onHideWithChildren();
-          this.hideWithChildren(e);
+          if (e) {
+            const { target: node } = e;
+            this.hideWithChildren(node);
+          } else if (this.contextNode) {
+            const node = this.graphControl.$id(this.contextNode);
+            this.hideWithChildren(node);
+          }
         },
         hasTrailingDivider: true
       },
@@ -87,27 +92,28 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         selector: "node",
         onClickFunction: e => {
           this.props.onHideOthers();
-          this.hideOtherTwins(e);
+          if (e) {
+            const { target: node } = e;
+            this.hideOtherTwins(node.id());
+          } else if (this.contextNode) {
+            this.hideOtherTwins(this.contextNode);
+          }
         },
         hasTrailingDivider: true
       },
       {
         id: "hide-non-children",
-        content: "Hide non children",
+        content: "Hide non-children",
         selector: "node",
         onClickFunction: e => {
           this.props.onHideNonChildren();
-          this.hideNonChildren(e);
-        },
-        hasTrailingDivider: true
-      },
-      {
-        id: "header-2",
-        content: "Options:",
-        selector: "node, edge",
-        disabled: true,
-        onClickFunction: e => {
-          e.preventDefault();
+          if (e) {
+            const { target: node } = e;
+            this.hideNonChildren(node);
+          } else if (this.contextNode) {
+            const node = this.graphControl.$id(this.contextNode);
+            this.hideNonChildren(node);
+          }
         },
         hasTrailingDivider: true
       },
@@ -115,8 +121,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         id: "delete-edge",
         content: "Delete relationship(s)",
         selector: "edge",
-        onClickFunction: () => {
-          this.props.onConfirmRelationshipDelete();
+        onClickFunction: e => {
+          if (e) {
+            const { target: edge } = e;
+            this.props.onConfirmRelationshipDelete(edge);
+          } else if (this.contextNode) {
+            const edge = this.graphControl.$id(this.contextEdge);
+            this.props.onConfirmRelationshipDelete(edge);
+          }
         },
         hasTrailingDivider: true
       },
@@ -125,7 +137,13 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         content: "Delete twin(s)",
         selector: "node",
         onClickFunction: e => {
-          this.props.onConfirmTwinDelete(e);
+          if (e) {
+            const { target: node } = e;
+            this.props.onConfirmTwinDelete(node);
+          } else if (this.contextNode) {
+            const node = this.graphControl.$id(this.contextNode);
+            this.props.onConfirmTwinDelete(node);
+          }
         },
         hasTrailingDivider: true
       },
@@ -134,7 +152,13 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         content: "Get relationships",
         selector: "node",
         onClickFunction: e => {
-          this.props.onGetRelationships(e);
+          if (e) {
+            const { target: node } = e;
+            this.props.onGetRelationships(node);
+          } else if (this.contextNode) {
+            const node = this.graphControl.$id(this.contextNode);
+            this.props.onGetRelationships(node);
+          }
         },
         hasTrailingDivider: true
       },
@@ -188,7 +212,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  hideSelectedTwins = ({ target: node }) => {
+  hideSelectedTwins = nodeId => {
     const cy = this.graphControl;
     if (this.selectedNodes.length > 0) {
       this.selectedNodes.forEach(x => {
@@ -196,8 +220,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       });
       cy.$(":selected").unselect();
       this.clearSelection();
-    } else if (node && node.id()) {
-      cy.$id(node.id()).toggleClass("hide", true);
+    } else if (nodeId) {
+      cy.$id(nodeId).toggleClass("hide", true);
     }
   }
 
@@ -207,24 +231,24 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  hideOtherTwins = ({ target: node }) => {
+  hideOtherTwins = nodeId => {
     const cy = this.graphControl;
     if (this.selectedNodes.length > 0) {
       cy.nodes().forEach(currentNode => {
-        if (this.selectedNodes.filter(n => n.id === currentNode.id()).length === 0 && currentNode.id() !== node.id()) {
+        if (this.selectedNodes.filter(n => n.id === currentNode.id()).length === 0 && currentNode.id() !== nodeId) {
           cy.$id(currentNode.id()).toggleClass("hide", true);
         }
       });
-    } else if (node && node.id()) {
+    } else if (nodeId) {
       cy.nodes().forEach(currentNode => {
-        if (currentNode.id() !== node.id()) {
+        if (currentNode.id() !== nodeId) {
           cy.$id(currentNode.id()).toggleClass("hide", true);
         }
       });
     }
   }
 
-  hideNonChildren = ({ target: node }) => {
+  hideNonChildren = node => {
     const cy = this.graphControl;
     let relatedNodesIds = [];
     if (this.selectedNodes.length > 0) {
@@ -256,7 +280,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     return relatedNodesIds;
   }
 
-  hideWithChildren = ({ target: node }) => {
+  hideWithChildren = node => {
     const cy = this.graphControl;
     let relatedNodesIds = [];
     if (this.selectedNodes.length > 0) {
@@ -268,7 +292,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
     cy.nodes().forEach(cyNode => {
       if (relatedNodesIds.indexOf(cyNode.id()) !== -1) {
-        cy.$id(cyNode.id()).toggleClass("hide", true);
+        cyNode.toggleClass("hide", true);
       }
     });
     this.selectedNodes = [];
@@ -353,6 +377,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.nodes().forEach(cyNode => {
       cy.$id(cyNode.id()).toggleClass("opaque", false);
       cy.$id(cyNode.id()).toggleClass("highlighted", false);
+      cy.$id(cyNode.id()).toggleClass("selected", false);
     });
     cy.edges().forEach(cyEdge => {
       cy.$id(cyEdge.id()).toggleClass("opaque", false);
@@ -506,7 +531,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         const node = cy.elements(`node[id="${id}"]`);
         if (node) {
           this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
-          cy.$id(node.data().id).toggleClass("highlighted", true);
+          cy.$id(node.data().id).toggleClass("selected", true);
           cy.$id(node.data().id).toggleClass("opaque", false);
           node.connectedEdges().forEach(edge => {
             const relatedNodeId = node.id() === edge.data().source ? edge.data().target : edge.data().source;
@@ -517,6 +542,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           });
         }
       });
+    } else {
+      this.clearSelection();
     }
   }
 
@@ -527,9 +554,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         cy.$id(getUniqueRelationshipId(rel)).toggleClass("highlighted", true);
         cy.$id(getUniqueRelationshipId(rel)).toggleClass("opaque", false);
       });
-    }
-    if (this.selectedNodes.length === 0) {
-      this.clearSelection();
     }
   }
 
@@ -561,16 +585,61 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   onNodeRightClick = ({ target: node }) => {
-    this.setState({ hideContextMenu: false });
-    this.contextMenuIsOpen = true;
-    this.onNodeUnhover();
-    if (this.selectedNodes.length === 1 && this.selectedNodes[0].id !== node.id()) {
-      this.contextMenu.showMenuItem("add-relationship");
-    } else if (this.selectedNodes.length === 2 && this.selectedNodes.filter(n => n.id === node.id()).length === 1) {
-      this.contextMenu.showMenuItem("add-relationship");
-    } else {
-      this.contextMenu.hideMenuItem("add-relationship");
+    this.setContextMenuState(node.id());
+  }
+
+  setContextMenuState = nodeId => {
+    this.setState({ hideContextMenu: false }, () => {
+      this.contextMenuIsOpen = true;
+      this.onNodeUnhover();
+      if (nodeId) {
+        if (this.selectedNodes.length === 1 && this.selectedNodes[0].id !== nodeId) {
+          this.contextMenu.showMenuItem("add-relationship");
+        } else if (this.selectedNodes.length === 2 && this.selectedNodes.filter(n => n.id === nodeId).length === 1) {
+          this.contextMenu.showMenuItem("add-relationship");
+        } else {
+          this.contextMenu.hideMenuItem("add-relationship");
+        }
+      }
+    });
+  }
+
+  focusContextMenu = () => {
+    const contextMenuEl = document.getElementsByClassName("custom-context-menu")[0];
+    const availableMenuItems = Array.from(contextMenuEl.querySelectorAll(".custom-menu-item")).filter(item => !item.disabled && item.style.display !== "none");
+    const focusBackAndClearHandlers = () => {
+      this.props.onFocusBackToTwinViewer();
+      availableMenuItems.forEach(item => {
+        item.removeEventListener("keydown", handler);
+      });
+      this.contextNode = null;
+      this.contextEdge = null;
+      this.contextMenu = this.graphControl.contextMenus({
+        menuItems: this.contextMenuItems,
+        menuItemClasses: [ "custom-menu-item" ],
+        contextMenuClasses: [ "custom-context-menu" ]
+      });
+    };
+    const handler = e => {
+      if (e.keyCode === SPACE_KEY_CODE) {
+        e.preventDefault();
+        focusBackAndClearHandlers();
+      } else if (e.keyCode === ENTER_KEY_CODE) {
+        e.preventDefault();
+        e.target.click();
+        focusBackAndClearHandlers();
+      }
+    };
+    if (availableMenuItems[0]) {
+      availableMenuItems[0].focus();
+      availableMenuItems.forEach(item => {
+        item.addEventListener("keydown", handler);
+      });
     }
+    availableMenuItems[availableMenuItems.length - 1].addEventListener("keydown", e => {
+      e.preventDefault();
+      availableMenuItems[0].focus();
+    });
   }
 
   getContents = (properties, relationships) => {
@@ -818,8 +887,60 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.edges().toggleClass("opaque", false);
     cy.nodes().forEach(cyNode => {
       cy.$id(cyNode.id()).toggleClass("highlighted", false);
+      cy.$id(cyNode.id()).toggleClass("selected", false);
       cy.$id(cyNode.id()).toggleClass("opaque", false);
     });
+  }
+
+  emitNodeEvent = (nodeId, event) => {
+    this.graphControl.$id(nodeId).emit(event);
+  }
+
+  rightClickEdge = edgeId => {
+    this.graphControl.$id(edgeId).emit("cxttap");
+    const { x, y } = this.graphControl.$id(edgeId).renderedMidpoint();
+    this.displayContextMenu("edge", x, y);
+  }
+
+  rightClickNode = nodeId => {
+    const { x, y } = this.graphControl.$id(nodeId).renderedPosition();
+    this.contextNode = nodeId;
+    this.displayContextMenu("node", x, y, nodeId);
+  }
+
+  displayContextMenu = (type, x, y, nodeId) => {
+    this.contextMenuItems.forEach(item => {
+      const selectors = item.selector.split(", ");
+      if (selectors.includes(type)) {
+        this.contextMenu.showMenuItem(item.id);
+      } else {
+        this.contextMenu.hideMenuItem(item.id);
+      }
+    });
+    const contextMenuEl = document.getElementsByClassName("cy-context-menus-cxt-menu")[0];
+    const graphHeight = this.graphControl.height();
+    const graphWidth = this.graphControl.width();
+    const inset = {
+      top: "auto",
+      right: "auto",
+      bottom: "auto",
+      left: "auto"
+    };
+    const getPx = val => typeof val === "string" ? val : `${val}px`;
+    if (x > (graphWidth / 2)) {
+      inset.right = (graphWidth - x) + 10;
+    } else {
+      inset.left = x + 10;
+    }
+    if (y > (graphHeight / 2)) {
+      inset.bottom = (graphHeight - y) + 10;
+    } else {
+      inset.top = y + 10;
+    }
+
+    contextMenuEl.style.inset = `${getPx(inset.top)} ${getPx(inset.right)} ${getPx(inset.bottom)} ${getPx(inset.left)}`;
+    contextMenuEl.style.display = "block";
+    this.setContextMenuState(nodeId);
   }
 
   render() {
@@ -853,7 +974,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id={this.navControlId} className="graph-navigator" />
+          <div id={this.navControlId} className="graph-navigator" role="presentation" />
         </div>
       </div>
     );

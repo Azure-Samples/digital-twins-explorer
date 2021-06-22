@@ -6,9 +6,10 @@
 .oc-output {
   background-color: $backgroundColor2;
   overflow-y: auto;
-  height: calc(100% - 24px);
   font-family: $fontFamilyConsole;
+  height: calc(100% - 24px);
   font-size: 12px;
+  height: calc(100% - 5px);
   margin: 2px;
   user-select: text;
   pre {

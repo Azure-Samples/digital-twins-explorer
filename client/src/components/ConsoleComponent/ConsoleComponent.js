@@ -19,6 +19,14 @@ export class ConsoleComponent extends Component {
     this.terminal = React.createRef();
   }
 
+  componentDidMount() {
+    eventService.subscribeFocusConsole(() => {
+      if (this.terminal.current) {
+        this.terminal.current.focusTerminal();
+      }
+    });
+  }
+
   patchTwin = async (arg1, arg2, arg3, arg4) => {
     if (arg1 && arg2 && arg3 && arg4) {
       try {

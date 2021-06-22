@@ -1,0 +1,271 @@
+{
+    "app": {
+        "exportComponentConfig": {
+            "title": "EXPORT"
+        },
+        "goldenLayoutConfig": {
+            "queryComponent": "QUERY EXPLORER",
+            "modelViewer":  "MODELS",
+            "twinViewer": "TWINS",
+            "graph": "TWIN GRAPH",
+            "modelGraphViewer": "MODEL GRAPH"
+        },
+        "importComponentConfig": {
+            "title": "IMPORT"
+        },
+        "optionalComponents": {
+            "console": "Console",
+            "output": "Output"
+        },
+        "errorPage": "Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue."
+    },
+    "appCommandBar" : {
+        "keyboardShortcuts": {
+            "ariaLabel": "keyboard shortcuts",
+            "text": "Keyboard Shortcuts",
+            "closeButton": "Close",
+            "navigateWithin": "Navigate within an element",
+            "navigateTo": "Navigate between elements",
+            "select": "Select elements",
+            "selectMultiple": "Select multiple elements",
+            "contextMenu": "Toggle context menu",
+            "deselectAll": "Deselect all selected elements"
+        },
+        "deleteTwins": {
+            "ariaLabel": "delete all twins",
+            "text": "Delete All Twins"
+        },
+        "signIn": {
+            "ariaLabel": "azure digital twins url",
+            "text": "Azure Digital Twins URL"
+        },
+        "settings": {
+            "ariaLabel": "settings",
+            "text": "Settings"
+        },
+        "commandBar" : {
+            "ariaLabel": "Use left and right arrow keys to navigate between commands"
+        }
+    },
+    "configurationFormComponent": {
+        "appAdtUrlField": "Azure Digital Twins URL",
+        "cancelButton": "Cancel",
+        "detail": "Configuration data is saved in local storage.",
+        "heading": "Azure Digital Twins URL",
+        "saveButton": "Save"
+    }, 
+    "deleteAllTwinsComponent": {
+        "cancelButton": "Cancel",
+        "deleteButton": "Delete",
+        "heading": "Are you sure?"
+    },
+    "graphViewerComponent": {
+        "toggleIcon": "Toggle property inspector",
+        "alertCloseIcon": "Close alert"
+    },
+    "graphViewerCommandBarComponent": {
+        "buttonGroupItems": {
+            "exportGraph": "Export Graph",
+            "importGraph": "Import Graph",
+            "showRelationships": {
+                "text": "Show All Relationships",
+                "ariaLabel": "show all relationships"
+            },
+            "showTwins": "Show All"
+        },
+        "expansionLevelItems": {
+            "ariaLabel": "Select number of layers to expand",
+            "text": "Expansion Level"
+        },
+        "expansionModeItems": {
+            "text": "Expansion Mode",
+            "ariaLabel": "select expansion mode",
+            "subMenuProps": {
+                "REL_TYPE_ALL": "In/Out",
+                "REL_TYPE_INCOMING": "In",
+                "REL_TYPE_OUTGOING": "Out"
+            }
+        },
+        "layoutItems": {
+            "ariaLabel": "run layout",
+            "text": "Run Layout"
+        },
+        "render": {
+            "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
+        }
+    },
+    "graphViewerFilteringComponent": {
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "center": "Center",
+        "zoomToFit": "Zoom to fit",
+        "filter": "Toggle model filter drawer",
+        "header1": "Filter",
+        "header2": "Highlight",
+        "selectAllHighlighted": "Select all highlighted",
+        "selectAllFiltered": "Select all filtered",
+        "deselectAll": "Deselect all"
+    },
+    "graphViewerRelationshipDeleteComponent": {
+        "heading": "Are you sure?"
+    },
+    "graphViewerTermManagementComponent": {
+        "menuItems": {
+            "ariaLabel": "add outgoing relationships",
+            "text": "Add Outgoing Relationships"
+        },
+        "toggleTermsOptions": "toggle term options menu",
+        "removeFiltering": "remove filtering term",
+        "textFieldPlaceholder": "Match term",
+        "clearAll": "Clear all"
+    },
+    "importCommandBar":{
+        "ariaLabel": "Use left and right arrow keys to navigate between commands"
+    },
+    "modelGraphViewerCommandBarComponent": {
+        "layoutItems": {
+            "text": "Run Layout",
+            "ariaLabel": "run layout"
+        },
+        "render": {
+            "ariaLabel": "Use left and right arrow keys to navigate between commands"
+        }
+    },
+    "modelGraphViewerComponent": {
+        "toggleIcon": "Toggle model detail"
+    },
+    "modelGraphViewerFilteringComponent": {
+        "controlsButtonGroup": {
+            "zoomIn": "Zoom in",
+            "zoomOut": "Zoom out",
+            "center": "Center",
+            "zoomToFit": "Zoom to fit",
+            "filter": "Toggle model filter drawer",
+            "header1": "Filter",
+            "header2": "Highlight"
+        }
+    },
+    "modelGraphViewerRelationshipsToggle":{
+        "componentsToggle": "toggle components",
+        "inheritancesToggle": "toggle inheritances",
+        "relationshipsToggle": "toggle relationships"
+    },
+    "modelGraphViewerTermManagementComponent":{
+        "menuItems": {
+            "superTypes": {
+                "text": "Add Supertype",
+                "ariaLabel": "add supertype"
+            },
+            "addSubTypes": {
+                "text": "Add Subtypes",
+                "ariaLabel": "add subtypes"
+            },
+            "addOutgoingRelationships": {
+                "text": "Add Outgoing Targets",
+                "ariaLabel": "add outgoing targets"
+            },
+            "matchDtmi": {
+                "text": "Match DTMI",
+                "ariaLabel": "match dtmi"
+            },
+            "matchDisplayName": {
+                "text": "Match Display Name",
+                "ariaLabel": "match display name"
+            }
+        },
+        "removeFiltering": "remove filtering term",
+        "termOptions": "toggle filter menu"
+    },
+    "modelViewerCommandBarComponent": {
+        "farItems": {
+            "deleteModels": {
+                "text":"Delete All Models"
+            },
+            "downloadModels": {
+                "text":"Download Models",
+                "ariaLabel": "download all models"
+            },
+            "uploadModel": {
+                "text":"Upload a Model"
+            },
+            "uploadModelsDirectory": {
+                "text":"Upload a directory of Models"
+            },
+            "uploadModelImages": {
+                "text":"Upload Model Images"
+            }
+        },
+        "render": {
+            "ariaLabel": "Use left and right arrow keys to navigate between commands"
+        },
+        "searchPlaceholder": "Search"
+    },
+    "modelViewerCreateComponent": {
+        "cancelButton": "Cancel",
+        "heading": "New Twin Name",
+        "saveButton": "Save"
+    },
+    "modelViewerDeleteComponent" : {
+        "heading": "Are you sure?",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+    },
+    "modelViewerItem": {
+        "deleteModel": "Delete Model",
+        "uploadModelImage": "Upload Model Image",
+        "viewModel": "View Model",
+        "createTwin": "Create a Twin"
+    },
+    "modelViewerItemCommandBarComponent": {
+        "farItems": {
+            "createTwin": "Create a Twin",
+            "deleteModels": "Delete Model",
+            "uploadModel": "Upload Model Image",
+            "viewModel": "View Model"
+        },
+        "ariaLabel":"Use left and right arrow keys to navigate between commands"
+    },
+    "modelViewerViewComponent": {
+        "heading": "Model Information",
+        "defaultButton": "Close"
+    },
+    "preferencesFormComponent": {
+        "ariaLabel":"Close Preferences Modal",
+        "heading1": "Performance",
+        "heading2": "View",
+        "heading3": "Display Settings",
+        "eagerLoadingField": "Eager Loading",
+        "cachingField": "Caching",
+        "highContrastField": "High Contrast"
+    },
+    "propertyInspectorComponent": {
+        "jsonEditorEmptyValue": "Unset",
+        "searchPlaceholder": "Search"
+    },
+    "propertyInspectorCommandBarComponent": {
+        "farItems": {
+            "collapseTree": "Collapse Tree",
+            "expandTree": "Expand Tree",
+            "redo": "Redo",
+            "save": "Patch Twin",
+            "undo": "Undo"
+        },
+        "commandBar": {
+            "title": "Properties",
+            "ariaLabel": "Use left and right arrow keys to navigate between commands"
+        }
+    },
+    "queryComponent": {
+        "confirmQueryDialogComponent1": {
+            "title": "Query Already Exists",
+            "description": "Saving this query will overwrite the existing one."
+        },
+        "confirmQueryDialogComponent2": {
+            "title": "Are you sure?"
+        },
+        "defaultButton": "Run Query",
+        "iconButton": "Save",
+        "savedQueries": "Saved Queries",
+        "overlayResults": "Overlay results"
+    }
+}

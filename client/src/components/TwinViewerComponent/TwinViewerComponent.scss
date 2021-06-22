@@ -1,0 +1,149 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../theme/theme.scss";
+
+.modellist-control {
+  height: 100%;
+  background-color: $backgroundColor5;
+}
+
+.tv-grid {
+  font-size: 12px;
+  font-family: $fontFamilyMain;
+  font-weight: 200;
+  height: 100%;
+  overflow: hidden;
+  padding-top: 15px;
+}
+
+.tv-toolbarButtons {
+  height: 16px;
+  font-size: 8px;
+  font-weight: 200;
+  &:hover, &:focus {
+    background: transparent;
+  }
+}
+
+.tv-modelList {
+  height: 100%;
+  width: 100%;
+  background-color: $backgroundColor2;
+}
+
+.tv-modelListWrapper {
+  display: block;
+  height: calc(100% - 65px);
+  overflow: overlay;
+  background-color: $backgroundColor5;
+  padding: 0 15px;
+}
+
+.tv_buttonGroup {
+  display: flex;
+}
+
+.tv_listItem {
+  margin-bottom: 7px;
+  padding: 6px 6px 10px 6px;
+  background-color: $backgroundColor8;
+  border: solid 2px $backgroundColor8;
+  line-height: 1.7;
+  > .ms-Stack {
+    display: flex;
+    justify-content: space-between;
+    >.ms-Stack {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+  &:focus {
+    border: solid 2px $buttonColor;
+    outline: none;
+  }
+}
+
+.tv-relationships {
+  margin-left: 10px;
+  border-left: 2px solid #999999;
+  padding-left: 10px;
+}
+
+.tv_listItem_selected {
+  border: solid 2px #DB1919;
+}
+
+.tv_listItemName {
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tv_listItemKey {
+  font-size: 12px;
+  font-weight: 600;
+  color: $textColorLight2;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  max-height: 18px;
+}
+
+.tv_listItemDesc {
+  font-size: 10px;
+}
+
+.tv-loadButtons {
+  height: 22px;
+  font-weight: 200;
+  padding: 0;
+  &:active {
+    background: transparent;
+  }
+  &:first-child {
+    .ms-Button-icon {
+      font-size: 15px;
+      transform: translateY(-1px);
+    }
+  }
+  &:last-child {
+    .ms-Button-icon {
+      font-size: 17.25px;
+    }
+  }
+  .ms-Button-icon {
+    margin: 0;
+  }
+}
+
+.tv-filter {
+  font-size: 12px;
+  font-weight: 200;
+  padding: 0 15px 15px 15px;
+}
+
+.tv-filter input {
+  font-family: $fontFamilyMain;
+  font-size: 14px;
+  background-color: #353535;
+  color: $textColorLight1;
+  border-width: 0px;
+  flex: 1 1;
+}
+
+.tv-fileInput {
+  display: none;
+}
+
+.ms-Dialog-main {
+  max-width: 800px; /* Your maximum width here */
+}
+
+.ms-SelectionZone {
+  padding: 0 15px;
+}

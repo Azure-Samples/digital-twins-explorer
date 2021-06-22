@@ -5,6 +5,7 @@ import {
   Pivot,
   PivotItem
 } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 import ModelGraphViewerTermManagementComponent from "../ModelGraphViewerTermManagementComponent/ModelGraphViewerTermManagementComponent";
 
 const ModelGraphViewerFilteringComponent = ({
@@ -20,7 +21,8 @@ const ModelGraphViewerFilteringComponent = ({
   onUpdateFilteringTerm,
   onUpdateHighlightingTerm,
   highlightingTerms,
-  filteringTerms
+  filteringTerms,
+  t
 }) => (
   <>
     <div className="gc-controls">
@@ -28,30 +30,30 @@ const ModelGraphViewerFilteringComponent = ({
         <div className="controls_buttonGroup">
           <IconButton
             iconProps={{ iconName: "Add" }}
-            title="Zoom in"
-            ariaLabel="Zoom in"
+            title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomIn")}
+            ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomIn")}
             onClick={onZoomIn}
             className="control-loadButtons" />
           <IconButton
             iconProps={{ iconName: "CalculatorSubtract" }}
-            title="Zoom out"
-            ariaLabel="Zoom out"
+            title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomOut")}
+            ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomOut")}
             onClick={onZoomOut}
             className="control-loadButtons" />
         </div>
         <div className="controls_singleButton">
           <IconButton
             iconProps={{ iconName: "ZoomToFit" }}
-            title="Zoom to fit"
-            ariaLabel="Zoom to fit"
+            title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomToFit")}
+            ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomToFit")}
             onClick={onZoomToFit}
             className="control-loadButtons" />
         </div>
         <div className="controls_singleButton filter_button">
           <IconButton
             iconProps={{ iconName: "Filter" }}
-            title="Toggle model filter drawer"
-            ariaLabel="Toggle model filter drawer"
+            title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.filter")}
+            ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.filter")}
             className="control-loadButtons"
             onClick={toggleFilter} />
         </div>
@@ -60,14 +62,14 @@ const ModelGraphViewerFilteringComponent = ({
     <div className="gc-filter-contents">
       <div>
         <Pivot onLinkClick={onSwitchFilters}>
-          <PivotItem headerText="Filter" key="filter">
+          <PivotItem headerText={t("modelGraphViewerFilteringComponent.controlsButtonGroup.header1")} key="filter">
             <ModelGraphViewerTermManagementComponent
               onAddFilteringTerm={onAddFilteringTerm}
               onRemoveFilteringTerm={onRemoveFilteringTerm}
               terms={filteringTerms}
               onUpdateTerm={onUpdateFilteringTerm} />
           </PivotItem>
-          <PivotItem headerText="Highlight" key="highlight">
+          <PivotItem headerText={t("modelGraphViewerFilteringComponent.controlsButtonGroup.header2")} key="highlight">
             <ModelGraphViewerTermManagementComponent
               onAddFilteringTerm={onAddHighlightingTerm}
               onRemoveFilteringTerm={onRemoveHighlightingTerm}
@@ -80,4 +82,4 @@ const ModelGraphViewerFilteringComponent = ({
   </>
 );
 
-export default ModelGraphViewerFilteringComponent;
+export default withTranslation()(ModelGraphViewerFilteringComponent);

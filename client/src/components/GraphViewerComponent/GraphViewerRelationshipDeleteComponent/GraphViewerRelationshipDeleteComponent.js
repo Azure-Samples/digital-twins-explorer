@@ -3,6 +3,7 @@
 
 import React, { Component } from "react";
 import { DefaultButton } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -11,7 +12,7 @@ import { eventService } from "../../../services/EventService";
 
 import "../GraphViewerComponentShared.scss";
 
-export class GraphViewerRelationshipDeleteComponent extends Component {
+class GraphViewerRelationshipDeleteComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -50,7 +51,11 @@ export class GraphViewerRelationshipDeleteComponent extends Component {
       return;
     }
 
-    this.setState({ showModal: true });
+    this.setState({ showModal: true }, () => {
+      setTimeout(() => {
+        document.getElementById("delete-relationship-button").focus();
+      }, 200);
+    });
   }
 
   confirm = async () => {
@@ -66,9 +71,9 @@ export class GraphViewerRelationshipDeleteComponent extends Component {
     const { showModal, isLoading } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
-        <h2 className="heading-2">Are you sure?</h2>
+        <h2 className="heading-2">{this.props.t("graphViewerRelationshipDeleteComponent.heading")}</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button save-button" onClick={this.confirm}>Delete</DefaultButton>
+          <DefaultButton className="modal-button save-button" onClick={this.confirm} id="delete-relationship-button">Delete</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
         </div>
       </ModalComponent>
@@ -76,3 +81,5 @@ export class GraphViewerRelationshipDeleteComponent extends Component {
   }
 
 }
+
+export default withTranslation("translation", { withRef: true })(GraphViewerRelationshipDeleteComponent);

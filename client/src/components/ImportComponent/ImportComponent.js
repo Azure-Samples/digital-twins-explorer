@@ -4,7 +4,7 @@
 import React, { Component } from "react";
 
 import { GraphViewerCytoscapeComponent } from "../GraphViewerComponent/GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
-import { ImportCommandBar } from "./ImportCommandBar/ImportCommandBar";
+import ImportCommandBar from "./ImportCommandBar/ImportCommandBar";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import ImportStatsComponent from "./ImportStatsComponent/ImportStatsComponent";
 import { importService } from "../../services/ImportService";

@@ -606,6 +606,10 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
+  emitNodeEvent = (nodeId, event) => {
+    this.graphControl.$id(nodeId).emit(event);
+  }
+
   render() {
     const { hideContextMenu } = this.state;
     return (
@@ -634,7 +638,7 @@ export class ModelGraphViewerCytoscapeComponent extends React.Component {
             }
           }} />
         <div className="navigator-container">
-          <div id="model-graph-viewer-nav" className="graph-navigator" />
+          <div id="model-graph-viewer-nav" className="graph-navigator" role="presentation" />
         </div>
         <div id="hidden-text-ruler" ref={this.hiddenTextRuler} />
       </div>

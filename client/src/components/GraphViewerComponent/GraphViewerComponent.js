@@ -4,14 +4,15 @@
 import React from "react";
 import { Icon } from "office-ui-fabric-react";
 
-import { GraphViewerCommandBarComponent } from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
+import GraphViewerCommandBarComponent from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
 import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
 import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
-import { GraphViewerRelationshipDeleteComponent } from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
-import { PropertyInspectorComponent } from "../PropertyInspectorComponent/PropertyInspectorComponent";
+import GraphViewerRelationshipDeleteComponent from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
+import PropertyInspectorComponent from "../PropertyInspectorComponent/PropertyInspectorComponent";
 import GraphViewerFilteringComponent from "./GraphViewerFilteringComponent/GraphViewerFilteringComponent";
+import { withTranslation } from "react-i18next";
 
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { apiService } from "../../services/ApiService";
@@ -24,7 +25,7 @@ import { REL_TYPE_OUTGOING, DETAIL_MIN_WIDTH } from "../../services/Constants";
 import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
-export class GraphViewerComponent extends React.Component {
+class GraphViewerComponent extends React.Component {
 
   constructor(props) {
     super(props);
@@ -40,6 +41,7 @@ export class GraphViewerComponent extends React.Component {
       overlayResults: false,
       overlayItems: {},
       filterIsOpen: false,
+      currentFilter: "filter",
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false,
       propInspectorDetailWidth: DETAIL_MIN_WIDTH,
@@ -47,6 +49,8 @@ export class GraphViewerComponent extends React.Component {
       outputIsOpen: false,
       highlightingTerms: [],
       filteringTerms: [],
+      highlightedNodes: [],
+      filteredNodes: [],
       noResults: false
     };
     this.view = React.createRef();
@@ -65,7 +69,9 @@ export class GraphViewerComponent extends React.Component {
   }
 
   componentDidMount() {
-    eventService.subscribeQuery(query => this.getData(query));
+    eventService.subscribeQuery(query => {
+      this.getData(query);
+    });
     eventService.subscribeOverlayQueryResults(overlayResults => {
       this.resetFiltering();
       if (this.state.overlayResults && !overlayResults) {
@@ -107,10 +113,34 @@ export class GraphViewerComponent extends React.Component {
         this.setState({ outputIsOpen: false });
       }
     });
+    eventService.subscribeFocusTwin(twin => {
+      this.cyRef.current.emitNodeEvent(twin.$dtId, "mouseover");
+    });
+    eventService.subscribeBlurTwin(twin => {
+      this.cyRef.current.emitNodeEvent(twin.$dtId, "mouseout");
+    });
+    eventService.subscribeTwinContextMenu(twin => {
+      this.cyRef.current.rightClickNode(twin.$dtId);
+      this.cyRef.current.focusContextMenu();
+    });
+    eventService.subscribeRelationshipContextMenu(relationship => {
+      this.cyRef.current.rightClickEdge(getUniqueRelationshipId(relationship));
+      this.cyRef.current.focusContextMenu();
+    });
+    eventService.subscribeClickRelationship(relationship => {
+      eventService.publishSelection({ selection: relationship, selectionType: "relationship" });
+    });
+    eventService.subscribeClearGraphSelection(() => {
+      this.cyRef.current.clearOverlay();
+    });
+    eventService.subscribeSelectTwins(twinIds => {
+      this.cyRef.current.selectNodes(twinIds);
+    });
   }
 
   clearData() {
     eventService.publishSelection();
+    eventService.publishGraphTwins([]);
     this.allNodes = [];
     if (this.cyRef.current) {
       this.cyRef.current.clearTwins();
@@ -162,6 +192,7 @@ export class GraphViewerComponent extends React.Component {
           this.cyRef.current.selectEdges(relationships);
         } else {
           this.allNodes = allTwins;
+          eventService.publishGraphTwins(this.allNodes);
         }
       }
     } catch (exc) {
@@ -274,6 +305,7 @@ export class GraphViewerComponent extends React.Component {
 
                   this.allNodes = this.allNodes.concat(missingTwins);
                   this.cyRef.current.addTwins(missingTwins);
+                  eventService.publishGraphTwins(this.allNodes);
                 } else {
                   presentRels = rels.filter(x =>
                     allTwins.some(y => y.$dtId === x.$sourceId) && allTwins.some(y => y.$dtId === x.$targetId));
@@ -297,6 +329,7 @@ export class GraphViewerComponent extends React.Component {
       });
 
       await bs.run();
+      eventService.publishGraphRelationships(this.relationships);
     }
 
     if (clearExisting) {
@@ -313,6 +346,7 @@ export class GraphViewerComponent extends React.Component {
 
   onNodeClicked = async e => {
     this.setState({ selectedNode: e.selectedNode, selectedNodes: e.selectedNodes });
+    eventService.publishSelectedTwins(e.selectedNodes);
     const { highlightingTerms } = this.state;
     if (highlightingTerms.length > 0) {
       const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
@@ -374,6 +408,7 @@ export class GraphViewerComponent extends React.Component {
   onControlClicked = () => {
     this.setState({ selectedNode: null, selectedNodes: null, selectedEdges: null });
     eventService.publishSelection();
+    eventService.publishSelectedTwins([]);
 
     const { highlightingTerms, filteringTerms } = this.state;
     if (highlightingTerms.length > 0) {
@@ -399,6 +434,8 @@ export class GraphViewerComponent extends React.Component {
     }
     this.setState({ selectedNode: null, selectedNodes: null });
     eventService.publishSelection();
+    this.allNodes = this.allNodes.filter(n => !ids.includes(n.$dtId));
+    eventService.publishGraphTwins(this.allNodes);
   }
 
   onHide = () => this.setState({ hideMode: "hide-selected", canShowAll: true });
@@ -481,7 +518,7 @@ export class GraphViewerComponent extends React.Component {
     this.setState({ overlayItems: {} });
   }
 
-  onConfirmTwinDelete = ({ target: node }) => {
+  onConfirmTwinDelete = node => {
     let { selectedNode, selectedNodes } = this.state;
     if (node && node.id()) {
       if (!selectedNodes) {
@@ -497,14 +534,26 @@ export class GraphViewerComponent extends React.Component {
     });
   }
 
-  onConfirmRelationshipDelete = () => {
+  onConfirmRelationshipDelete = edge => {
     const { selectedEdges } = this.state;
+    const edgeData = edge.data();
     if (selectedEdges) {
-      this.deleteRel.current.open();
+      if (selectedEdges.some(e => e.id === edgeData.id)) {
+        this.deleteRel.current.open();
+      } else {
+        const newEdges = [ ...selectedEdges, edgeData ];
+        this.setState({ selectedEdges: newEdges }, () => {
+          this.deleteRel.current.open();
+        });
+      }
+    } else {
+      this.setState({ selectedEdges: [ edgeData ] }, () => {
+        this.deleteRel.current.open();
+      });
     }
   }
 
-  onGetRelationships = ({ target: node }) => {
+  onGetRelationships = node => {
     let selectedNode = null;
     if (node && node.id()) {
       selectedNode = { id: node.id(), modelId: node.data().modelId };
@@ -557,6 +606,7 @@ export class GraphViewerComponent extends React.Component {
     }
   };
 
+
   handleMouseUp = e => {
     e.preventDefault();
     window.removeEventListener("mousemove", this.handleMouseMove);
@@ -571,7 +621,6 @@ export class GraphViewerComponent extends React.Component {
     window.addEventListener("mousemove", this.handleMouseMove);
     window.addEventListener("mouseup", this.handleMouseUp);
   };
-
 
   onUpdateFilteringTerm = term => {
     const { filteringTerms } = this.state;
@@ -631,15 +680,18 @@ export class GraphViewerComponent extends React.Component {
       highlightedNodesIds = [ ...highlightedNodesIds, ...overlayItems.twins ];
     }
     this.cyRef.current.highlightNodes(highlightedNodesIds, activeTerms.length > 0 || overlayResults);
+    this.setState({ highlightedNodes });
   }
 
   filterNodes = () => {
     const { filteringTerms } = this.state;
     const activeTerms = filteringTerms.filter(term => term.isActive);
     const filteredNodes = this.getFilteredNodes(activeTerms, false);
+    this.setState({ filteredNodes });
     if (this.cyRef.current) {
       this.cyRef.current.showAllNodes();
       this.cyRef.current.filterNodes(filteredNodes);
+      eventService.publishGraphTwins(filteredNodes);
     }
   }
 
@@ -729,6 +781,7 @@ export class GraphViewerComponent extends React.Component {
   }
 
   onSwitchFilters = e => {
+    let currentFilter = "filter";
     if (e.key.includes("filter")) {
       if (this.cyRef.current) {
         this.cyRef.current.clearHighlighting();
@@ -738,14 +791,65 @@ export class GraphViewerComponent extends React.Component {
       if (this.cyRef.current) {
         this.cyRef.current.showAllNodes();
       }
+      currentFilter = "highlight";
+      this.highlightNodes();
+    }
+    this.setState({ currentFilter });
+  }
+
+  onSelectAllHighlighted = () => {
+    const { highlightedNodes } = this.state;
+    if (highlightedNodes.length > 0) {
+      this.cyRef.current.selectNodes(highlightedNodes.map(node => node.$dtId));
+      const newSelectedNodes = highlightedNodes.map(node => ({ id: node.$dtId, modelId: node.$metadata.$model }));
+      this.setState({ selectedNode: newSelectedNodes[0], selectedNodes: newSelectedNodes });
+      eventService.publishSelectedTwins(newSelectedNodes);
+    }
+  }
+
+  onSelectAllFiltered = () => {
+    const { filteredNodes } = this.state;
+    if (filteredNodes.length > 0) {
+      this.cyRef.current.selectNodes(filteredNodes.map(node => node.$dtId));
+      const newSelectedNodes = filteredNodes.map(node => ({ id: node.$dtId, modelId: node.$metadata.$model }));
+      this.setState({ selectedNode: newSelectedNodes[0], selectedNodes: newSelectedNodes });
+      eventService.publishSelectedTwins(newSelectedNodes);
+    }
+  }
+
+  deselectAll = () => {
+    const { currentFilter } = this.state;
+    eventService.publishSelectedTwins([]);
+    this.setState({ selectedNode: null, selectedNodes: null });
+    if (currentFilter === "filter") {
+      this.cyRef.current.clearHighlighting();
+      this.filterNodes();
+    } else {
       this.highlightNodes();
     }
   }
 
+  onClearAll = () => {
+    const { currentFilter } = this.state;
+    eventService.publishSelectedTwins([]);
+    if (currentFilter === "filter") {
+      this.setState({ selectedNode: null, selectedNodes: null, filteringTerms: [] }, () => {
+        this.cyRef.current.clearHighlighting();
+        this.filterNodes();
+      });
+    } else {
+      this.setState({ selectedNode: null, selectedNodes: null, highlightingTerms: [] }, () => {
+        this.highlightNodes();
+      });
+    }
+  }
+
+  onFocusBackToTwinViewer = () => eventService.publishFocusTwinViewer();
+
   render() {
     const { isLoading, progress, filterIsOpen, propertyInspectorIsOpen,
       overlayResults, overlayItems, propInspectorDetailWidth, couldNotDisplay, relationshipsOnly,
-      outputIsOpen, highlightingTerms, filteringTerms, noResults } = this.state;
+      outputIsOpen, highlightingTerms, filteringTerms, filteredNodes, highlightedNodes, noResults, selectedNodes } = this.state;
     return (
       <div className={`gvc-wrap ${propertyInspectorIsOpen ? "pi-open" : "pi-closed"}`}>
         <div className={`gc-grid ${filterIsOpen ? "open" : "closed"}`}>
@@ -765,6 +869,7 @@ export class GraphViewerComponent extends React.Component {
               onHideOthers={this.onHideOthers}
               onHideNonChildren={this.onHideNonChildren}
               onHide={this.onHide}
+              onFocusBackToTwinViewer={this.onFocusBackToTwinViewer}
               onHideWithChildren={this.onHideWithChildren}
               onCreateRelationship={this.onConfirmRelationshipCreate}
               onGetRelationships={this.onGetRelationships}
@@ -793,7 +898,7 @@ export class GraphViewerComponent extends React.Component {
               <Icon
                 className="alert--close"
                 iconName="ChromeClose"
-                aria-label="Close alert"
+                aria-label={this.props.t("graphViewerComponent.alertCloseIcon")}
                 role="button"
                 onClick={() => this.setState({ couldNotDisplay: false })}
                 title="Close alert" />
@@ -808,8 +913,16 @@ export class GraphViewerComponent extends React.Component {
               onUpdateFilteringTerm={this.onUpdateFilteringTerm}
               onUpdateHighlightingTerm={this.onUpdateHighlightingTerm}
               onSwitchFilters={this.onSwitchFilters}
+              deselectAll={this.deselectAll}
+              canSelectAllFilter={filteredNodes.length > 0 && (!selectedNodes || selectedNodes.length === 0)}
+              canSelectAllHighlight={highlightedNodes.length > 0 && (!selectedNodes || selectedNodes.length === 0)}
+              onSelectAllHighlighted={this.onSelectAllHighlighted}
+              selectAllHighlightedText={this.props.t("graphViewerFilteringComponent.selectAllHighlighted")}
+              onSelectAllFiltered={this.onSelectAllFiltered}
+              selectAllFilteredText={this.props.t("graphViewerFilteringComponent.selectAllFiltered")}
               highlightingTerms={highlightingTerms}
-              filteringTerms={filteringTerms} />
+              filteringTerms={filteringTerms}
+              onClearAll={this.onClearAll} />
           </div>
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
@@ -818,9 +931,10 @@ export class GraphViewerComponent extends React.Component {
             <Icon
               className="toggle-icon"
               iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              aria-label="Toggle property inspector"
+              onClick={this.togglePropertyInspector}
+              aria-label={this.props.t("graphViewerComponent.toggleIcon")}
               role="button"
-              title="Toggle property inspector" />
+              title={this.props.t("graphViewerComponent.toggleIcon")} />
           </div>
           <PropertyInspectorComponent />
           {propertyInspectorIsOpen && (
@@ -834,3 +948,5 @@ export class GraphViewerComponent extends React.Component {
   }
 
 }
+
+export default withTranslation("translation", { withRef: true })(GraphViewerComponent);
