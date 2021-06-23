@@ -65,8 +65,8 @@
     },
     "graphViewerCommandBarComponent": {
         "buttonGroupItems": {
-            "exportGraph": "Export Graph",
-            "importGraph": "Import Graph",
+            "exportGraph": "Export graph",
+            "importGraph": "Import graph",
             "showRelationships": {
                 "text": "Show all relationships",
                 "ariaLabel": "show all relationships"
@@ -78,7 +78,7 @@
             "text": "Expansion level"
         },
         "expansionModeItems": {
-            "text": "Expansion mode",
+            "text": "Expansion direction",
             "ariaLabel": "select expansion mode",
             "subMenuProps": {
                 "REL_TYPE_ALL": "In/Out",
@@ -87,8 +87,8 @@
             }
         },
         "layoutItems": {
-            "ariaLabel": "run layout",
-            "text": "Run layout"
+            "ariaLabel": "Choose layout",
+            "text": "Choose layout"
         },
         "render": {
             "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
@@ -179,11 +179,12 @@
     "modelViewerCommandBarComponent": {
         "farItems": {
             "deleteModels": {
-                "text":"Delete all Models"
+                "text":"Delete all Models",
+                "ariaLabel": "delete all models"
             },
             "downloadModels": {
-                "text":"Download Models",
-                "ariaLabel": "download all models"
+                "text":"Refresh Models",
+                "ariaLabel": "Refresh all models"
             },
             "uploadModel": {
                 "text":"Upload a Model"
@@ -192,7 +193,7 @@
                 "text":"Upload a directory of Models"
             },
             "uploadModelImages": {
-                "text":"Upload Model images"
+                "text":"Upload model images"
             }
         },
         "render": {

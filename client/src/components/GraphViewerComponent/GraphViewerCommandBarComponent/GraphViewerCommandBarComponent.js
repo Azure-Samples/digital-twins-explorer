@@ -89,7 +89,7 @@ class GraphViewerCommandBarComponent extends Component {
       text: this.props.t("graphViewerCommandBarComponent.expansionModeItems.text"),
       ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionModeItems.ariaLabel"),
       iconOnly: true,
-      iconProps: { iconName: "ModelingView" },
+      iconProps: { iconName: "ExpansionDirection" },
       className: `${this.buttonClass} command-bar-dropdown`,
       style: dropdownButtonStyles,
       subMenuProps: {
@@ -125,7 +125,7 @@ class GraphViewerCommandBarComponent extends Component {
       key: "expansionLevel",
       text: this.props.t("graphViewerCommandBarComponent.expansionLevelItems.text"),
       ariaLabel: this.props.t("graphViewerCommandBarComponent.expansionLevelItems.ariaLabel"),
-      iconProps: { iconName: "Org" },
+      iconProps: { iconName: "ExpansionLevel" },
       className: this.buttonClass,
       iconOnly: true,
       style: singleButtonStyles
@@ -138,7 +138,7 @@ class GraphViewerCommandBarComponent extends Component {
       text: this.props.t("graphViewerCommandBarComponent.layoutItems.ariaLabel"),
       ariaLabel: this.props.t("graphViewerCommandBarComponent.layoutItems.ariaLabel"),
       iconOnly: true,
-      iconProps: { iconName: "ArrangeSendToBack" },
+      iconProps: { iconName: "ChooseLayout" },
       onClick: () => this.props.onLayoutClicked(),
       className: this.buttonClass,
       subMenuProps: {},
@@ -148,7 +148,7 @@ class GraphViewerCommandBarComponent extends Component {
 
   renderRelationshipExpansionItem = () => (
     <div className="expansion-level-option">
-      <Icon iconName="Org" />
+      <Icon iconName="ExpansionLevel" />
       <TextField id="relExpansionLevelField"
         className="command-bar-input configuration-input numeric-input" value={this.state.relExpansionLevel}
         onChange={this.onExpansionLevelChange} type="number" min="1" max="5" ariaLabel="Select expansion level" role="menuitem" />

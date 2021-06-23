@@ -20,7 +20,7 @@ class ModelViewerCommandBarComponent extends Component {
       key: "uploadModelImages",
       text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelImages.text"),
       ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelImages.text"),
-      iconProps: { iconName: "ImageSearch" },
+      iconProps: { iconName: "Photo2Add" },
       onClick: () => this.props.onUploadModelImagesClicked(),
       iconOnly: true,
       className: this.buttonClass
@@ -29,7 +29,7 @@ class ModelViewerCommandBarComponent extends Component {
       key: "downloadModels",
       text: this.props.t("modelViewerCommandBarComponent.farItems.downloadModels.text"),
       ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.downloadModels.text"),
-      iconProps: { iconName: "CloudDownload" },
+      iconProps: { iconName: "Refresh" },
       onClick: () => this.props.onDownloadModelsClicked(),
       iconOnly: true,
       className: this.buttonClass
@@ -38,7 +38,7 @@ class ModelViewerCommandBarComponent extends Component {
       key: "uploadModel",
       text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModel.text"),
       ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModel.text"),
-      iconProps: { iconName: "CloudUpload" },
+      iconProps: { iconName: "Upload" },
       onClick: () => this.props.onUploadModelClicked(),
       iconOnly: true,
       className: this.buttonClass
@@ -47,7 +47,7 @@ class ModelViewerCommandBarComponent extends Component {
       key: "uploadModelsDirectory",
       text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelsDirectory.text"),
       ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelsDirectory.text"),
-      iconProps: { iconName: "DocumentSet" },
+      iconProps: { iconName: "BulkUploadFolder" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,
       className: this.buttonClass
