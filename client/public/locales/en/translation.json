@@ -193,7 +193,7 @@
                 "text":"Upload a directory of Models"
             },
             "uploadModelImages": {
-                "text":"Upload model images"
+                "text":"Upload Model images"
             }
         },
         "render": {
