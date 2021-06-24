@@ -4,6 +4,7 @@
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
 import { withTranslation } from "react-i18next";
+import "./ModelViewerItemCommandBarComponent.scss";
 
 const buttonStyles = {
   fontSize: 14,
@@ -69,7 +70,20 @@ class ModelViewerItemCommandBarComponent extends Component {
             }
           }}
           overflowItems={showItemMenu ? this.overflowItems : []}
-          calloutProps={{ style: { background: "red" }}}
+          overflowButtonProps={{
+            menuProps: {
+              className: "model-viewer-item-command-bar-overflow-menu",
+              items: [],
+              calloutProps: {
+                styles: {
+                  root: {
+                    marginLeft: "55px",
+                    marginTop: "-30px"
+                  }
+                }
+              }
+            }
+          }}
           onKeyDown={this.props.onKeyDown}
           ariaLabel={this.props.t("modelViewerItemCommandBarComponent.ariaLabel")} />
       </div>

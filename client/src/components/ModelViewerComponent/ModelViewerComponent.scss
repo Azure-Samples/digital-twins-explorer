@@ -149,21 +149,3 @@
 .ms-SelectionZone {
   padding: 0 15px;
 }
-
-.ms-Callout-main {
-  margin-left: 55px;
-  margin-top: -30px;
-  border: 1px solid $backgroundColor4;
-  li {
-    border-bottom: 1px solid $backgroundColor4;
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-  button {
-    &:focus {
-      background: #98E3FD !important;
-      color: $textColorDark1;
-    }
-  }
-}
