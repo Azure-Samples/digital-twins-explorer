@@ -226,4 +226,4 @@ class GraphViewerCommandBarComponent extends Component {
 
 }
 
-export default withTranslation()(GraphViewerCommandBarComponent);
+export default withTranslation("translation", { withRef: true })(GraphViewerCommandBarComponent);

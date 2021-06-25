@@ -42,13 +42,13 @@ const GraphViewerFilteringComponent = ({
         <Stack horizontal={false}>
           <div className="controls_buttonGroup">
             <IconButton
-              iconProps={{ iconName: "Add" }}
+              iconProps={{ iconName: "ZoomIn" }}
               title={t("graphViewerFilteringComponent.zoomIn")}
               ariaLabel={t("graphViewerFilteringComponent.zoomIn")}
               onClick={onZoomIn}
               className="control-loadButtons" />
             <IconButton
-              iconProps={{ iconName: "CalculatorSubtract" }}
+              iconProps={{ iconName: "ZoomOut" }}
               title={t("graphViewerFilteringComponent.zoomOut")}
               ariaLabel={t("graphViewerFilteringComponent.zoomOut")}
               onClick={onZoomOut}
@@ -56,7 +56,7 @@ const GraphViewerFilteringComponent = ({
           </div>
           <div className="controls_singleButton">
             <IconButton
-              iconProps={{ iconName: "FitPage" }}
+              iconProps={{ iconName: "SetToCenter" }}
               title={t("graphViewerFilteringComponent.center")}
               ariaLabel={t("graphViewerFilteringComponent.center")}
               onClick={onCenter}

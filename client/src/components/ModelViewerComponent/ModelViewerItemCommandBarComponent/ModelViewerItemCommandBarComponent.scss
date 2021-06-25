@@ -1,0 +1,17 @@
+@import "../../../theme/theme.scss";
+
+.model-viewer-item-command-bar-overflow-menu {
+  border: 1px solid $backgroundColor4;
+  li {
+    border-bottom: 1px solid $backgroundColor4;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  button {
+    &:focus {
+      background: #98E3FD !important;
+      color: $textColorDark1;
+    }
+  }
+}
