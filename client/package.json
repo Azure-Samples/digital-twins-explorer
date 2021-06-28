@@ -29,7 +29,7 @@
     "jsonlint": "^1.6.3",
     "msal": "^1.2.1",
     "office-ui-fabric-react": "^7.117.4",
-    "prismjs": "^1.23.0",
+    "prismjs": "^1.24.0",
     "react": "^17.0.1",
     "react-console-emulator": "^4.0.1",
     "react-cytoscapejs": "^1.2.1",
