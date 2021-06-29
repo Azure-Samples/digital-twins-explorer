@@ -9,6 +9,7 @@
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
     "ajv": "^8.1.0",
+    "ajv-keywords": "^5.0.0",
     "cytoscape": "^3.14.0",
     "cytoscape-cola": "^2.3.0",
     "cytoscape-context-menus": "^4.0.0",
