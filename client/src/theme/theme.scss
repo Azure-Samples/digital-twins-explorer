@@ -42,6 +42,8 @@ html {
   --scrollbar-color: #8C8C8C;
 
   --highlight-color: #98E3FD;
+
+  --dark-fabric-primary: #60aaff;
 }
 
 $backgroundColor1: var(--background-color1);
@@ -83,6 +85,8 @@ $editorNumberColor: var(--editor-number-color);
 
 $scrollbarColor: var(--scrollbar-color);
 $highlightColor: var(--highlight-color);
+
+$darkFabricPrimary: var(--dark-fabric-primary);
 
 $fontFamilyMain: "Segoe UI", sans-serif;
 $fontFamilyConsole: 'Consolas','Courier New', Courier, monospace;

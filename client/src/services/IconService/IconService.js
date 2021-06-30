@@ -17,7 +17,7 @@ const initIcons = () => {
 
     const customIcons = {
         icons: {
-            'BulkUploadFolder': <BulkUploadFolder className="ms-Button-icon iconBlue" style={iconStyles} />,
+            'BulkUploadFolder': <BulkUploadFolder className="ms-Button-icon custom-svg-icon" style={iconStyles} />,
             'ExpansionDirection': <ExpansionDirection className="ms-Button-icon iconWhite" style={iconStyles} />,
             'ExpansionLevel': <ExpansionLevel className="ms-Button-icon iconWhite" style={iconStyles} />,
             'SetToCenter': <SetToCenter className="ms-Button-icon" style={iconStyles} />,

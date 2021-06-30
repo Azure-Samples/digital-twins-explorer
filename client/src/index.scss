@@ -433,3 +433,14 @@ code[class*="language-"], pre[class*="language-"] {
     background-color: $buttonColor;
   }
 }
+
+.custom-svg-icon {
+  path {
+    fill: $darkFabricPrimary;
+  }
+  &:hover {
+    path {
+      fill: $textColorLight1;
+    }
+  }
+}
