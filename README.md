@@ -100,7 +100,7 @@ In addition to local operation, you can also run Azure Digital Twins Explorer as
     1. Click **Access Control (IAM)** from the left blade.
     1. Click **+ Add** then **Add role assignment**.
     1. Select **Azure Digital Twins Data Owner** as the Role.
-    1. Assign accesss to **System assigned managed identity - Functions App**.
+    1. Assign access to **System assigned managed identity - Functions App**.
     1. Select your **Functions App** from the list.
     1. Click **Save**.
 
