@@ -29,14 +29,6 @@ const PropertyInspectorComponent = () => {
 
     const flattenModelAndSetSelection = async (selection, selectionType) => {
         const modelService = new ModelService();
-
-        const setRootAndBaseModels = async (modelId) => {
-            const baseModelIds = (await modelService.getModel(modelId)).bases;
-            setRootAndBaseModelIdsToFlatten({
-                rootModelId: selection['$metadata']['$model'],
-                baseModelIds: baseModelIds
-            })
-        }
         
         if (selectionType === 'twin') {
             const baseModelIds = (await modelService.getModel(selection['$metadata']['$model'])).bases;
