@@ -19,7 +19,7 @@ import { GoldenLayoutComponent } from "./components/GoldenLayoutComponent/Golden
 import { GraphViewerComponent } from "./components/GraphViewerComponent/GraphViewerComponent";
 import { ModelGraphViewerComponent } from "./components/ModelGraphViewerComponent/ModelGraphViewerComponent";
 import { ModelViewerComponent } from "./components/ModelViewerComponent/ModelViewerComponent";
-import { PropertyInspectorComponent } from "./components/PropertyInspectorComponent/PropertyInspectorComponent";
+import PropertyInspectorComponent from "./components/PropertyInspectorComponent/PropertyInspectorComponentV2";
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
 import { QueryComponent } from "./components/QueryComponent/QueryComponent";
 import { ImportComponent } from "./components/ImportComponent/ImportComponent";

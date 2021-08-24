@@ -1,0 +1,7 @@
+@import "../../theme/theme.scss";
+
+.property-inspector-container{
+    height: calc(100% - 30px);
+    padding: 8px 16px;
+    overflow-y: auto;
+}
