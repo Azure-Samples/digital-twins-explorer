@@ -1,28 +1,66 @@
 /* eslint-disable */
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useReducer } from "react";
 import { eventService } from "../../services/EventService";
 import getAdtAdapter from "./AdtAdapterInstance";
 import { ModelService } from "../../services/ModelService";
 import { apiService } from "../../services/ApiService";
 import { PropertyInspector } from '@microsoft/iot-cardboard-js';
+import produce from "immer"
 import "@microsoft/iot-cardboard-js/themes.css";
 import "./PropertyInspectorComponentV2.scss";
 
+const pIActionTypes = {
+    setSourceTwin: 'setSourceTwin',
+    setSelectionType: 'setSelectionType',
+    setSelection: 'setSelection',
+    setRootAndBaseModelIdsToFlatten: 'setRootAndBaseModelIdsToFlatten',
+    setAdapter: 'setAdapter',
+    setIsSelectionLoading: 'setIsSelectionLoading'
+} 
+
+const propertyInspectorReducer = produce((draft, action) => {
+    switch (action.type) {
+        case pIActionTypes.setSourceTwin:
+            draft.sourceTwin = action.payload;
+            break;
+        case pIActionTypes.setSelectionType:
+            draft.selectionType = action.payload;
+            break;
+        case pIActionTypes.setSelection:
+            draft.selection = action.payload;
+            break;
+        case pIActionTypes.setRootAndBaseModelIdsToFlatten:
+            draft.rootAndBaseModelIdsToFlatten = action.payload;
+            break;
+        case pIActionTypes.setAdapter:
+            draft.adapter = action.payload;
+            break;
+        case pIActionTypes.setIsSelectionLoading:
+            draft.isSelectionLoading = action.payload;
+            break;
+    }
+})
+
 const PropertyInspectorComponent = () => {
 
-    const [selectionType, setSelectionType] = useState(null);
-    const [selection, setSelection] = useState(null);
-    const [rootAndBaseModelIdsToFlatten, setRootAndBaseModelIdsToFlatten] = useState(null);
-    const [adapter, setAdapter] = useState(null);
+    const [state, dispatch] = useReducer(propertyInspectorReducer, {
+        sourceTwin: null,
+        selectionType: null,
+        selection: null,
+        rootAndBaseModelIdsToFlatten: null,
+        adapter: null,
+        isSelectionLoading: false
+    })
 
     const subscribeSelection = () => {
         eventService.subscribeSelection(payload => {
             if (payload) {
                 const { selection, selectionType } = payload;
+                dispatch({ type: pIActionTypes.setIsSelectionLoading, payload: true });
                 flattenModelAndSetSelection(selection, selectionType);
             } else {
-                setSelectionType(null);
-                setSelection(null);
+                dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+                dispatch({ type: pIActionTypes.setSelection, payload: null });
             }
         });
     }
@@ -32,20 +70,40 @@ const PropertyInspectorComponent = () => {
         
         if (selectionType === 'twin') {
             const baseModelIds = (await modelService.getModel(selection['$metadata']['$model'])).bases;
-            setRootAndBaseModelIdsToFlatten({
-                rootModelId: selection['$metadata']['$model'],
-                baseModelIds: baseModelIds
+            dispatch({
+                type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
+                payload: {
+                    rootModelId: selection['$metadata']['$model'],
+                    baseModelIds: baseModelIds
+                }
             })
         } else if (selectionType === 'relationship') {
             const sourceTwin = await apiService.getTwinById(selection['$sourceId']);
-            const baseModelIds = (await modelService.getModel(sourceTwin['$metadata']['$model'])).bases;
-            setRootAndBaseModelIdsToFlatten({
-                rootModelId: sourceTwin['$metadata']['$model'],
-                baseModelIds: baseModelIds
+            dispatch({
+                type: pIActionTypes.setSourceTwin,
+                payload: sourceTwin
             })
-        } 
-        setSelectionType(selectionType);
-        setSelection(selection);
+            const baseModelIds = (await modelService.getModel(sourceTwin['$metadata']['$model'])).bases;
+            dispatch({
+                type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
+                payload: {
+                    rootModelId: sourceTwin['$metadata']['$model'],
+                    baseModelIds: baseModelIds
+                }
+            })
+        }
+        dispatch({
+            type: pIActionTypes.setSelectionType,
+            payload: selectionType
+        })
+        dispatch({
+            type: pIActionTypes.setSelection,
+            payload: selection
+        })
+        dispatch({
+            type: pIActionTypes.setIsSelectionLoading,
+            payload: false
+        })
     }
 
     const subscribeConfigure = () => {
@@ -58,7 +116,10 @@ const PropertyInspectorComponent = () => {
 
     const setAdtAdapter = async () => {
         const adtAdapter = await getAdtAdapter();
-        setAdapter(adtAdapter);
+        dispatch({
+            type: pIActionTypes.setAdapter,
+            payload: adtAdapter
+        })
     }
 
     // On mount
@@ -68,34 +129,37 @@ const PropertyInspectorComponent = () => {
         subscribeConfigure();
     }, [])
 
-    if (!adapter || !selection) return null;
+    if (!state.adapter || !state.selection) return null;
 
-    if (selectionType === 'twin') {
+    if (state.selectionType === 'twin') {
         return (
             <div className="property-inspector-container">
                 <PropertyInspector
-                    resolvedTwin={selection}
-                    twinId={selection['$dtId']}
-                    adapter={adapter}
+                    resolvedTwin={state.selection}
+                    twinId={state.selection['$dtId']}
+                    adapter={state.adapter}
                     rootAndBaseModelIdsToFlatten={{
-                        baseModelIds: rootAndBaseModelIdsToFlatten.baseModelIds,
-                        rootModelId: rootAndBaseModelIdsToFlatten.rootModelId
+                        baseModelIds: state.rootAndBaseModelIdsToFlatten.baseModelIds,
+                        rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
                     }}
+                    isPropertyInspectorLoading={state.isSelectionLoading}
                 />
             </div>
         );
-    } else if (selectionType === 'relationship') {
+    } else if (state.selectionType === 'relationship') {
         return (
             <div className="property-inspector-container">
                 <PropertyInspector
-                    resolvedRelationship={selection}
-                    relationshipId={selection['$relationshipId']}
-                    twinId={selection['$sourceId']}
-                    adapter={adapter}
+                    resolvedRelationship={state.selection}
+                    resolvedTwin={state.sourceTwin}
+                    relationshipId={state.selection['$relationshipId']}
+                    twinId={state.selection['$sourceId']}
+                    adapter={state.adapter}
                     rootAndBaseModelIdsToFlatten={{
-                        baseModelIds: rootAndBaseModelIdsToFlatten.baseModelIds,
-                        rootModelId: rootAndBaseModelIdsToFlatten.rootModelId
+                        baseModelIds: state.rootAndBaseModelIdsToFlatten.baseModelIds,
+                        rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
                     }}
+                    isPropertyInspectorLoading={state.isSelectionLoading}
                 />
             </div>
         );
