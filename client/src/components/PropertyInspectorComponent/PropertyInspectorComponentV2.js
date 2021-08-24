@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { eventService } from "../../services/EventService";
 import getAdtAdapter from "./AdtAdapterInstance";
 import { ModelService } from "../../services/ModelService";
+import { apiService } from "../../services/ApiService";
 import { PropertyInspector } from '@microsoft/iot-cardboard-js';
 import "@microsoft/iot-cardboard-js/themes.css";
 import "./PropertyInspectorComponentV2.scss";
@@ -13,8 +14,6 @@ const PropertyInspectorComponent = () => {
     const [selection, setSelection] = useState(null);
     const [rootAndBaseModelIdsToFlatten, setRootAndBaseModelIdsToFlatten] = useState(null);
     const [adapter, setAdapter] = useState(null);
-
-    const modelService = useRef(new ModelService());
 
     const subscribeSelection = () => {
         eventService.subscribeSelection(payload => {
@@ -29,11 +28,30 @@ const PropertyInspectorComponent = () => {
     }
 
     const flattenModelAndSetSelection = async (selection, selectionType) => {
-        const baseModelIds = (await modelService.current.getModel(selection['$metadata']['$model'])).bases;
-        setRootAndBaseModelIdsToFlatten({
-            rootModelId: selection['$metadata']['$model'],
-            baseModelIds: baseModelIds
-        })
+        const modelService = new ModelService();
+
+        const setRootAndBaseModels = async (modelId) => {
+            const baseModelIds = (await modelService.getModel(modelId)).bases;
+            setRootAndBaseModelIdsToFlatten({
+                rootModelId: selection['$metadata']['$model'],
+                baseModelIds: baseModelIds
+            })
+        }
+        
+        if (selectionType === 'twin') {
+            const baseModelIds = (await modelService.getModel(selection['$metadata']['$model'])).bases;
+            setRootAndBaseModelIdsToFlatten({
+                rootModelId: selection['$metadata']['$model'],
+                baseModelIds: baseModelIds
+            })
+        } else if (selectionType === 'relationship') {
+            const sourceTwin = await apiService.getTwinById(selection['$sourceId']);
+            const baseModelIds = (await modelService.getModel(sourceTwin['$metadata']['$model'])).bases;
+            setRootAndBaseModelIdsToFlatten({
+                rootModelId: sourceTwin['$metadata']['$model'],
+                baseModelIds: baseModelIds
+            })
+        } 
         setSelectionType(selectionType);
         setSelection(selection);
     }
