@@ -4,6 +4,7 @@ import { eventService } from "../../services/EventService";
 import getAdtAdapter from "./AdtAdapterInstance";
 import { ModelService } from "../../services/ModelService";
 import { PropertyInspector } from '@microsoft/iot-cardboard-js';
+import "@microsoft/iot-cardboard-js/themes.css";
 import "./PropertyInspectorComponentV2.scss";
 
 const PropertyInspectorComponent = () => {
