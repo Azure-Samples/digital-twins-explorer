@@ -70,7 +70,6 @@ const PropertyInspectorComponent = () => {
         
         if (selectionType === 'twin') {
             const baseModel = await modelService.getModel(selection['$metadata']['$model']);
-            console.log(baseModel);
             dispatch({
                 type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
                 payload: {
