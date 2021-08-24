@@ -69,12 +69,13 @@ const PropertyInspectorComponent = () => {
         const modelService = new ModelService();
         
         if (selectionType === 'twin') {
-            const baseModelIds = (await modelService.getModel(selection['$metadata']['$model'])).bases;
+            const baseModel = await modelService.getModel(selection['$metadata']['$model']);
+            console.log(baseModel);
             dispatch({
                 type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
                 payload: {
                     rootModelId: selection['$metadata']['$model'],
-                    baseModelIds: baseModelIds
+                    baseModelIds: [...baseModel.bases, ...baseModel.components.map(c => c.id)]
                 }
             })
         } else if (selectionType === 'relationship') {
