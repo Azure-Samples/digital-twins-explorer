@@ -9,24 +9,33 @@ import "./PropertyInspectorComponentV2.scss";
 
 const PropertyInspectorComponent = () => {
 
-    const [isLoadingSelection, setIsLoadingSelection] = useState(false);
     const [selectionType, setSelectionType] = useState(null);
     const [selection, setSelection] = useState(null);
+    const [rootAndBaseModelIdsToFlatten, setRootAndBaseModelIdsToFlatten] = useState(null);
     const [adapter, setAdapter] = useState(null);
+
+    const modelService = useRef(new ModelService());
 
     const subscribeSelection = () => {
         eventService.subscribeSelection(payload => {
             if (payload) {
                 const { selection, selectionType } = payload;
-                setIsLoadingSelection(true);
-                setSelectionType(selectionType);
-                setSelection(selection);
+                flattenModelAndSetSelection(selection, selectionType);
             } else {
-                setIsLoadingSelection(false);
                 setSelectionType(null);
                 setSelection(null);
             }
         });
+    }
+
+    const flattenModelAndSetSelection = async (selection, selectionType) => {
+        const baseModelIds = (await modelService.current.getModel(selection['$metadata']['$model'])).bases;
+        setRootAndBaseModelIdsToFlatten({
+            rootModelId: selection['$metadata']['$model'],
+            baseModelIds: baseModelIds
+        })
+        setSelectionType(selectionType);
+        setSelection(selection);
     }
 
     const subscribeConfigure = () => {
@@ -58,6 +67,10 @@ const PropertyInspectorComponent = () => {
                     resolvedTwin={selection}
                     twinId={selection['$dtId']}
                     adapter={adapter}
+                    rootAndBaseModelIdsToFlatten={{
+                        baseModelIds: rootAndBaseModelIdsToFlatten.baseModelIds,
+                        rootModelId: rootAndBaseModelIdsToFlatten.rootModelId
+                    }}
                 />
             </div>
         );
@@ -69,6 +82,10 @@ const PropertyInspectorComponent = () => {
                     relationshipId={selection['$relationshipId']}
                     twinId={selection['$sourceId']}
                     adapter={adapter}
+                    rootAndBaseModelIdsToFlatten={{
+                        baseModelIds: rootAndBaseModelIdsToFlatten.baseModelIds,
+                        rootModelId: rootAndBaseModelIdsToFlatten.rootModelId
+                    }}
                 />
             </div>
         );
