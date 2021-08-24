@@ -54,7 +54,8 @@ const PropertyInspectorComponent = () => {
     if (selectionType === 'twin') {
         return (
             <div className="property-inspector-container">
-                <PropertyInspector 
+                <PropertyInspector
+                    resolvedTwin={selection}
                     twinId={selection['$dtId']}
                     adapter={adapter}
                 />
@@ -64,6 +65,7 @@ const PropertyInspectorComponent = () => {
         return (
             <div className="property-inspector-container">
                 <PropertyInspector
+                    resolvedRelationship={selection}
                     relationshipId={selection['$relationshipId']}
                     twinId={selection['$sourceId']}
                     adapter={adapter}
