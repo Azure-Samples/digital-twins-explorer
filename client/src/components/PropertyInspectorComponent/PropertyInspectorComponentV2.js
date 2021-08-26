@@ -4,7 +4,7 @@ import { eventService } from "../../services/EventService";
 import getAdtAdapter from "./AdtAdapterInstance";
 import { ModelService } from "../../services/ModelService";
 import { apiService } from "../../services/ApiService";
-import { PropertyInspector } from '@microsoft/iot-cardboard-js';
+import { PropertyInspector, Theme } from '@microsoft/iot-cardboard-js';
 import produce from "immer"
 import "@microsoft/iot-cardboard-js/themes.css";
 import "./PropertyInspectorComponentV2.scss";
@@ -143,6 +143,7 @@ const PropertyInspectorComponent = () => {
                         rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
                     }}
                     isPropertyInspectorLoading={state.isSelectionLoading}
+                    theme={'explorer'}
                 />
             </div>
         );
@@ -160,6 +161,7 @@ const PropertyInspectorComponent = () => {
                         rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
                     }}
                     isPropertyInspectorLoading={state.isSelectionLoading}
+                    theme={'explorer'}
                 />
             </div>
         );
