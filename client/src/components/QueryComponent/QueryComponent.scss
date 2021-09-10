@@ -61,6 +61,7 @@
 .qc-queryControls {
   display: flex;
   margin-top: 2px;
+  align-items: center;
   .ms-Checkbox {
     align-items: center;
     margin-right: 10px;
@@ -180,8 +181,12 @@
   border: none;
   border-radius: none;
   background: $buttonColor;
-  &:hover, &:focus {
+  color: black;
+  font-weight: 400;
+  &:hover,
+  &:focus {
     background: $buttonColor;
+    color: black;
   }
 }
 
@@ -196,7 +201,8 @@
   margin-right: 10px;
 }
 
-.qc-save-query, .qc-confirm-delete {
+.qc-save-query,
+.qc-confirm-delete {
   h2 {
     font-weight: 400;
     margin-bottom: 10px;
@@ -243,6 +249,18 @@
   }
 }
 
-.ms-Button-flexContainer{
+.ms-Button-flexContainer {
   width: 100%;
+}
+
+.drop-down-text-box {
+  .ms-TextField-fieldGroup {
+    border: none;
+    margin: 0;
+    height: 30px;
+    &:focus {
+      outline: none;
+      border: none;
+    }
+  }
 }

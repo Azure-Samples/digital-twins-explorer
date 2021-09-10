@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { eventService } from "../../../services/EventService";
 import { IconButton, Label, TextField, Checkbox, Toggle } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
+import { eventService } from "../../../services/EventService";
 
 const addIconStyle = {
   background: "#0078d4",
@@ -13,7 +14,7 @@ const addIconStyle = {
   cursor: "pointer"
 };
 
-export default class ModelGraphViewerTermManagementComponent extends Component {
+class ModelGraphViewerTermManagementComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -23,28 +24,28 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
     this.menuItems = [
       {
         key: "addSuperTypes",
-        text: "Add Supertype",
-        ariaLabel: "add supertype"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.superTypes.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.superTypes.ariaLabel")
       },
       {
         key: "addSubTypes",
-        text: "Add Subtypes",
-        ariaLabel: "add subtypes"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addSubTypes.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addSubTypes.ariaLabel")
       },
       {
         key: "addOutgoingRelationships",
-        text: "Add Outgoing Relationships",
-        ariaLabel: "add outgoing relationships"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addOutgoingRelationships.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.addOutgoingRelationships.ariaLabel")
       },
       {
         key: "matchDtmi",
-        text: "Match DTMI",
-        ariaLabel: "match dtmi"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDtmi.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDtmi.ariaLabel")
       },
       {
         key: "matchDisplayName",
-        text: "Match Display Name",
-        ariaLabel: "match display name"
+        text: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDisplayName.text"),
+        ariaLabel: this.props.t("modelGraphViewerTermManagementComponent.menuItems.matchDisplayName.ariaLabel")
       }
     ];
   }
@@ -164,6 +165,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
             <div className="filter-term" key={`${term.text}-${term.isActive ? "active" : "inactive"}`}>
               <div className={`term-bar ${term.isActive ? "active" : ""}`}>
                 <Toggle className="filter-toggle"
+                  ariaLabel={term.text}
                   checked={term.isActive} onChange={() => this.onTermActiveChange(term)} style={{
                     marginBottom: 0,
                     height: 12,
@@ -175,6 +177,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
                     <IconButton
                       onClick={() => this.toggleTermOptions(term)}
                       className="more-icon"
+                      ariaLabel={this.props.t("modelGraphViewerTermManagementComponent.termOptions")}
                       style={{
                         height: 22,
                         width: 22
@@ -194,6 +197,7 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
                   </div>
                   <IconButton
                     onClick={() => this.removeTerm(term)}
+                    ariaLabel={this.props.t("modelGraphViewerTermManagementComponent.removeFiltering")}
                     style={{
                       background: term.isActive ? "#084772" : "#7E7E7E",
                       height: 22,
@@ -215,3 +219,5 @@ export default class ModelGraphViewerTermManagementComponent extends Component {
   }
 
 }
+
+export default withTranslation()(ModelGraphViewerTermManagementComponent);

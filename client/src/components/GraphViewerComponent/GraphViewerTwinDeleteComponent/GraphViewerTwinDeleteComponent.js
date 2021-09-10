@@ -57,7 +57,11 @@ export class GraphViewerTwinDeleteComponent extends Component {
       return;
     }
 
-    this.setState({ showModal: true });
+    this.setState({ showModal: true }, () => {
+      setTimeout(() => {
+        document.getElementById("delete-twin-button").focus();
+      }, 200);
+    });
   }
 
   confirm = async () => {
@@ -75,7 +79,7 @@ export class GraphViewerTwinDeleteComponent extends Component {
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
         <h2 className="heading-2">Are you sure?</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button save-button" onClick={this.confirm}>Delete</DefaultButton>
+          <DefaultButton className="modal-button save-button" onClick={this.confirm} id="delete-twin-button">Delete</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
         </div>
       </ModalComponent>

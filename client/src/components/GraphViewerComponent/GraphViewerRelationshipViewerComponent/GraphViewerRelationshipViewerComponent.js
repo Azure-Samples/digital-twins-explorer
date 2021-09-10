@@ -46,7 +46,11 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       return;
     }
 
-    this.setState({ isLoading: true, showModal: true });
+    this.setState({ isLoading: true, showModal: true }, () => {
+      setTimeout(() => {
+        document.getElementById("rel-detail-close-modal-button").focus();
+      }, 200);
+    });
     await this.getOutgoingRelationships(selectedNode.id);
     await this.getIncomingRelationships(selectedNode.id);
   }
@@ -119,7 +123,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
           </div>
         )}
         <div className="btn-group">
-          <DefaultButton className="modal-button close-button" onClick={this.close}>Close</DefaultButton>
+          <DefaultButton className="modal-button close-button" onClick={this.close} id="rel-detail-close-modal-button">Close</DefaultButton>
         </div>
       </ModalComponent>
     );

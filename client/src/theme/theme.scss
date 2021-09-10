@@ -1,37 +1,92 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+html {
+  // Fallback variables (new variables have to be added to the variables.js file for every contrast)
+  --background-color1: #1e1e1e;
+  --background-color2: #252526;
+  --background-color3: #161616;
+  --background-color4: #3a3a3a;
+  --background-color5: #222222;
+  --background-color6: black;
+  --background-color7: gray;
+  --background-color8: #171717;
 
-$backgroundColor1 : #1e1e1e;
-$backgroundColor2 : #252526;
-$backgroundColor3: #161616;
-$backgroundColor4 : #3a3a3a;
-$backgroundColor5 : #222222;
-$backgroundColor6 : black;
-$backgroundColor7 : gray;
-$backgroundColor8 : #171717;
+  --button-color: #189BFF;
 
-$inputColor: #353535;
-$inputOutlineColor: #999999;
+  --input-color: #353535;
+  --input-outline-color: #999999;
+  --input-placeholder-color: #9E9E9E;
 
-$buttonColor: #2F7FDB;
+  --icon-hover-color: #A3D7FF;
 
-$outlineColor1 : #cccccc;
-$outlineColor2 : #999999;
-$outlineColor3 : #aa9999;
-$outlineColor4 : #e5e5e5;
+  --outline-color1: #cccccc;
+  --outline-color2: #999999;
+  --outline-color3: #aa9999;
+  --outline-color4: #e5e5e5;
 
-$textColorDark1: black;
+  --outline-focus-color: #71a9f8;
 
-$textColorLight1: #f2f2f2;
-$textColorLight2: #a3a3a3;
-$textColorLight3: #aaaaaa;
+  --text-color-dark1: black;
 
-$textColorError: red;
-$textColorWarning: rgb(255, 188, 20);
-$textColorSuccess: greenyellow;
+  --text-color-light1: #f2f2f2;
+  --text-color-light2: #a3a3a3;
+  --text-color-light3: #aaaaaa;
 
-$editorStringColor: #F0C081;
-$editorNumberColor: #9dcf8d;
+  --text-color-error: red;
+  --text-color-warning: rgb(255, 188, 20);
+  --text-color-success: greenyellow;
+
+  --editor-string-color: #F0C081;
+  --editor-number-color: #9dcf8d;
+
+  --scrollbar-color: #8C8C8C;
+
+  --highlight-color: #98E3FD;
+
+  --dark-fabric-primary: #60aaff;
+}
+
+$backgroundColor1: var(--background-color1);
+$backgroundColor2: var(--background-color2);
+$backgroundColor3: var(--background-color3);
+$backgroundColor4: var(--background-color4);
+$backgroundColor5: var(--background-color5);
+$backgroundColor6: var(--background-color6);
+$backgroundColor7: var(--background-color7);
+$backgroundColor8: var(--background-color8);
+
+$inputColor: var(--input-color);
+$inputOutlineColor: var(--input-outline-color);
+$inputPlaceholderColor: var(--input-placeholder-color);
+
+$iconHoverColor: var(--icon-hover-color);
+
+$buttonColor: var(--button-color);
+
+$outlineColor1: var(--outline-color1);
+$outlineColor2: var(--outline-color2);
+$outlineColor3: var(--outline-color3);
+$outlineColor4: var(--outline-color4);
+
+$outlineFocusColor: var(--outline-focus-color);
+
+$textColorDark1:  var(--text-color-dark1);
+
+$textColorLight1:  var(--text-color-light1);
+$textColorLight2:  var(--text-color-light2);
+$textColorLight3:  var(--text-color-light3);
+
+$textColorError: var(--text-color-error);
+$textColorWarning: var(--text-color-warning);
+$textColorSuccess: var(--text-color-success);
+
+$editorStringColor: var(--editor-string-color);
+$editorNumberColor: var(--editor-number-color);
+
+$scrollbarColor: var(--scrollbar-color);
+$highlightColor: var(--highlight-color);
+
+$darkFabricPrimary: var(--dark-fabric-primary);
 
 $fontFamilyMain: "Segoe UI", sans-serif;
 $fontFamilyConsole: 'Consolas','Courier New', Courier, monospace;

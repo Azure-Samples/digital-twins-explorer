@@ -26,7 +26,7 @@ body {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #404040;
+  background-color: $scrollbarColor;
   outline: 1px solid black;
 }
 ::-webkit-scrollbar-corner {
@@ -34,11 +34,11 @@ body {
 }
 ::-webkit-scrollbar-thumb:horizontal:hover,
 ::-webkit-scrollbar-thumb:vertical:hover {
-  background-color: #464646;
+  background-color: $scrollbarColor;
 }
 ::-webkit-scrollbar-thumb:horizontal:active,
 ::-webkit-scrollbar-thumb:vertical:active {
-  background-color: #4d4d4d;
+  background-color: $scrollbarColor;
 }
 
 ::placeholder {
@@ -114,6 +114,7 @@ body {
   padding-top: 4px;
   height: calc(100vh - 52px);
   color: white;
+  width: 100vw;
 }
 
 .json-markup-string {
@@ -313,6 +314,133 @@ code[class*="language-"], pre[class*="language-"] {
     li {
       padding: 2px 8px 2px 4px;
       font-size: 13px;
+    }
+  }
+}
+
+.draggable {
+  width: 3px;
+  background-color: $backgroundColor2;
+  transition: background-color 200ms ease;
+
+  &:hover {
+    cursor: col-resize;
+    background-color: #3f3f3f;
+  }
+  &.horizontal {
+    width: 100%;
+    height: 3px;
+    &:hover {
+      cursor: row-resize;
+    }
+  }
+}
+.full-height {
+  height: 100%;
+}
+.tab-pivot {
+  div[role=tabpanel] {
+    height: calc(100% - 35px);
+    background-color: $backgroundColor5;
+    >div {
+      height: 100%;
+    }
+  }
+  .ms-Pivot-link {
+    height: 30px;
+    background-color: $backgroundColor5;
+    font-size: 12px;
+    margin-top: 5px;
+    &::before {
+      display: none;
+    }
+  }
+}
+.tab-pivot-panel {
+  height: calc(100% - 35px);
+  background-color: $backgroundColor5;
+  >div {
+    height: 100%;
+    &.hidden {
+      visibility: hidden;
+      height: 0;
+    }
+  }
+}
+.tab-button {
+  &::before {
+    display: none;
+  }
+}
+.relative {}
+
+.bottom-area-content {
+  display: flex;
+  height: calc(100% - 3px);
+  >div {
+    flex: 1;
+    height: 100%;
+    &:first-child {
+      margin-right: 5px;
+    }
+    .tab-pivot {
+      height: 100%;
+    }
+  }
+}
+
+.ms-TextField-fieldGroup {
+  &::after {
+    border: 2px solid $outlineFocusColor !important;
+  }
+  input {
+    &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: $inputPlaceholderColor !important;
+      opacity: 1; /* Firefox */
+    }
+  }
+}
+
+.ms-CommandBarItem-link {
+  &:hover {
+    .ms-Button-icon {
+      color: $textColorLight1;
+    }
+  }
+}
+
+.light-command-bar {
+  .ms-CommandBarItem-link {
+    .ms-Button-icon {
+      color: $textColorLight2;
+      
+    }
+    &.is-disabled {
+      .ms-Button-icon {
+        color: rgb(89, 89, 89);
+      }
+    }
+    &:hover {
+      .ms-Button-icon {
+        color: $textColorLight1;
+      }
+    }
+  }
+}
+
+.mvg-filter, .gv-filter {
+  i {
+    background-color: $buttonColor;
+  }
+}
+
+.custom-svg-icon {
+  path {
+    fill: $darkFabricPrimary;
+  }
+  &:hover {
+    path {
+      fill: $textColorLight1;
     }
   }
 }

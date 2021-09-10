@@ -7,7 +7,6 @@ import { DefaultButton } from "office-ui-fabric-react";
 import { apiService } from "../../../services/ApiService";
 import { eventService } from "../../../services/EventService";
 import { print } from "../../../services/LoggingService";
-
 export default class DeleteAllTwinsComponent extends Component {
 
   constructor(props) {
@@ -52,10 +51,10 @@ export default class DeleteAllTwinsComponent extends Component {
     const { showModal, isLoading } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
-        <h2 className="heading-2">Are you sure?</h2>
+        <h2 className="heading-2">{this.props.t("deleteAllTwinsComponent.heading")}</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button save-button" onClick={this.confirm}>Delete</DefaultButton>
-          <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
+          <DefaultButton className="modal-button save-button" onClick={this.confirm}>{this.props.t("deleteAllTwinsComponent.deleteButton")}</DefaultButton>
+          <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>{this.props.t("deleteAllTwinsComponent.cancelButton")}</DefaultButton>
         </div>
       </ModalComponent>
     );

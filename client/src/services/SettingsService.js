@@ -11,7 +11,7 @@ class SettingsService {
 
   constructor() {
     this.settings = storageService.getLocalStorageObject(StorageKeyName)
-      || { caching: true, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1 };
+      || { caching: true, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal" };
   }
 
   get caching() {
@@ -38,6 +38,15 @@ class SettingsService {
 
   set queries(queries) {
     this.settings.queries = queries;
+    this.save();
+  }
+
+  get contrast() {
+    return this.settings.contrast || "normal";
+  }
+
+  set contrast(contrast) {
+    this.settings.contrast = contrast;
     this.save();
   }
 

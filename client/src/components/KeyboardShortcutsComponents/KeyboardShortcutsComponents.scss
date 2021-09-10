@@ -1,0 +1,71 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../theme/theme.scss";
+
+.keyboard-shortcuts {
+  .main-icon {
+    color: $buttonColor;
+    margin-right: 15px;
+    font-size: 36px;
+  }
+  h2 {
+    color: $textColorLight1;
+    font-weight: 400;
+    margin-bottom: 10px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .keys {
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .key {
+    border-radius: 5px;
+    background-color: $backgroundColor1;
+    border: 1px solid $outlineColor2;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    margin-right: 10px;
+    &.square {
+      width: 30px;
+    }
+    &.text {
+      padding: 0 18px;
+    }
+  }
+  .operator {
+    margin-right: 10px;
+  }
+
+  .btn-group {
+    bottom: 3.5vh;
+    right: 3.5vh;
+    position: absolute;
+  }
+
+  .modal-button {
+    width: 100px;
+    margin-right: 10px;
+    color: $textColorLight1;
+    border: none;
+
+    &.close-button {
+      background: $buttonColor;
+      margin-right: 0;
+    }
+  }
+
+  .btn-group {
+    margin-top: 15px;
+  }
+}

@@ -174,6 +174,8 @@
       margin-bottom: 0;
       height: 100%;
       margin-right: 5px;
+      display: flex;
+      align-items: center;
       .ms-Toggle-background {
         border-color: transparent;
         background: #7E7E7E;
@@ -205,7 +207,7 @@
       }
       .term-bar {
         height: 22px;
-        color: $textColorLight1;
+        color: white;
         font-size: 12px;
         font-weight: 600;
         background: $inputOutlineColor;

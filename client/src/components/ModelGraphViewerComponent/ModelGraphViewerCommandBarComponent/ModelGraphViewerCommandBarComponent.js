@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
+import { withTranslation } from "react-i18next";
 import { CommandBar, CommandBarButton } from "office-ui-fabric-react";
 
 import "./ModelGraphViewerCommandBarComponent.scss";
@@ -19,7 +20,7 @@ const dropdownButtonStyles = {
   marginLeft: 10
 };
 
-export class ModelGraphViewerCommandBarComponent extends Component {
+class ModelGraphViewerCommandBarComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -29,8 +30,8 @@ export class ModelGraphViewerCommandBarComponent extends Component {
   layoutItems = [
     {
       key: "relayout",
-      text: "Run Layout",
-      ariaLabel: "run layout",
+      text: this.props.t("modelGraphViewerCommandBarComponent.layoutItems.text"),
+      ariaLabel: this.props.t("modelGraphViewerCommandBarComponent.layoutItems.ariaLabel"),
       iconOnly: true,
       iconProps: { iconName: "ArrangeSendToBack" },
       onClick: () => this.props.onLayoutClicked(),
@@ -59,9 +60,11 @@ export class ModelGraphViewerCommandBarComponent extends Component {
         <CommandBar className="gv-commandbar"
           farItems={this.layoutItems}
           buttonAs={this.renderButton}
-          ariaLabel="Use left and right arrow keys to navigate between commands" />
+          ariaLabel={this.props.t("modelGraphViewerCommandBarComponent.layoutItems.render.ariaLabel")} />
       </div>
     );
   }
 
 }
+
+export default withTranslation()(ModelGraphViewerCommandBarComponent);

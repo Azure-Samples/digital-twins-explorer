@@ -48,7 +48,7 @@ export class ModelViewerViewComponent extends Component {
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="mv-model-view-modal">
         <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#close-model-btn">
           <form onSubmit={this.close}>
-            <h2 className="heading-2">Model Information</h2>
+            <h2 className="heading-2">{this.props.t("modelViewerViewComponent.heading")}</h2>
             <div className="pre-wrapper modal-scroll">
               {model && <pre>
                 <code className="language-json">
@@ -58,7 +58,7 @@ export class ModelViewerViewComponent extends Component {
             </div>
             <div className="btn-group">
               <DefaultButton id="close-model-btn" className="modal-button close-button" type="submit" onClick={this.close}>
-                Close
+                {this.props.t("modelViewerViewComponent.defaultButton")}
               </DefaultButton>
             </div>
           </form>

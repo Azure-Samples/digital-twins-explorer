@@ -54,25 +54,42 @@
 }
 
 .custom-context-menu {
-  background: $backgroundColor2;
   border: 0px solid transparent !important;
-  border-radius: 5px !important;
+  border-radius: 0 !important;
   outline: none;
   min-width: 200px !important;
-  padding: 12px 0 !important;
+  padding: 0 !important;
 }
 
 .custom-menu-item {
-  background: $backgroundColor2 !important;
+  background: $backgroundColor3 !important;
   border: 0px solid transparent !important;
-  padding-left: 12px !important;
+  padding: 10px 8px !important;
   outline: none;
   color: $textColorLight1 !important;
   font-family: $fontFamilyMain !important;
-  font-size: 16px !important;
-  &:hover {
-    background: $backgroundColor1 !important;
-    color: $textColorLight1 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  border: 1px solid $backgroundColor2 !important;
+  border-bottom: none !important;
+  &:last-child {
+    border-bottom: 1px solid $backgroundColor2 !important;
+  }
+  &:hover, &:focus {
+    background: $highlightColor !important;
+    color: $textColorDark1 !important;
+    border: 1px solid $textColorDark1 !important;
+    border-bottom: none !important;
+    &:last-child {
+      border-bottom: 1px solid $textColorDark1 !important;
+    }
+  }
+  &:focus {
+    border: 1px double $textColorLight1 !important;
+    border-bottom: none !important;
+    &:last-child {
+      border-bottom: 1px solid $textColorLight1 !important;
+    }
   }
 }
 

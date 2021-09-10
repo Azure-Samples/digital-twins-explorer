@@ -96,7 +96,13 @@ export const graphStyles = [ // the stylesheet for the graph
     style: {
       "opacity": "0.4"
     }
-  }
+  },
+  {
+    selector: "node.selected",
+    style: {
+      "border-color": "#900",
+    }
+  },
 ]
 
 export const dagreOptions = {
