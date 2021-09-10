@@ -4,6 +4,7 @@
 import React, { Component } from "react";
 import { TextField, Dropdown, DefaultButton, Icon, IconButton,
   FocusZone, FocusZoneTabbableElements, Checkbox } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
 import { print } from "../../services/LoggingService";
 import { eventService } from "../../services/EventService";
@@ -15,7 +16,8 @@ import { ConfirmQueryDialogComponent } from "./ConfirmQueryDialogComponent/Confi
 
 const defaultQuery = "SELECT * FROM digitaltwins";
 
-export class QueryComponent extends Component {
+const ENTER_KEY_CODE = 13;
+class QueryComponent extends Component {
 
   queryOptions = [
     { key: "query", text: "Query" },
@@ -155,35 +157,49 @@ export class QueryComponent extends Component {
     eventService.publishOverlayQueryResults(!!checked);
   };
 
+  handleOverlayResultsKeyUp = e => {
+    if (e.keyCode === ENTER_KEY_CODE) {
+      eventService.publishOverlayQueryResults(!this.state.isOverlayResultsChecked);
+      this.setState(prevState => ({ isOverlayResultsChecked: !prevState.isOverlayResultsChecked }));
+    }
+  }
+
   render() {
     const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
       showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
+
     return (
       <>
         <div className="qc-grid">
           <div className="qc-queryBox">
             <div className="qc-label">
               <Dropdown
-                placeholder="Saved Queries"
+                placeholder={this.props.t("queryComponent.savedQueries")}
+                ariaLabel={this.props.t("queryComponent.savedQueries")}
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
+                role="presentation"
                 styles={{
                   dropdown: { width: 200 }
                 }}
                 onChange={this.onSelectedQueryChange} />
             </div>
-            <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#queryField">
+            <FocusZone handleTabKey={FocusZoneTabbableElements.all} defaultActiveElement="#queryField">
               <form onSubmit={this.executeQuery}>
-                <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} />
+                <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
               </form>
             </FocusZone>
             <div className="qc-queryControls">
-              <Checkbox label="Overlay results" checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+              <FocusZone onKeyUp={this.handleOverlayResultsKeyUp}>
+                <Checkbox label={this.props.t("queryComponent.overlayResults")} checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+              </FocusZone>
               <DefaultButton className="query-button" onClick={this.executeQuery}>
-                Run Query
+                {this.props.t("queryComponent.defaultButton")}
               </DefaultButton>
-              <IconButton className="query-save-button" iconProps={{ iconName: "Save" }} title="Save" ariaLabel="Save query"
+              <IconButton className="query-save-button"
+                iconProps={{ iconName: this.props.t("queryComponent.iconButton"), style: { color: "black" } }}
+                title={this.props.t("queryComponent.iconButton")} ariaLabel="Save query"
                 onClick={this.saveQueryButtonClicked} />
             </div>
           </div>
@@ -191,12 +207,12 @@ export class QueryComponent extends Component {
         <SaveQueryDialogComponent isVisible={showSaveQueryModal}
           onConfirm={this.saveQuery} onCancel={this.cancelSaveQuery}
           onChange={this.onChangeQueryName} query={newQueryName} />
-        <ConfirmQueryDialogComponent title="Query Already Exists"
-          description="Saving this query will overwrite the existing one."
+        <ConfirmQueryDialogComponent title={this.props.t("queryComponent.confirmQueryDialogComponent1.title")}
+          description={this.props.t("queryComponent.confirmQueryDialogComponent1.description")}
           action="Confirm" isVisible={showConfirmOverwriteModal}
           onConfirm={this.overwriteQuery} onCancel={this.cancelSaveQuery}
           defaultActiveElementId="deleteQueryField" />
-        <ConfirmQueryDialogComponent title="Are you sure?"
+        <ConfirmQueryDialogComponent title={this.props.t("queryComponent.confirmQueryDialogComponent2.title")}
           action="Delete" isVisible={showConfirmDeleteModal}
           onConfirm={this.confirmDeleteQuery} onCancel={this.cancelDeleteQuery} />
       </>
@@ -204,3 +220,5 @@ export class QueryComponent extends Component {
   }
 
 }
+
+export default withTranslation()(QueryComponent);

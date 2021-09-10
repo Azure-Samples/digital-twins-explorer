@@ -3,7 +3,14 @@
 
 import React from "react";
 import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
-import { IconButton, Stack } from "office-ui-fabric-react";
+import { Stack } from "office-ui-fabric-react";
+import ModelViewerItemCommandBarComponent from "../ModelViewerItemCommandBarComponent/ModelViewerItemCommandBarComponent";
+
+const TAB_KEY_CODE = 9;
+const ARROW_DOWN_KEY_CODE = 40;
+const ARROW_UP_KEY_CODE = 38;
+const SPACE_CODE = 32;
+const ENTER_KEY_CODE = 13;
 
 const commonStyles = {
   display: "inline-block",
@@ -33,8 +40,10 @@ const classNames = mergeStyleSets({
   ]
 });
 
-export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect, onSetModelImage, onUpdateModelImage, modelImage, isSelected }) => {
+const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect,
+  onSetModelImage, onUpdateModelImage, modelImage, isSelected, onFocus, onBlur, onArrowDown, onArrowUp, setRef, onTab, showItemMenu }) => {
   const uploadModelImageRef = React.createRef();
+  const commandBar = React.createRef();
 
   const onHandleModelImage = () => {
     if (modelImage) {
@@ -44,26 +53,51 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
     }
   };
 
+  const onKeyDownItem = e => {
+    switch (e.keyCode) {
+      case ARROW_DOWN_KEY_CODE:
+        onArrowDown();
+        break;
+      case ARROW_UP_KEY_CODE:
+        onArrowUp();
+        break;
+      case SPACE_CODE:
+        e.preventDefault();
+        commandBar.current.clickOverflowButton();
+        break;
+      case ENTER_KEY_CODE:
+        onSelect();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const onKeyDownMenu = e => {
+    if (e.keyCode === TAB_KEY_CODE && !e.shiftKey) {
+      onTab(e);
+    }
+  };
+
   return (
-    <div className={classNames.item} data-is-focusable data-selection-index={itemIndex} onClick={onSelect}>
-      <div className={`mv_listItem ${isSelected ? "mv_listItem_selected" : ""}`} data-is-focusable data-selection-toggle data-selection-invoke>
+    <div className={classNames.item} tabIndex="0" data-selection-index={itemIndex} data-selection-toggle
+      data-is-focusable onClick={onSelect} onFocus={onFocus} onBlur={onBlur} onKeyDown={onKeyDownItem} ref={setRef}>
+      <div className={`mv_listItem ${isSelected ? "mv_listItem_selected" : ""}`} data-selection-invoke>
         <Stack horizontal={false}>
           <Stack horizontal>
             <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
             <div className="mv_buttonGroup">
-              <IconButton iconProps={{ iconName: "Delete" }} id={item.key}
-                title="Delete Model" ariaLabel="Delete Model"
-                className="mv-loadButtons" onClick={onDelete} />
-              <IconButton iconProps={{ iconName: "ImageSearch" }} id={item.key}
-                title="Upload Model image" ariaLabel="Upload Model image"
-                className="mv-loadButtons" onClick={onHandleModelImage} />
-              <IconButton iconProps={{ iconName: "Info" }} id={item.key}
-                title="View Model" ariaLabel="View Model"
-                className="mv-loadButtons" onClick={onView} />
-              <IconButton iconProps={{ iconName: "AddTo" }} id={item.key}
-                title="Create a Twin" ariaLabel="Create a Twin"
-                className="mv-loadButtons" onClick={onCreate} />
-              <input id={item.key} type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
+              <ModelViewerItemCommandBarComponent
+                item={item}
+                buttonClass="mv-loadButtons"
+                onDelete={onDelete}
+                onHandleModelImage={onHandleModelImage}
+                onCreate={onCreate}
+                onKeyDown={onKeyDownMenu}
+                ref={commandBar}
+                showItemMenu={showItemMenu}
+                onView={onView} />
+              <input type="file" name="image-upload" className="mv-fileInput" accept="image/png, image/jpeg"
                 ref={uploadModelImageRef} onChange={evt => onSetModelImage(evt, item, uploadModelImageRef)} />
             </div>
           </Stack>
@@ -73,3 +107,5 @@ export const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, o
     </div>
   );
 };
+
+export default ModelViewerItem;

@@ -1,4 +1,6 @@
 import React from "react";
+import { withTranslation } from "react-i18next";
+
 import {
   IconButton,
   Stack,
@@ -21,72 +23,92 @@ const GraphViewerFilteringComponent = ({
   onUpdateHighlightingTerm,
   highlightingTerms,
   filteringTerms,
-  onSwitchFilters
-}) => (
-  <>
-    <div className="gc-controls">
-      <Stack horizontal={false}>
-        <div className="controls_buttonGroup">
-          <IconButton
-            iconProps={{ iconName: "ZoomIn" }}
-            title="Zoom in"
-            ariaLabel="Zoom in"
-            onClick={onZoomIn}
-            className="control-loadButtons" />
-          <IconButton
-            iconProps={{ iconName: "ZoomOut" }}
-            title="Zoom out"
-            ariaLabel="Zoom out"
-            onClick={onZoomOut}
-            className="control-loadButtons" />
-        </div>
-        <div className="controls_singleButton">
-          <IconButton
-            iconProps={{ iconName: "SetToCenter" }}
-            title="Center"
-            ariaLabel="Center"
-            onClick={onCenter}
-            className="control-loadButtons" />
-        </div>
-        <div className="controls_singleButton">
-          <IconButton
-            iconProps={{ iconName: "ZoomToFit" }}
-            title="Zoom to fit"
-            ariaLabel="Zoom to fit"
-            onClick={onZoomToFit}
-            className="control-loadButtons" />
-        </div>
-        <div className="controls_singleButton filter_button">
-          <IconButton
-            iconProps={{ iconName: "Filter" }}
-            title="Toggle model filter drawer"
-            ariaLabel="Toggle model filter drawer"
-            className="control-loadButtons"
-            onClick={toggleFilter} />
-        </div>
-      </Stack>
-    </div>
-    <div className="gc-filter-contents">
-      <div>
-        <Pivot onLinkClick={onSwitchFilters}>
-          <PivotItem headerText="Filter" key="filter">
-            <GraphViewerTermManagementComponent
-              onAddFilteringTerm={onAddFilteringTerm}
-              onRemoveFilteringTerm={onRemoveFilteringTerm}
-              onUpdateTerm={onUpdateFilteringTerm}
-              terms={filteringTerms} />
-          </PivotItem>
-          <PivotItem headerText="Highlight" key="highlight">
-            <GraphViewerTermManagementComponent
-              onAddFilteringTerm={onAddHighlightingTerm}
-              onRemoveFilteringTerm={onRemoveHighlightingTerm}
-              onUpdateTerm={onUpdateHighlightingTerm}
-              terms={highlightingTerms} />
-          </PivotItem>
-        </Pivot>
+  onSwitchFilters,
+  onSelectAllHighlighted,
+  selectAllHighlightedText,
+  onSelectAllFiltered,
+  selectAllFilteredText,
+  deselectAll,
+  canSelectAllFilter,
+  canSelectAllHighlight,
+  onClearAll,
+  t
+}) => {
+  const filterButtonText = canSelectAllFilter ? selectAllFilteredText : t("graphViewerFilteringComponent.deselectAll");
+  const highlightButtonText = canSelectAllHighlight ? selectAllHighlightedText : t("graphViewerFilteringComponent.deselectAll");
+  return (
+    <>
+      <div className="gc-controls">
+        <Stack horizontal={false}>
+          <div className="controls_buttonGroup">
+            <IconButton
+              iconProps={{ iconName: "ZoomIn" }}
+              title={t("graphViewerFilteringComponent.zoomIn")}
+              ariaLabel={t("graphViewerFilteringComponent.zoomIn")}
+              onClick={onZoomIn}
+              className="control-loadButtons" />
+            <IconButton
+              iconProps={{ iconName: "ZoomOut" }}
+              title={t("graphViewerFilteringComponent.zoomOut")}
+              ariaLabel={t("graphViewerFilteringComponent.zoomOut")}
+              onClick={onZoomOut}
+              className="control-loadButtons" />
+          </div>
+          <div className="controls_singleButton">
+            <IconButton
+              iconProps={{ iconName: "SetToCenter" }}
+              title={t("graphViewerFilteringComponent.center")}
+              ariaLabel={t("graphViewerFilteringComponent.center")}
+              onClick={onCenter}
+              className="control-loadButtons" />
+          </div>
+          <div className="controls_singleButton">
+            <IconButton
+              iconProps={{ iconName: "ZoomToFit" }}
+              title={t("graphViewerFilteringComponent.zoomToFit")}
+              ariaLabel={t("graphViewerFilteringComponent.zoomToFit")}
+              onClick={onZoomToFit}
+              className="control-loadButtons" />
+          </div>
+          <div className="controls_singleButton filter_button">
+            <IconButton
+              iconProps={{ iconName: "Filter" }}
+              title={t("graphViewerFilteringComponent.filter")}
+              ariaLabel={t("graphViewerFilteringComponent.filter")}
+              className="control-loadButtons"
+              onClick={toggleFilter} />
+          </div>
+        </Stack>
       </div>
-    </div>
-  </>
-);
+      <div className="gc-filter-contents">
+        <div>
+          <Pivot onLinkClick={onSwitchFilters} className="filtering-pivot">
+            <PivotItem headerText={t("graphViewerFilteringComponent.header1")} key="filter">
+              <GraphViewerTermManagementComponent
+                onAddFilteringTerm={onAddFilteringTerm}
+                onRemoveFilteringTerm={onRemoveFilteringTerm}
+                onUpdateTerm={onUpdateFilteringTerm}
+                onAction={canSelectAllFilter ? onSelectAllFiltered : deselectAll}
+                actionText={filteringTerms.length > 0 ? filterButtonText : ""}
+                onClearAll={onClearAll}
+                terms={filteringTerms} />
+            </PivotItem>
+            <PivotItem headerText={t("graphViewerFilteringComponent.header2")} key="highlight">
+              <GraphViewerTermManagementComponent
+                onAddFilteringTerm={onAddHighlightingTerm}
+                onRemoveFilteringTerm={onRemoveHighlightingTerm}
+                onUpdateTerm={onUpdateHighlightingTerm}
+                onAction={canSelectAllHighlight ? onSelectAllHighlighted : deselectAll}
+                actionText={highlightingTerms.length > 0 ? highlightButtonText : ""}
+                onClearAll={onClearAll}
+                terms={highlightingTerms} />
+            </PivotItem>
+          </Pivot>
+        </div>
+      </div>
+    </>
+  );
+};
 
-export default GraphViewerFilteringComponent;
+
+export default withTranslation()(GraphViewerFilteringComponent);

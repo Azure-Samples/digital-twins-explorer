@@ -3,8 +3,9 @@
 
 import React, { Component } from "react";
 import { TextField, Selection, SelectionMode, SelectionZone } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
-import { ModelViewerCommandBarComponent } from "./ModelViewerCommandBarComponent/ModelViewerCommandBarComponent";
+import ModelViewerCommandBarComponent from "./ModelViewerCommandBarComponent/ModelViewerCommandBarComponent";
 import { ModelViewerViewComponent } from "./ModelViewerViewComponent/ModelViewerViewComponent";
 import { ModelViewerCreateComponent } from "./ModelViewerCreateComponent/ModelViewerCreateComponent";
 import { ModelViewerDeleteComponent } from "./ModelViewerDeleteComponent/ModelViewerDeleteComponent";
@@ -12,7 +13,7 @@ import { ModelViewerUpdateModelImageComponent } from "./ModelViewerUpdateModelIm
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { readFile, sortArray } from "../../utils/utilities";
 import { print } from "../../services/LoggingService";
-import { ModelViewerItem } from "./ModelViewerItem/ModelViewerItem";
+import ModelViewerItem from "./ModelViewerItem/ModelViewerItem";
 import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
@@ -20,7 +21,7 @@ import { settingsService } from "../../services/SettingsService";
 
 import "./ModelViewerComponent.scss";
 
-export class ModelViewerComponent extends Component {
+class ModelViewerComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -41,7 +42,9 @@ export class ModelViewerComponent extends Component {
     this.deleteRef = React.createRef();
     this.selectRef = React.createRef();
     this.updateModelImageRef = React.createRef();
+    this.modelViewerItems = [];
     this.inputFileRef = null;
+    this.lastFocusedItemIndex = null;
   }
 
   async componentDidMount() {
@@ -74,6 +77,10 @@ export class ModelViewerComponent extends Component {
 
     eventService.subscribeModelSelectionUpdatedInGraph(modelId => {
       this.updateModelItemSelection(modelId);
+    });
+
+    eventService.subscribeFocusModelViewer(() => {
+      this.modelViewerItems[this.lastFocusedItemIndex ? this.lastFocusedItemIndex : 0].focus();
     });
 
     eventService.subscribeModelsUpdate(() => {
@@ -280,8 +287,38 @@ export class ModelViewerComponent extends Component {
     eventService.publishSelectModel(currentSelectedItem);
   }
 
+  onFocus = item => {
+    eventService.publishFocusModel(item.key);
+  }
+
+  onBlur = item => eventService.publishBlurModel(item.key);
+
+  onTab = (itemIndex, e) => {
+    this.lastFocusedItemIndex = itemIndex;
+    eventService.publishFocusRelationshipsToggle(e);
+  }
+
+  onArrowUp = itemIndex => {
+    const prevItemToFocus = this.modelViewerItems[itemIndex - 1];
+    if (prevItemToFocus) {
+      prevItemToFocus.focus();
+    }
+  }
+
+  onArrowDown = itemIndex => {
+    const nextItemToFocus = this.modelViewerItems[itemIndex + 1];
+    if (nextItemToFocus) {
+      nextItemToFocus.focus();
+    }
+  }
+
+  setModelViewerItemRef = (itemRef, index) => {
+    this.modelViewerItems[index] = itemRef;
+  }
+
   render() {
     const { items, isLoading, filterText } = this.state;
+    const { showItemMenu } = this.props;
     return (
       <>
         <div className="mv-grid">
@@ -293,38 +330,51 @@ export class ModelViewerComponent extends Component {
               onUploadModelClicked={() => this.uploadModelRef.current.click()}
               onUploadModelsFolderClicked={() => this.uploadModelFolderRef.current.click()}
               onUploadModelImagesClicked={() => this.uploadModelImagesRef.current.click()} />
-            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
+            <input id="json-file-input" type="file" name="name" className="mv-fileInput" multiple accept=".json"
               ref={this.uploadModelRef} onChange={this.handleUpload} />
             <input id="directory-input" type="file" name="name" className="mv-fileInput"
               webkitdirectory="" mozdirectory="true" directory=""
               ref={this.uploadModelFolderRef} onChange={this.handleUpload} />
-            <input id="file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
+            <input id="image-file-input" type="file" name="name" className="mv-fileInput" multiple accept="image/png, image/jpeg"
               ref={this.uploadModelImagesRef} onChange={this.handleUploadOfModelImages} />
           </div>
           <div>
             <TextField className="mv-filter" onChange={this.onFilterChanged} styles={this.getStyles}
-              placeholder="Search" value={filterText} />
+              placeholder={this.props.t("modelViewerCommandBarComponent.searchPlaceholder")} value={filterText} />
           </div>
           <div data-is-scrollable="true" className="mv-modelListWrapper">
             <SelectionZone selection={new Selection({ selectionMode: SelectionMode.single })}>
               {items.map((item, index) => {
                 const modelImage = settingsService.getModelImage(item.key);
                 return (
-                  <ModelViewerItem key={item.key} item={item} itemIndex={index} isSelected={item.selected}
+                  <ModelViewerItem
+                    key={item.key}
+                    item={item}
+                    itemIndex={index}
+                    isSelected={item.selected}
+                    showItemMenu={showItemMenu}
                     modelImage={modelImage}
                     onUpdateModelImage={this.onUpdateModelImage}
-                    onSetModelImage={this.onSetModelImage} onView={() => this.onView(item)}
-                    onCreate={() => this.onCreate(item)} onDelete={() => this.onDelete(item)}
-                    onSelect={() => this.onSelect(item)} />
+                    onSetModelImage={this.onSetModelImage}
+                    setRef={ref => this.setModelViewerItemRef(ref, index)}
+                    onView={() => this.onView(item)}
+                    onCreate={() => this.onCreate(item)}
+                    onDelete={() => this.onDelete(item)}
+                    onSelect={() => this.onSelect(item)}
+                    onFocus={() => this.onFocus(item)}
+                    onBlur={() => this.onBlur(item)}
+                    onTab={e => this.onTab(index, e)}
+                    onArrowUp={() => this.onArrowUp(index)}
+                    onArrowDown={() => this.onArrowDown(index)} />
                 );
               })}
             </SelectionZone>
           </div>
           {isLoading && <LoaderComponent />}
         </div>
-        <ModelViewerViewComponent ref={this.viewRef} />
-        <ModelViewerCreateComponent ref={this.createRef} />
-        <ModelViewerDeleteComponent ref={this.deleteRef} />
+        <ModelViewerViewComponent ref={this.viewRef} t={this.props.t} />
+        <ModelViewerCreateComponent ref={this.createRef} t={this.props.t} />
+        <ModelViewerDeleteComponent ref={this.deleteRef} t={this.props.t} />
         <ModelViewerUpdateModelImageComponent
           ref={this.updateModelImageRef}
           onDelete={this.onDeleteModelImage}
@@ -334,3 +384,5 @@ export class ModelViewerComponent extends Component {
   }
 
 }
+
+export default withTranslation()(ModelViewerComponent);

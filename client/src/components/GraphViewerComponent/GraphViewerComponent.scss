@@ -95,7 +95,7 @@
   &.open {
     .gc-filter {
       .gc-filter-contents {
-        height: 120px;
+        height: 155px;
       }
     }
 
@@ -134,6 +134,8 @@
     margin-bottom: 0;
     height: 100%;
     margin-right: 5px;
+    display: flex;
+    align-items: center;
     .ms-Toggle-background {
       border-color: transparent;
       background: #7E7E7E;
@@ -364,6 +366,36 @@
       margin-left: 5px;
       margin-top: 3px;
       margin-bottom: 3px;
+    }
+  }
+}
+
+.filtering-pivot {
+  .ms-Pivot-link {
+    height: 30px;
+    color: $textColorLight2;
+    &.is-selected {
+      color: $textColorLight1;
+    }
+    &::before {
+      height: 0;
+    }
+  }
+  .ms-TextField-field {
+    background-color: $backgroundColor1;
+    color: $textColorLight2;
+  }
+  .action-button {
+    background-color: $backgroundColor1;
+    border: none;
+    border-radius: 3px;
+    color: $textColorLight1;
+    padding: 5px 12px;
+    margin-right: 10px;
+    font-weight: 400;
+    font-family: $fontFamilyMain;
+    &:hover {
+      background-color: $buttonColor;
     }
   }
 }

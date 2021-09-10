@@ -3,9 +3,16 @@
 
 @import "../../theme/theme.scss";
 
+:root {
+  --json-editor-empty-value: "Unset";
+}
+
 .pi-gridWrapper {
   height: inherit;
   max-height: 100%;
+  .ms-Button-label {
+    font-weight: 200 !important;
+  }
 }
 
 .pi-patch-modal {
@@ -25,10 +32,6 @@
       background: $buttonColor;
     }
   }
-}
-
-.ms-Button-label {
-  font-weight: 200 !important;
 }
 
 .pi-grid {
@@ -90,9 +93,10 @@
   align-items: center;
   justify-content: space-between;
   padding-left: 16px;
-  color: #888888;
+  color: #ccc;
   .pi-title {
     text-transform: uppercase;
+    color: var(--bg);
   }
 }
 
@@ -210,5 +214,5 @@ div.jsoneditor-value.jsoneditor-number, div.jsoneditor-value.jsoneditor-string {
 }
 
 div.jsoneditor-value.jsoneditor-empty::after {
-  content: "Unset";
+  content: var(--json-editor-empty-value);
 }

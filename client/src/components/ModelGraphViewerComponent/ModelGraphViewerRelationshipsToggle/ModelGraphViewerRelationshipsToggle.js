@@ -1,15 +1,19 @@
 import React from "react";
 import { Toggle } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 
 import "./ModelGraphViewerRelationshipsToggle.scss";
 
-export const ModelGraphViewerRelationshipsToggle = ({
+const ModelGraphViewerRelationshipsToggle = ({
   onRelationshipsToggleChange,
   onInheritancesToggleChange,
   onComponentsToggleChange,
   showRelationships,
   showInheritances,
-  showComponents
+  showComponents,
+  setFirstItemRef,
+  onKeyDown,
+  t
 }) => (
   <div className="relationship-key">
     <div className="rels-wrap">
@@ -26,6 +30,9 @@ export const ModelGraphViewerRelationshipsToggle = ({
           id="relationships-toggle"
           className="rel-toggle"
           checked={showRelationships}
+          ariaLabel={t("modelGraphViewerRelationshipsToggle.relationshipsToggle")}
+          ref={setFirstItemRef}
+          onKeyDown={onKeyDown}
           onChange={onRelationshipsToggleChange} />
       </div>
       <div className="rel-key">
@@ -38,8 +45,9 @@ export const ModelGraphViewerRelationshipsToggle = ({
         </svg>
         <span className="rel-title">Inheritances</span>
         <Toggle
-          id="relationships-toggle"
+          id="inheritances-toggle"
           className="rel-toggle"
+          ariaLabel={t("modelGraphViewerRelationshipsToggle.inheritancesToggle")}
           checked={showInheritances}
           onChange={onInheritancesToggleChange} />
       </div>
@@ -53,11 +61,14 @@ export const ModelGraphViewerRelationshipsToggle = ({
         </svg>
         <span className="rel-title">Components</span>
         <Toggle
-          id="relationships-toggle"
+          id="components-toggle"
           className="rel-toggle"
+          ariaLabel={t("modelGraphViewerRelationshipsToggle.componentsToggle")}
           checked={showComponents}
           onChange={onComponentsToggleChange} />
       </div>
     </div>
   </div>
 );
+
+export default withTranslation()(ModelGraphViewerRelationshipsToggle);

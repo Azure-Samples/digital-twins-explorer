@@ -65,6 +65,11 @@ export function addNavigator(cy, navigationOptions, container) {
   const newFn = function () {
     try {
       fn();
+      // Add navigator image alt for accessibility purposes
+      const imgEl = document.getElementById(container.replace("#", "")).getElementsByTagName("img")[0];
+      if (imgEl) {
+        imgEl.setAttribute("alt", "graph navigator");
+      }
     } catch (e) {
       // Retry the render function after a timeout
       setTimeout(newFn, nav.options.rerenderDelay);

@@ -80,12 +80,12 @@ export class ModelViewerCreateComponent extends Component {
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="mv-create">
         <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#outlined-required">
           <form onSubmit={this.save}>
-            <h2 className="heading-2">New Twin Name</h2>
+            <h2 className="heading-2">{this.props.t("modelViewerCreateComponent.heading")}</h2>
             <TextField required errorMessage={error} id="outlined-required" className="name-input" styles={this.getStyles}
-              value={name} onChange={this.onNameChange} autoFocus />
+              value={name} onChange={this.onNameChange} autoFocus ariaLabel={this.props.t("modelViewerCreateComponent.heading")} />
             <div className="btn-group">
-              <PrimaryButton type="submit" className="modal-button save-button" onClick={this.save}>Save</PrimaryButton>
-              <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
+              <PrimaryButton type="submit" className="modal-button save-button" onClick={this.save}>{this.props.t("modelViewerCreateComponent.saveButton")}</PrimaryButton>
+              <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>{this.props.t("modelViewerCreateComponent.cancelButton")}</DefaultButton>
             </div>
           </form>
         </FocusZone>

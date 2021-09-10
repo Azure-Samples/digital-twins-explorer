@@ -1,18 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+import PubSub from "pubsub-js";
 
+const buildCallback = c => (e, val) => c(val);
 class EventService {
-
-  constructor() {
-    this.eventHub = null;
-    this.queue = [];
-  }
-
-  initialize(eventHub) {
-    this.eventHub = eventHub;
-    this.queue.forEach(x => this._action(x));
-    this.queue = [];
-  }
 
   publishQuery(query) {
     this._emit("query", query);
@@ -98,6 +89,94 @@ class EventService {
     this._on("selection", callback);
   }
 
+  publishGraphTwins(selection) {
+    this._emit("graphtwins", selection);
+  }
+
+  subscribeGraphTwins(callback) {
+    this._on("graphtwins", callback);
+  }
+
+  publishGraphRelationships(selection) {
+    this._emit("graphrels", selection);
+  }
+
+  subscribeGraphRelationships(callback) {
+    this._on("graphrels", callback);
+  }
+
+  publishFocusTwin(twin) {
+    this._emit("focustwin", twin);
+  }
+
+  subscribeFocusTwin(callback) {
+    this._on("focustwin", callback);
+  }
+
+  publishBlurTwin(twin) {
+    this._emit("blurtwin", twin);
+  }
+
+  subscribeBlurTwin(callback) {
+    this._on("blurtwin", callback);
+  }
+
+  publishFocusModel(model) {
+    this._emit("focusmodel", model);
+  }
+
+  subscribeFocusModel(callback) {
+    this._on("focusmodel", buildCallback(callback));
+  }
+
+  publishBlurModel(model) {
+    this._emit("blurmodel", model);
+  }
+
+  subscribeBlurModel(callback) {
+    this._on("blurmodel", callback);
+  }
+
+  publishSelectTwins(twins) {
+    this._emit("clicktwins", twins);
+  }
+
+  subscribeSelectTwins(callback) {
+    this._on("clicktwins", callback);
+  }
+
+  publishClickRelationship(rel) {
+    this._emit("clickrel", rel);
+  }
+
+  subscribeClickRelationship(callback) {
+    this._on("clickrel", callback);
+  }
+
+  publishRelationshipContextMenu(rel) {
+    this._emit("relcontextmenu", rel);
+  }
+
+  subscribeRelationshipContextMenu(callback) {
+    this._on("relcontextmenu", callback);
+  }
+
+  publishTwinContextMenu(rel) {
+    this._emit("twincontextmenu", rel);
+  }
+
+  subscribeTwinContextMenu(callback) {
+    this._on("twincontextmenu", callback);
+  }
+
+  publishClearGraphSelection() {
+    this._emit("cleargraphselection");
+  }
+
+  subscribeClearGraphSelection(callback) {
+    this._on("cleargraphselection", callback);
+  }
+
   publishCreateTwin(evt) {
     this._emit("createtwin", evt);
   }
@@ -138,6 +217,13 @@ class EventService {
     this._on("createmodel", callback);
   }
 
+  publishSelectedTwins(twins) {
+    this._emit("selectedtwins", twins);
+  }
+
+  subscribeSelectedTwins(callback) {
+    this._on("selectedtwins", callback);
+  }
 
   publishDeleteModel(evt) {
     this._emit("deletemodel", evt);
@@ -169,6 +255,14 @@ class EventService {
 
   subscribeCloseComponent(callback) {
     this._on("closecomponent", callback);
+  }
+
+  publishFocusConsole(component) {
+    this._emit("focusconsole", component);
+  }
+
+  subscribeFocusConsole(callback) {
+    this._on("focusconsole", buildCallback(callback));
   }
 
   publishOpenOptionalComponent(component) {
@@ -239,18 +333,38 @@ class EventService {
     this._off("environmentChanged", callback);
   }
 
-  _emit = (name, payload) => this._action({ type: "emit", name, payload });
+  publishFocusRelationshipsToggle(e) {
+    this._emit("focusrelationshiptoggle", e);
+  }
 
-  _off = (name, payload) => this._action({ type: "off", name, payload });
+  subscribeFocusRelationshipsToggle(callback) {
+    this._on("focusrelationshiptoggle", buildCallback(callback));
+  }
 
-  _on = (name, payload) => this._action({ type: "on", name, payload });
+  publishFocusModelViewer() {
+    this._emit("focusmodelviewer");
+  }
+
+  subscribeFocusModelViewer(callback) {
+    this._on("focusmodelviewer", buildCallback(callback));
+  }
+
+  publishFocusTwinViewer() {
+    this._emit("focustwinviewer");
+  }
+
+  subscribeFocusTwinViewer(callback) {
+    this._on("focustwinviewer", buildCallback(callback));
+  }
+
+  _emit = (name, payload) => this._action({ type: "publish", name, payload });
+
+  _off = (name, payload) => this._action({ type: "unsubscribe", name, payload });
+
+  _on = (name, payload) => this._action({ type: "subscribe", name, payload: buildCallback(payload) });
 
   _action({ type, name, payload }) {
-    if (this.eventHub) {
-      this.eventHub[type](name, payload);
-    } else {
-      this.queue.push({ type, name, payload });
-    }
+    PubSub[type](name, payload);
   }
 
 }

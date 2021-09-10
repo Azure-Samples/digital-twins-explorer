@@ -5,7 +5,7 @@ import React from "react";
 
 import { ModelGraphViewerCytoscapeComponent, ModelGraphViewerCytoscapeLayouts } from "./ModelGraphViewerCytoscapeComponent/ModelGraphViewerCytoscapeComponent";
 import ModelGraphViewerFilteringComponent from "./ModelGraphViewerFilteringComponent/ModelGraphViewerFilteringComponent";
-import { ModelGraphViewerRelationshipsToggle } from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
+import ModelGraphViewerRelationshipsToggle from "./ModelGraphViewerRelationshipsToggle/ModelGraphViewerRelationshipsToggle";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
@@ -13,10 +13,14 @@ import { ModelService } from "../../services/ModelService";
 import "./ModelGraphViewerComponent.scss";
 import { ModelGraphViewerModelDetailComponent } from "./ModelGraphViewerModelDetailComponent/ModelGraphViewerModelDetailComponent";
 import { Icon } from "office-ui-fabric-react";
+import { withTranslation } from "react-i18next";
 import { DETAIL_MIN_WIDTH } from "../../services/Constants";
-import { ModelGraphViewerCommandBarComponent } from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
+import ModelGraphViewerCommandBarComponent from "./ModelGraphViewerCommandBarComponent/ModelGraphViewerCommandBarComponent";
 
-export class ModelGraphViewerComponent extends React.Component {
+const TAB_KEY_CODE = 9;
+const ENTER_KEY_CODE = 13;
+
+class ModelGraphViewerComponent extends React.Component {
 
   constructor(props) {
     super(props);
@@ -35,51 +39,66 @@ export class ModelGraphViewerComponent extends React.Component {
       selectedModel: null
     };
     this.cyRef = React.createRef();
+    this.relationshipsToggle = null;
     this.commandRef = React.createRef();
     this.modelDetail = React.createRef();
-    this.props.glContainer.on("show", this.initialize);
-    this.isInitialized = false;
     this.modelService = new ModelService();
     this.resizeStartX = 0;
     this.resizeEndX = 0;
+    this.isInitialized = false;
   }
 
   initialize = async () => {
-    if (this.isInitialized) {
-      return;
-    }
-    this.isInitialized = true;
-    await this.retrieveModels();
-  }
-
-  componentDidMount() {
-    eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
-    eventService.subscribeDeleteModel(this.removeModel);
-    eventService.subscribeCreateModel(this.addModels);
-    eventService.subscribeConfigure(evt => {
-      if (evt.type === "end" && evt.config) {
+    if (!this.isInitialized) {
+      this.isInitialized = true;
+      eventService.subscribeModelIconUpdate(modelId => this.cyRef.current.updateModelIcon(modelId));
+      eventService.subscribeDeleteModel(this.removeModel);
+      eventService.subscribeCreateModel(this.addModels);
+      eventService.subscribeConfigure(evt => {
+        if (evt.type === "end" && evt.config) {
+          this.modelService = new ModelService();
+          this.cyRef.current.clearNodes();
+          this.setState({ isLoading: false });
+          this.retrieveModels();
+        }
+      });
+      eventService.subscribeClearModelsData(() => {
+        this.modelService = new ModelService();
+        this.cyRef.current.clearNodes();
+        this.setState({ isLoading: false });
+      });
+      eventService.subscribeModelsUpdate(() => {
         this.modelService = new ModelService();
         this.cyRef.current.clearNodes();
         this.setState({ isLoading: false });
         this.retrieveModels();
-      }
-    });
-    eventService.subscribeClearModelsData(() => {
-      this.modelService = new ModelService();
-      this.cyRef.current.clearNodes();
-      this.setState({ isLoading: false });
-    });
-    eventService.subscribeModelsUpdate(() => {
-      this.modelService = new ModelService();
-      this.cyRef.current.clearNodes();
-      this.setState({ isLoading: false });
-      this.retrieveModels();
-    });
-    eventService.subscribeSelectModel(item => {
-      this.setState({ selectedModel: item }, () => {
-        this.highlightNodes();
       });
-    });
+      eventService.subscribeFocusModel(model => {
+        this.cyRef.current.emitNodeEvent(model, "mouseover");
+      });
+      eventService.subscribeBlurModel(model => {
+        this.cyRef.current.emitNodeEvent(model, "mouseout");
+      });
+      eventService.subscribeFocusRelationshipsToggle(e => {
+        e.preventDefault();
+        this.relationshipsToggle.focus();
+      });
+      eventService.subscribeSelectModel(item => {
+        if (item) {
+          this.setState({ selectedModel: item }, () => {
+            this.highlightNodes();
+            this.modelDetail.current.loadModel(item.key);
+          });
+        } else {
+          this.setState({ selectedModel: null }, () => {
+            this.cyRef.current.clearHighlighting();
+            this.modelDetail.current.clear();
+          });
+        }
+      });
+      eventService.subscribeModelSelectionUpdatedInGraph(this.deselectModel);
+      await this.retrieveModels();
+    }
   }
 
   updateProgress(newProgress) {
@@ -120,33 +139,32 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
   addModels = async models => {
-    if (this.isInitialized) {
-      this.updateProgress(0);
-      await this.modelService.addModels(models);
+    this.updateProgress(0);
+    await this.modelService.addModels(models);
 
-      const mapped = await this.modelService.getModels(models.map(m => m["@id"]));
-      const modelNodes = this.getNodes(mapped);
-      const componentRelationships = this.getComponentRelationships(mapped);
-      const extendRelationships = this.getExtendRelationships(mapped);
-      const relationships = this.getRelationships(mapped);
+    const mapped = await this.modelService.getModels(models.map(m => m["@id"]));
+    const modelNodes = this.getNodes(mapped);
+    const componentRelationships = this.getComponentRelationships(mapped);
+    const extendRelationships = this.getExtendRelationships(mapped);
+    const relationships = this.getRelationships(mapped);
 
-      this.allNodes.push(modelNodes);
-      this.componentRelationships.push(componentRelationships);
-      this.extendRelationships.push(extendRelationships);
-      this.relationships.push(relationships);
+    this.allNodes.push(modelNodes);
+    this.componentRelationships.push(componentRelationships);
+    this.extendRelationships.push(extendRelationships);
+    this.relationships.push(relationships);
 
-      this.cyRef.current.addNodes(modelNodes);
-      this.cyRef.current.addRelationships(relationships, "related");
-      this.cyRef.current.addRelationships(componentRelationships, "component");
-      this.cyRef.current.addRelationships(extendRelationships, "extends");
-      await this.cyRef.current.doLayout(this.progressCallback);
-      this.setState({ isLoading: false });
-      this.updateProgress(100);
-    }
+    this.cyRef.current.addNodes(modelNodes);
+    this.cyRef.current.addRelationships(relationships, "related");
+    this.cyRef.current.addRelationships(componentRelationships, "component");
+    this.cyRef.current.addRelationships(extendRelationships, "extends");
+    await this.cyRef.current.doLayout(this.progressCallback);
+    this.setState({ isLoading: false });
+    this.updateProgress(100);
+    this.canDeselect = true;
   }
 
   removeModel = id => {
-    if (id && this.isInitialized) {
+    if (id) {
       this.modelService.removeModel(id);
       this.cyRef.current.removeNodes([ id ]);
     }
@@ -223,6 +241,20 @@ export class ModelGraphViewerComponent extends React.Component {
 
   progressCallback = progress => {
     this.updateProgress(progress * 100);
+  }
+
+  deselectModel = () => {
+    if (this.canDeselect) {
+      this.modelDetail.current.clear();
+      const { selectedModel } = this.state;
+      if (selectedModel) {
+        this.cyRef.current.emitNodeEvent(selectedModel.key, "unselect");
+        this.cyRef.current.clearHighlighting();
+        this.setState({ selectedModel: null });
+      }
+    } else {
+      this.canDeselect = true;
+    }
   }
 
   onRelationshipsToggleChange = async () => {
@@ -315,16 +347,19 @@ export class ModelGraphViewerComponent extends React.Component {
 
   onNodeClicked = modelId => {
     this.modelDetail.current.loadModel(modelId);
+    this.canDeselect = false;
     eventService.publishModelSelectionUpdatedInGraph(modelId);
     const { highlightingTerms } = this.state;
     if (highlightingTerms.length > 0) {
       const newTerms = highlightingTerms.map(t => ({ ...t, isActive: false }));
       this.setState({ highlightingTerms: newTerms });
     }
+    this.setState({ selectedModel: modelId });
   }
 
   onControlClicked = () => {
     this.modelDetail.current.clear();
+    this.canDeselect = false;
     eventService.publishModelSelectionUpdatedInGraph();
     const { highlightingTerms, filteringTerms } = this.state;
     if (highlightingTerms.length > 0) {
@@ -557,12 +592,33 @@ export class ModelGraphViewerComponent extends React.Component {
     this.updateProgress(100);
   }
 
+  onRelationshipsToggleKeyDown = e => {
+    if (e.keyCode === TAB_KEY_CODE && e.shiftKey) {
+      eventService.publishFocusModelViewer();
+    }
+  }
+
+  handleToggleModelDetailOnEnter = e => {
+    if (e.keyCode === ENTER_KEY_CODE) {
+      this.toggleModelDetail();
+    }
+  }
+
   render() {
     const { isLoading, progress, filterIsOpen, showRelationships, showInheritances, showComponents, highlightingTerms, modelDetailIsOpen, modelDetailWidth, filteringTerms, layout } = this.state;
     return (
       <div className={`mgv-wrap ${modelDetailIsOpen ? "md-open" : "md-closed"}`}>
         <div className={`model-graph gc-grid ${filterIsOpen ? "open" : "closed"}`}>
           <div className="gc-wrap">
+            <ModelGraphViewerRelationshipsToggle
+              setFirstItemRef={ref => this.relationshipsToggle = ref}
+              onKeyDown={this.onRelationshipsToggleKeyDown}
+              onRelationshipsToggleChange={this.onRelationshipsToggleChange}
+              onInheritancesToggleChange={this.onInheritancesToggleChange}
+              onComponentsToggleChange={this.onComponentsToggleChange}
+              showRelationships={showRelationships}
+              showInheritances={showInheritances}
+              showComponents={showComponents} />
             <div className="gc-toolbar">
               <ModelGraphViewerCommandBarComponent
                 className="gc-commandbar" buttonClass="gc-toolbarButtons"
@@ -578,13 +634,6 @@ export class ModelGraphViewerComponent extends React.Component {
               isHighlighting={highlightingTerms && highlightingTerms.length > 0}
               highlightFilteredNodes={this.highlightFilteredNodes}
               ref={this.cyRef} />
-            <ModelGraphViewerRelationshipsToggle
-              onRelationshipsToggleChange={this.onRelationshipsToggleChange}
-              onInheritancesToggleChange={this.onInheritancesToggleChange}
-              onComponentsToggleChange={this.onComponentsToggleChange}
-              showRelationships={showRelationships}
-              showInheritances={showInheritances}
-              showComponents={showComponents} />
           </div>
           <div className="gc-filter">
             <ModelGraphViewerFilteringComponent
@@ -608,11 +657,11 @@ export class ModelGraphViewerComponent extends React.Component {
           )}
         </div>
         <div className="model-detail" style={{width: modelDetailIsOpen ? `${modelDetailWidth}%` : 0}}>
-          <div className="detail-toggle" onClick={this.toggleModelDetail}>
+          <div className="detail-toggle" onClick={this.toggleModelDetail} tabIndex="0" onKeyDown={this.handleToggleModelDetailOnEnter}>
             <Icon
               className="toggle-icon"
               iconName={modelDetailIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
-              aria-label="Toggle model details"
+              aria-label={this.props.t("modelGraphViewerComponent.toggleIcon")}
               role="button"
               title="Toggle model details" />
           </div>
@@ -628,3 +677,5 @@ export class ModelGraphViewerComponent extends React.Component {
   }
 
 }
+
+export default withTranslation("translation", { withRef: true })(ModelGraphViewerComponent);

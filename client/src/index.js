@@ -1,16 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
-import { Customizations } from "office-ui-fabric-react/lib/";
+import "./i18n";
 import initIcons from "./services/IconService/IconService";
 
 import App from "./App";
-import { darkFabricTheme } from "./theme/DarkFabricTheme";
 import "./index.scss";
 
 initIcons();
-Customizations.applySettings({ theme: darkFabricTheme });
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+  <Suspense fallback={<>Loading...</>}>
+    <App />
+  </Suspense>,
+  document.getElementById("root")
+);
