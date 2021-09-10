@@ -1,13 +1,16 @@
 /* eslint-disable */
-import { useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer } from "react";
 import { eventService } from "../../services/EventService";
 import getAdtAdapter from "./AdtAdapterInstance";
 import { ModelService } from "../../services/ModelService";
 import { apiService } from "../../services/ApiService";
-import { PropertyInspector, Theme } from '@microsoft/iot-cardboard-js';
+import { PropertyInspector } from '@microsoft/iot-cardboard-js';
+import { PropertyInspectorPatchInformationComponent }
+  from "./PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent";
 import produce from "immer"
 import "@microsoft/iot-cardboard-js/themes.css";
 import "./PropertyInspectorComponentV2.scss";
+
 
 const pIActionTypes = {
     setSourceTwin: 'setSourceTwin',
@@ -15,7 +18,9 @@ const pIActionTypes = {
     setSelection: 'setSelection',
     setRootAndBaseModelIdsToFlatten: 'setRootAndBaseModelIdsToFlatten',
     setAdapter: 'setAdapter',
-    setIsSelectionLoading: 'setIsSelectionLoading'
+    setIsSelectionLoading: 'setIsSelectionLoading',
+    setIsPatchInformationVisible: 'setIsPatchInformationVisible',
+    setPatchInformation: 'setPatchInformation'
 } 
 
 const propertyInspectorReducer = produce((draft, action) => {
@@ -38,6 +43,13 @@ const propertyInspectorReducer = produce((draft, action) => {
         case pIActionTypes.setIsSelectionLoading:
             draft.isSelectionLoading = action.payload;
             break;
+        case pIActionTypes.setIsPatchInformationVisible:
+            draft.isPatchInformationVisible = action.payload;
+            break;
+        case pIActionTypes.setPatchInformation:
+            draft.patchInformation = action.payload;
+            draft.isPatchInformationVisible = true;
+            break;
     }
 })
 
@@ -49,7 +61,9 @@ const PropertyInspectorComponent = () => {
         selection: null,
         rootAndBaseModelIdsToFlatten: null,
         adapter: null,
-        isSelectionLoading: false
+        isSelectionLoading: false,
+        isPatchInformationVisible: false,
+        patchInformation: null
     })
 
     const subscribeSelection = () => {
@@ -129,39 +143,57 @@ const PropertyInspectorComponent = () => {
         subscribeConfigure();
     }, [])
 
+    // Set up memoized PI dependencies
+    const onPatch = useCallback((patchData) => {
+        dispatch({type: pIActionTypes.setPatchInformation, payload: patchData})
+    }, [dispatch])
+
+   
     if (!state.adapter || !state.selection) return null;
 
     if (state.selectionType === 'twin') {
         return (
             <div className="property-inspector-container">
+                <PropertyInspectorPatchInformationComponent
+                    isVisible={state.isPatchInformationVisible}
+                    patch={state.patchInformation}
+                    onCloseModal={() => dispatch({
+                        type: pIActionTypes.setIsPatchInformationVisible,
+                        payload: false
+                    })}
+                />
                 <PropertyInspector
                     resolvedTwin={state.selection}
                     twinId={state.selection['$dtId']}
                     adapter={state.adapter}
-                    rootAndBaseModelIdsToFlatten={{
-                        baseModelIds: state.rootAndBaseModelIdsToFlatten.baseModelIds,
-                        rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
-                    }}
+                    rootAndBaseModelIdsToFlatten={state.setRootAndBaseModelIdsToFlatten}
                     isPropertyInspectorLoading={state.isSelectionLoading}
                     theme={'explorer'}
+                    onPatch={onPatch}
                 />
             </div>
         );
     } else if (state.selectionType === 'relationship') {
         return (
             <div className="property-inspector-container">
+                <PropertyInspectorPatchInformationComponent
+                    isVisible={state.isPatchInformationVisible}
+                    patch={state.patchInformation}
+                    onCloseModal={() => dispatch({
+                        type: pIActionTypes.setIsPatchInformationVisible,
+                        payload: false
+                    })}
+                />
                 <PropertyInspector
                     resolvedRelationship={state.selection}
                     resolvedTwin={state.sourceTwin}
                     relationshipId={state.selection['$relationshipId']}
                     twinId={state.selection['$sourceId']}
                     adapter={state.adapter}
-                    rootAndBaseModelIdsToFlatten={{
-                        baseModelIds: state.rootAndBaseModelIdsToFlatten.baseModelIds,
-                        rootModelId: state.rootAndBaseModelIdsToFlatten.rootModelId
-                    }}
+                    rootAndBaseModelIdsToFlatten={state.setRootAndBaseModelIdsToFlatten}
                     isPropertyInspectorLoading={state.isSelectionLoading}
                     theme={'explorer'}
+                    onPatch={onPatch}
                 />
             </div>
         );
