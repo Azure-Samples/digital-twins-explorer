@@ -20,7 +20,7 @@
 }
 
 .property-inspector-container{
-    height: calc(100% - 30px);
-    padding: 8px 16px;
-    overflow-y: auto;
+    height: calc(100% - 8px);
+    padding: 8px 16px 20px 16px;
+    overflow: hidden;
 }
