@@ -10,7 +10,7 @@ import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshi
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
 import GraphViewerRelationshipDeleteComponent from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
-import PropertyInspectorComponent from "../PropertyInspectorComponent/PropertyInspectorComponentV2";
+import PropertyInspectorComponent from "../PropertyInspectorComponent/PropertyInspectorComponent";
 import GraphViewerFilteringComponent from "./GraphViewerFilteringComponent/GraphViewerFilteringComponent";
 import { withTranslation } from "react-i18next";
 
