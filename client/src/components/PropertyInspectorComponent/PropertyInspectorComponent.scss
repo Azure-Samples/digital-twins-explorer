@@ -1,6 +1,12 @@
 @import "../../theme/theme.scss";
+@import '~prismjs/themes/prism-dark.css';
 
 .pi-patch-modal {
+    .patch-json-data{
+        max-height: 600px;
+        overflow: auto;
+        margin: 16px 0px;
+    }
     h2 {
         font-weight: 400;
         margin-bottom: 10px;

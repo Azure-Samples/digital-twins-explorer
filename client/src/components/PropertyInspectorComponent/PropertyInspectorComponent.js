@@ -1,45 +1,39 @@
 /* eslint-disable */
-import React, { useCallback, useEffect, useMemo, useReducer } from "react";
-import { eventService } from "../../services/EventService";
-import getAdtAdapter from "./AdtAdapterInstance";
-import { ModelService } from "../../services/ModelService";
-import { apiService } from "../../services/ApiService";
-import { PropertyInspector } from '@microsoft/iot-cardboard-js';
-import { PropertyInspectorPatchInformationComponent }
-  from "./PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent";
-import produce from "immer"
-import "@microsoft/iot-cardboard-js/themes.css";
-import "./PropertyInspectorComponent.scss";
-
+import React, { useCallback, useEffect, useReducer } from 'react';
+import { eventService } from '../../services/EventService';
+import { apiService } from '../../services/ApiService';
+import { StandalonePropertyInspector } from '@microsoft/iot-cardboard-js';
+import { PropertyInspectorPatchInformationComponent } from './PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent';
+import produce from 'immer';
+import '@microsoft/iot-cardboard-js/themes.css';
+import './PropertyInspectorComponent.scss';
+import LoaderComponent from '../LoaderComponent/LoaderComponent';
 
 const pIActionTypes = {
-    setSourceTwin: 'setSourceTwin',
     setSelectionType: 'setSelectionType',
     setSelection: 'setSelection',
-    setRootAndBaseModelIdsToFlatten: 'setRootAndBaseModelIdsToFlatten',
-    setAdapter: 'setAdapter',
+    setRootAndExpandedModels: 'setRootAndExpandedModels',
+    setRelationshipDefinition: 'setRelationshipDefinition',
     setIsSelectionLoading: 'setIsSelectionLoading',
     setIsPatchInformationVisible: 'setIsPatchInformationVisible',
     setPatchInformation: 'setPatchInformation',
-    incrementPiKey: 'incrementPiKey'
-} 
+    resetMissingModelIds: 'resetMissingModelIds',
+    addMissingModelIds: 'addMissingModelIds'
+};
 
 const propertyInspectorReducer = produce((draft, action) => {
     switch (action.type) {
-        case pIActionTypes.setSourceTwin:
-            draft.sourceTwin = action.payload;
-            break;
         case pIActionTypes.setSelectionType:
             draft.selectionType = action.payload;
             break;
         case pIActionTypes.setSelection:
             draft.selection = action.payload;
             break;
-        case pIActionTypes.setRootAndBaseModelIdsToFlatten:
-            draft.rootAndBaseModelIdsToFlatten = action.payload;
+        case pIActionTypes.setRootAndExpandedModels:
+            draft.rootAndExpandedModels = action.payload;
             break;
-        case pIActionTypes.setAdapter:
-            draft.adapter = action.payload;
+        case pIActionTypes.setRelationshipDefinition:
+            draft.relationshipDefinition = action.payload;
             break;
         case pIActionTypes.setIsSelectionLoading:
             draft.isSelectionLoading = action.payload;
@@ -51,130 +45,310 @@ const propertyInspectorReducer = produce((draft, action) => {
             draft.patchInformation = action.payload;
             draft.isPatchInformationVisible = true;
             break;
-        case pIActionTypes.incrementPiKey:
-            draft.piKey = draft.piKey + 1;
+        case pIActionTypes.resetMissingModelIds:
+            draft.missingModelIds = [];
+            break;
+        case pIActionTypes.addMissingModelIds:
+            if (Array.isArray(action.payload)) {
+                draft.missingModelIds = [
+                    ...draft.missingModelIds,
+                    ...action.payload
+                ];
+            } else {
+                draft.missingModelIds.push(action.payload);
+            }
             break;
     }
-})
+});
 
 const PropertyInspectorComponent = () => {
-
     const [state, dispatch] = useReducer(propertyInspectorReducer, {
-        sourceTwin: null,
         selectionType: null,
         selection: null,
-        rootAndBaseModelIdsToFlatten: null,
-        adapter: null,
+        rootAndExpandedModels: null,
+        relationshipDefinition: null,
         isSelectionLoading: false,
         isPatchInformationVisible: false,
         patchInformation: null,
-        piKey: 1
-    })
+        missingModelIds: []
+    });
 
     const subscribeSelection = () => {
-        eventService.subscribeSelection(payload => {
-            dispatch({ type: pIActionTypes.setIsSelectionLoading, payload: true });
+        eventService.subscribeSelection((payload) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
             dispatch({ type: pIActionTypes.setSelectionType, payload: null });
             dispatch({ type: pIActionTypes.setSelection, payload: null });
-            if (payload) {
+            if (payload && payload.selection !== state.selection) {
                 const { selection, selectionType } = payload;
-                flattenModelAndSetSelection(selection, selectionType);
+                queryModelsAndSetSelection(selection, selectionType);
             } else {
-                dispatch({ type: pIActionTypes.setIsSelectionLoading, payload: false });
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
             }
         });
-    }
+    };
 
-    const flattenModelAndSetSelection = async (selection, selectionType) => {
-        const modelService = new ModelService();
-        
+    const getModelDependencies = (models, rootModelId) => {
+        const flatModels = [];
+
+        const addModelDependencies = (modelId) => {
+            const model = models.find((m) => m.id === modelId)?.model;
+            if (!model) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: modelId
+                });
+            } else {
+                flatModels.push(model);
+
+                if (model.extends) {
+                    const extendedModelIds = Array.isArray(model.extends)
+                        ? model.extends
+                        : [model.extends];
+                    extendedModelIds.forEach((id) => addModelDependencies(id));
+                }
+                const componentIds = model.contents
+                    .filter((c) => c['@type'] === 'Component')
+                    .map((c) => c.schema);
+                componentIds.forEach((id) => addModelDependencies(id));
+            }
+        };
+
+        addModelDependencies(rootModelId);
+        return flatModels;
+    };
+
+    const queryModelsAndSetSelection = async (selection, selectionType) => {
+        dispatch({
+            type: pIActionTypes.setIsSelectionLoading,
+            payload: true
+        });
+
+        dispatch({
+            type: pIActionTypes.resetMissingModelIds
+        });
+
         if (selectionType === 'twin') {
-            const baseModel = await modelService.getModel(selection['$metadata']['$model']);
-            dispatch({
-                type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
-                payload: {
-                    rootModelId: selection['$metadata']['$model'],
-                    baseModelIds: [...baseModel.bases, ...baseModel.components.map(c => c.id)]
-                }
-            })
+            const models = await apiService.queryModels();
+            const rootModel = models.find(
+                (m) => m.id === selection['$metadata']['$model']
+            );
+
+            if (!rootModel) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: selection['$metadata']['$model']
+                });
+                dispatch({
+                    type: pIActionTypes.setRootAndExpandedModels,
+                    payload: {
+                        rootModel: null,
+                        expandedModels: []
+                    }
+                });
+            } else {
+                const expandedModels = getModelDependencies(
+                    models,
+                    rootModel?.id
+                );
+                dispatch({
+                    type: pIActionTypes.setRootAndExpandedModels,
+                    payload: {
+                        rootModel: rootModel?.model,
+                        expandedModels
+                    }
+                });
+            }
         } else if (selectionType === 'relationship') {
-            const sourceTwin = await apiService.getTwinById(selection['$sourceId']);
-            dispatch({
-                type: pIActionTypes.setSourceTwin,
-                payload: sourceTwin
-            })
-            const baseModelIds = (await modelService.getModel(sourceTwin['$metadata']['$model'])).bases;
-            dispatch({
-                type: pIActionTypes.setRootAndBaseModelIdsToFlatten,
-                payload: {
-                    rootModelId: sourceTwin['$metadata']['$model'],
-                    baseModelIds: baseModelIds
+            const sourceTwin = await apiService.getTwinById(
+                selection['$sourceId']
+            );
+            const models = await apiService.queryModels();
+            const rootModel = models.find(
+                (m) => m.id === sourceTwin['$metadata']['$model']
+            );
+
+            if (!rootModel) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: sourceTwin['$metadata']['$model']
+                });
+                dispatch({
+                    type: pIActionTypes.setRelationshipDefinition,
+                    payload: null
+                });
+            } else {
+                const expandedModels = getModelDependencies(
+                    models,
+                    rootModel?.id
+                );
+                let relationshipDefinition = null;
+
+                for (const model of expandedModels) {
+                    if (model.contents) {
+                        for (const item of model.contents) {
+                            const type = Array.isArray(item['@type'])
+                                ? item['@type'][0]
+                                : item['@type'];
+                            if (
+                                type === 'Relationship' &&
+                                selection['$relationshipName'] === item.name
+                            ) {
+                                relationshipDefinition = item;
+                                break;
+                            }
+                        }
+                    }
+                    if (relationshipDefinition) break;
                 }
-            })
+
+                dispatch({
+                    type: pIActionTypes.setRelationshipDefinition,
+                    payload: relationshipDefinition
+                });
+            }
         }
+
         dispatch({
             type: pIActionTypes.setSelectionType,
             payload: selectionType
-        })
+        });
         dispatch({
             type: pIActionTypes.setSelection,
             payload: selection
-        })
+        });
         dispatch({
             type: pIActionTypes.setIsSelectionLoading,
             payload: false
-        })
-    }
-
-    const subscribeConfigure = () => {
-        eventService.subscribeConfigure(evt => {
-            if (evt.type === "end") {
-                setAdtAdapter();
-            }
-        })
-    }
+        });
+    };
 
     const subscribeCreateModel = () => {
-        eventService.subscribeCreateModel(_models => {
-            dispatch({
-                type: pIActionTypes.incrementPiKey
-            })
+        eventService.subscribeCreateModel((_models) => {
+            dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+            dispatch({ type: pIActionTypes.setSelection, payload: null });
         });
-    }
+    };
 
     const subscribeDeleteModel = () => {
-        eventService.subscribeDeleteModel(_model => {
-            dispatch({
-                type: pIActionTypes.incrementPiKey
-            })
+        eventService.subscribeDeleteModel((_model) => {
+            dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+            dispatch({ type: pIActionTypes.setSelection, payload: null });
         });
-    }
+    };
 
-    const setAdtAdapter = async () => {
-        const adtAdapter = await getAdtAdapter();
-        dispatch({
-            type: pIActionTypes.setAdapter,
-            payload: adtAdapter
-        })
-    }
+    const onUpdateTwin = useCallback(
+        async (patchData) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
+
+            try {
+                await apiService.updateTwin(patchData.id, patchData.patches);
+            } catch (err) {
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: err.details.error
+                });
+                return;
+            }
+
+            const updatedTwin = await apiService.getTwinById(patchData.id);
+
+            dispatch({
+                type: pIActionTypes.setPatchInformation,
+                payload: patchData.patches
+            });
+
+            dispatch({
+                type: pIActionTypes.setSelection,
+                payload: updatedTwin
+            });
+
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: false
+            });
+        },
+        [dispatch, apiService]
+    );
+
+    const onUpdateRelationship = useCallback(
+        async (patchData) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
+
+            try {
+                await apiService.updateRelationship(
+                    patchData.sourceTwinId,
+                    patchData.id,
+                    patchData.patches
+                );
+            } catch (err) {
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: err.details.error
+                });
+                return;
+            }
+
+            try {
+                const updatedRelationship = await apiService.getRelationship(
+                    patchData.sourceTwinId,
+                    patchData.id
+                );
+
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: patchData.patches
+                });
+
+                dispatch({
+                    type: pIActionTypes.setSelection,
+                    payload: updatedRelationship.body
+                });
+
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+            } catch (err) {
+                console.err(err);
+            }
+        },
+        [dispatch, apiService]
+    );
 
     // On mount
     useEffect(() => {
-        setAdtAdapter();
         subscribeSelection();
-        subscribeConfigure();
         subscribeCreateModel();
         subscribeDeleteModel();
-    }, [])
+    }, []);
 
-    // Set up memoized PI dependencies
-    const onPatch = useCallback((patchData) => {
-        dispatch({type: pIActionTypes.setPatchInformation, payload: patchData})
-    }, [dispatch])
+    if (state.isSelectionLoading) {
+        return <LoaderComponent />;
+    }
 
-    if (!state.adapter || !state.selection) {
-        return null
-    };
+    if (!state.selection) {
+        return null;
+    }
 
     if (state.selectionType === 'twin') {
         return (
@@ -182,20 +356,24 @@ const PropertyInspectorComponent = () => {
                 <PropertyInspectorPatchInformationComponent
                     isVisible={state.isPatchInformationVisible}
                     patch={state.patchInformation}
-                    onCloseModal={() => dispatch({
-                        type: pIActionTypes.setIsPatchInformationVisible,
-                        payload: false
-                    })}
+                    onCloseModal={() =>
+                        dispatch({
+                            type: pIActionTypes.setIsPatchInformationVisible,
+                            payload: false
+                        })
+                    }
                 />
-                <PropertyInspector
-                    resolvedTwin={state.selection}
-                    twinId={state.selection['$dtId']}
-                    adapter={state.adapter}
-                    rootAndBaseModelIdsToFlatten={state.setRootAndBaseModelIdsToFlatten}
-                    isPropertyInspectorLoading={state.isSelectionLoading}
+
+                <StandalonePropertyInspector
                     theme={'explorer'}
-                    onPatch={onPatch}
-                    key={state.piKey}
+                    inputData={{
+                        rootModel: state.rootAndExpandedModels.rootModel,
+                        expandedModels:
+                            state.rootAndExpandedModels.expandedModels,
+                        twin: state.selection
+                    }}
+                    onCommitChanges={onUpdateTwin}
+                    missingModelIds={state.missingModelIds}
                 />
             </div>
         );
@@ -205,28 +383,28 @@ const PropertyInspectorComponent = () => {
                 <PropertyInspectorPatchInformationComponent
                     isVisible={state.isPatchInformationVisible}
                     patch={state.patchInformation}
-                    onCloseModal={() => dispatch({
-                        type: pIActionTypes.setIsPatchInformationVisible,
-                        payload: false
-                    })}
+                    onCloseModal={() =>
+                        dispatch({
+                            type: pIActionTypes.setIsPatchInformationVisible,
+                            payload: false
+                        })
+                    }
                 />
-                <PropertyInspector
-                    resolvedRelationship={state.selection}
-                    resolvedTwin={state.sourceTwin}
-                    relationshipId={state.selection['$relationshipId']}
-                    twinId={state.selection['$sourceId']}
-                    adapter={state.adapter}
-                    rootAndBaseModelIdsToFlatten={state.setRootAndBaseModelIdsToFlatten}
-                    isPropertyInspectorLoading={state.isSelectionLoading}
+
+                <StandalonePropertyInspector
                     theme={'explorer'}
-                    onPatch={onPatch}
-                    key={state.piKey}
+                    inputData={{
+                        relationship: state.selection,
+                        relationshipDefinition: state.relationshipDefinition
+                    }}
+                    onCommitChanges={onUpdateRelationship}
+                    missingModelIds={state.missingModelIds}
                 />
             </div>
         );
     } else {
         return null;
     }
-}
+};
 
-export default PropertyInspectorComponent;
+export default React.memo(PropertyInspectorComponent);

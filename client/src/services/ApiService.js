@@ -119,6 +119,12 @@ class ApiService {
     return await this.client.updateDigitalTwin(twinId, patch);
   }
 
+  async updateRelationship(twinId, relationshipId, patch) {
+    await this.initialize();
+
+    return await this.client.updateRelationship(twinId, relationshipId, patch);
+  }
+
   async queryRelationshipsPaged(twinIds, callback, type = REL_TYPE_OUTGOING) {
     await this.initialize();
 
