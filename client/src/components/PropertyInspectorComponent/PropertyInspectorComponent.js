@@ -1,455 +1,410 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
+/* eslint-disable */
+import React, { useCallback, useEffect, useReducer } from 'react';
+import { eventService } from '../../services/EventService';
+import { apiService } from '../../services/ApiService';
+import { StandalonePropertyInspector } from '@microsoft/iot-cardboard-js';
+import { PropertyInspectorPatchInformationComponent } from './PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent';
+import produce from 'immer';
+import '@microsoft/iot-cardboard-js/themes.css';
+import './PropertyInspectorComponent.scss';
+import LoaderComponent from '../LoaderComponent/LoaderComponent';
 
-import React, { Component } from "react";
-import { TextField } from "office-ui-fabric-react";
-import { JsonEditor as Editor } from "jsoneditor-react";
-import { compare, deepClone } from "fast-json-patch";
-import { withTranslation } from "react-i18next";
-import toJsonSchema from "to-json-schema";
-
-import LoaderComponent from "../LoaderComponent/LoaderComponent";
-import PropertyInspectorCommandBarComponent from "./PropertyInspectorCommandBarComponent/PropertyInspectorCommandBarComponent";
-import { PropertyInspectorPatchInformationComponent }
-  from "./PropertyInspectorPatchInformationComponent/PropertyInspectorPatchInformationComponent";
-import { print } from "../../services/LoggingService";
-import { apiService } from "../../services/ApiService";
-import { eventService } from "../../services/EventService";
-import { signalRService } from "../../services/SignalRService";
-import { ModelService } from "../../services/ModelService";
-
-import "jsoneditor-react/es/editor.min.css";
-import "./PropertyInspectorComponent.scss";
-import "../ModalComponent/ModalComponent.scss";
-
-const NonPatchableFields = [ "$dtId", "$etag", "$metadata", "telemetry" ];
-
-const applyDefaultValues = (properties, selection) => {
-  if (!selection || !properties) {
-    return selection;
-  }
-
-  const modelService = new ModelService();
-  for (const p of Object.keys(properties)) {
-    if (!properties[p].schema) {
-      if (!selection[p]) {
-        selection[p] = {};
-      }
-
-      applyDefaultValues(properties[p], selection[p]);
-      continue;
-    }
-
-    // eslint-disable-next-line no-undefined
-    if (selection[p] !== null && selection[p] !== undefined) {
-      continue;
-    }
-
-    const value = modelService.getPropertyDefaultValue(properties[p].schema);
-    selection[p] = value;
-  }
-
-  return selection;
+const pIActionTypes = {
+    setSelectionType: 'setSelectionType',
+    setSelection: 'setSelection',
+    setRootAndExpandedModels: 'setRootAndExpandedModels',
+    setRelationshipDefinition: 'setRelationshipDefinition',
+    setIsSelectionLoading: 'setIsSelectionLoading',
+    setIsPatchInformationVisible: 'setIsPatchInformationVisible',
+    setPatchInformation: 'setPatchInformation',
+    resetMissingModelIds: 'resetMissingModelIds',
+    addMissingModelIds: 'addMissingModelIds'
 };
 
-const reTypeDelta = (properties, delta) => {
-  const modelService = new ModelService();
-  for (const d of delta) {
-    const parts = d.path.split("/").filter(x => x);
-
-    let match = properties;
-    for (const p of parts) {
-      match = match[p];
-      if (!match) {
-        break;
-      }
+const propertyInspectorReducer = produce((draft, action) => {
+    switch (action.type) {
+        case pIActionTypes.setSelectionType:
+            draft.selectionType = action.payload;
+            break;
+        case pIActionTypes.setSelection:
+            draft.selection = action.payload;
+            break;
+        case pIActionTypes.setRootAndExpandedModels:
+            draft.rootAndExpandedModels = action.payload;
+            break;
+        case pIActionTypes.setRelationshipDefinition:
+            draft.relationshipDefinition = action.payload;
+            break;
+        case pIActionTypes.setIsSelectionLoading:
+            draft.isSelectionLoading = action.payload;
+            break;
+        case pIActionTypes.setIsPatchInformationVisible:
+            draft.isPatchInformationVisible = action.payload;
+            break;
+        case pIActionTypes.setPatchInformation:
+            draft.patchInformation = action.payload;
+            draft.isPatchInformationVisible = true;
+            break;
+        case pIActionTypes.resetMissingModelIds:
+            draft.missingModelIds = [];
+            break;
+        case pIActionTypes.addMissingModelIds:
+            if (Array.isArray(action.payload)) {
+                draft.missingModelIds = [
+                    ...draft.missingModelIds,
+                    ...action.payload
+                ];
+            } else {
+                draft.missingModelIds.push(action.payload);
+            }
+            break;
     }
+});
 
-    if (match && match.schema) {
-      let isRemoveOp = false;
+const PropertyInspectorComponent = () => {
+    const [state, dispatch] = useReducer(propertyInspectorReducer, {
+        selectionType: null,
+        selection: null,
+        rootAndExpandedModels: null,
+        relationshipDefinition: null,
+        isSelectionLoading: false,
+        isPatchInformationVisible: false,
+        patchInformation: null,
+        missingModelIds: []
+    });
 
-      if (d.value === null) {
-        isRemoveOp = true;
-      } else {
-        d.value = modelService.getPropertyDefaultValue(match.schema, d.value);
-      }
-
-      if (([ "dtmi:dtdl:instance:Schema:string;2", "string" ].includes(match.schema))) {
-        if (d.value === null) {
-          isRemoveOp = true;
-        }
-      } else if (d.value === null || d.value === "") {
-        isRemoveOp = true;
-      }
-
-      // eslint-disable-next-line no-negated-condition
-      if (!isRemoveOp) {
-        if (match.schema.type === "Enum") {
-          d.value = match.schema.values.filter(option =>
-            option.displayName ? option.displayName === d.value : option.name === d.value)[0].value;
-        }
-      } else {
-        d.op = "remove";
-        delete d.value;
-      }
-    }
-  }
-
-  return delta;
-};
-
-class PropertyInspectorComponent extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      showModal: false,
-      selection: null,
-      selectionType: null,
-      changed: false,
-      patch: null,
-      isLoading: false,
-      isLoadingSelection: false,
-      schema: null
+    const subscribeSelection = () => {
+        eventService.subscribeSelection((payload) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
+            dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+            dispatch({ type: pIActionTypes.setSelection, payload: null });
+            if (payload && payload.selection !== state.selection) {
+                const { selection, selectionType } = payload;
+                queryModelsAndSetSelection(selection, selectionType);
+            } else {
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+            }
+        });
     };
-    this.editorRef = React.createRef();
-    this.properties = null;
-    this.isDefined = null;
-    this.original = null;
-    this.updated = null;
-    this.modelService = null;
-    this.jsonEditorEmptyValue = this.props.t("propertyInspectorComponent.jsonEditorEmptyValue");
-  }
 
-  get editor() {
-    return this.editorRef.current ? this.editorRef.current.jsonEditor : null;
-  }
+    const getModelDependencies = (models, rootModelId) => {
+        const flatModels = [];
 
-  componentDidMount() {
-    this.initializeModelService();
-    this.subscribeSelection();
-    this.subscribeTelemetry();
-    eventService.subscribeCreateModel(models => {
-      this.initializeModelService();
-      models.forEach(model => {
-        this.updateEditorAfterModelDeleteOrCreate(model["@id"]);
-      });
-    });
-    eventService.subscribeDeleteModel(model => {
-      this.initializeModelService();
-      this.updateEditorAfterModelDeleteOrCreate(model);
-    });
-    eventService.subscribeImport(() => this.initializeModelService());
-  }
+        const addModelDependencies = (modelId) => {
+            const model = models.find((m) => m.id === modelId)?.model;
+            if (!model) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: modelId
+                });
+            } else {
+                flatModels.push(model);
 
-  initializeModelService = () => {
-    this.modelService = new ModelService();
-  }
+                if (model.extends) {
+                    const extendedModelIds = Array.isArray(model.extends)
+                        ? model.extends
+                        : [model.extends];
+                    extendedModelIds.forEach((id) => addModelDependencies(id));
+                }
+                const componentIds = model.contents
+                    .filter((c) => c['@type'] === 'Component')
+                    .map((c) => c.schema);
+                componentIds.forEach((id) => addModelDependencies(id));
+            }
+        };
 
-  updateEditorAfterModelDeleteOrCreate = async model => {
-    if (this.original && this.original.$metadata.$model === model) {
-      await this.updateModelProperties(model);
-      this.styleTwinInEditorProperties();
-    }
-  }
+        addModelDependencies(rootModelId);
+        return flatModels;
+    };
 
-  subscribeTelemetry = () => {
-    signalRService.subscribe("telemetry", telemetry => {
-      const { selection } = this.state;
-      if (telemetry && telemetry.dtId === selection.$dtId) {
-        const appendedSelection = {...selection};
-        appendedSelection.telemetry = telemetry.data;
-        this.setState({ selection: appendedSelection });
-        this.original.telemetry = this.updated.telemetry = telemetry.data;
-        this.editor.update(this.updated);
-      }
-    });
-  }
+    const queryModelsAndSetSelection = async (selection, selectionType) => {
+        dispatch({
+            type: pIActionTypes.setIsSelectionLoading,
+            payload: true
+        });
 
-  updateModelProperties = async modelId => {
-    let properties = null;
-    let isDefined = false;
-    try {
-      if (modelId) {
-        const model = await this.modelService.getModel(modelId);
-        properties = model.componentProperties;
-        isDefined = model.isDefined;
-      }
-    } catch (exc) {
-      print(`*** Error fetching twin properties: ${exc}`, "error");
-    }
-    this.properties = properties;
-    this.isDefined = isDefined;
-  }
+        dispatch({
+            type: pIActionTypes.resetMissingModelIds
+        });
 
-  subscribeSelection = () => {
-    eventService.subscribeSelection(payload => {
-      if (payload) {
-        const { selection, selectionType } = payload;
-        this.setState({ isLoadingSelection: true });
-        this.setContent(selection, selectionType, null);
-      } else {
-        this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
-      }
-    });
-  }
+        if (selectionType === 'twin') {
+            const models = await apiService.queryModels();
+            const rootModel = models.find(
+                (m) => m.id === selection['$metadata']['$model']
+            );
 
-  setContent = async (selection, selectionType, patch) => {
-    if (selectionType === "twin") {
-      await this.updateModelProperties(selection ? selection.$metadata.$model : null);
-      this.original = this.updated = selection ? await applyDefaultValues(this.properties, deepClone(selection)) : null;
-    } else if (selectionType === "relationship") {
-      this.original = this.updated = selection ? selection : null;
-    }
+            if (!rootModel) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: selection['$metadata']['$model']
+                });
+                dispatch({
+                    type: pIActionTypes.setRootAndExpandedModels,
+                    payload: {
+                        rootModel: null,
+                        expandedModels: []
+                    }
+                });
+            } else {
+                const expandedModels = getModelDependencies(
+                    models,
+                    rootModel?.id
+                );
+                dispatch({
+                    type: pIActionTypes.setRootAndExpandedModels,
+                    payload: {
+                        rootModel: rootModel?.model,
+                        expandedModels
+                    }
+                });
+            }
+        } else if (selectionType === 'relationship') {
+            const sourceTwin = await apiService.getTwinById(
+                selection['$sourceId']
+            );
+            const models = await apiService.queryModels();
+            const rootModel = models.find(
+                (m) => m.id === sourceTwin['$metadata']['$model']
+            );
 
-    const { isLoadingSelection } = this.state;
-    if (isLoadingSelection) {
-      const schema = selectionType === "twin" ? this.generateSchema() : null;
-      if (this.properties) {
-        this.setEnumPropertiesValues();
-      }
-      this.setState({ changed: false, selection, patch, selectionType, schema }, () => {
-        if (selection) {
-          this.editor.set(this.original);
-          this.styleTwinInEditorProperties();
-        }
-      });
-    } else {
-      this.original = this.updated = selection ? selection : null;
-      this.setState({ changed: false, selection: null, patch: null, selectionType: null, isLoadingSelection: false });
-    }
-  }
+            if (!rootModel) {
+                dispatch({
+                    type: pIActionTypes.addMissingModelIds,
+                    payload: sourceTwin['$metadata']['$model']
+                });
+                dispatch({
+                    type: pIActionTypes.setRelationshipDefinition,
+                    payload: null
+                });
+            } else {
+                const expandedModels = getModelDependencies(
+                    models,
+                    rootModel?.id
+                );
+                let relationshipDefinition = null;
 
-  setEnumPropertiesValues = () => {
-    Object.getOwnPropertyNames(this.original).forEach(propertyName => {
-      const property = this.properties[propertyName];
-      if (!propertyName.startsWith("$") && property && property.schema && property.schema.type && property.schema.type === "Enum") {
-        if (this.original[propertyName] !== "") {
-          const propertyOption = property.schema.values.filter(option => option.value === this.original[propertyName])[0];
-          this.original[propertyName] = propertyOption.displayName ? propertyOption.displayName : propertyOption.name;
-        }
-      }
-    });
-  }
+                for (const model of expandedModels) {
+                    if (model.contents) {
+                        for (const item of model.contents) {
+                            const type = Array.isArray(item['@type'])
+                                ? item['@type'][0]
+                                : item['@type'];
+                            if (
+                                type === 'Relationship' &&
+                                selection['$relationshipName'] === item.name
+                            ) {
+                                relationshipDefinition = item;
+                                break;
+                            }
+                        }
+                    }
+                    if (relationshipDefinition) break;
+                }
 
-  generateSchema = () => {
-    if (this.properties && this.original) {
-      const schema = toJsonSchema(this.original);
-      this.setObjectPropertiesSchema(this.properties, schema);
-      return schema;
-    }
-
-    return null;
-  }
-
-  setObjectPropertiesSchema = (obj, schema) => {
-    Object.getOwnPropertyNames(obj).forEach(propertyName => {
-      const property = this.properties[propertyName];
-      if (!propertyName.startsWith("$") && property && property.writable) {
-        switch (property.schema.type) {
-          case "Object":
-            this.setObjectPropertiesSchema(property.schema, schema.properties[propertyName]);
-            break;
-          case "Enum":
-            schema.properties[propertyName] = {
-              "enum": property.schema.values.map(option =>
-                option.displayName ? option.displayName : option.name)
-            };
-            break;
-          default:
-            break;
-        }
-      }
-    });
-  }
-
-  styleTwinInEditorProperties = () => {
-    if (!this.editor || !this.editor.node) {
-      return;
-    }
-
-    this.editor.node.childs.forEach(item => {
-      if (!item.field.startsWith("$")) {
-        if (this.properties[item.field]) {
-          this.stylePropertyNodeStyle(item, "", "");
-        } else {
-          this.stylePropertyNodeStyle(item, "yellow", "important");
-        }
-      }
-    });
-    const rootMetaIndex = this.editor.node.childs.findIndex(item => item.field.toLowerCase() === "$metadata");
-    if (rootMetaIndex >= 0) {
-      const metadataNode = this.editor.node.childs[rootMetaIndex];
-      metadataNode.expand(true);
-      const modelIndex = metadataNode.childs.findIndex(item => item.field.toLowerCase() === "$model");
-      if (modelIndex >= 0) {
-        if (this.isDefined) {
-          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "");
-          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "");
-        } else {
-          metadataNode.childs[modelIndex].dom.field.style.setProperty("color", "red", "important");
-          metadataNode.childs[modelIndex].dom.value.style.setProperty("color", "red", "important");
-        }
-      }
-    }
-  }
-
-  stylePropertyNodeStyle = (item, color, important) => {
-    if (item.dom.field) {
-      item.dom.field.style.setProperty("color", color, important);
-      item.dom.value.style.setProperty("color", color, important);
-    }
-    if (item.type === "object") {
-      item.expand(true);
-      item.childs.forEach(child => {
-        this.stylePropertyNodeStyle(child, color, important);
-      });
-    }
-  }
-
-  showModal = () => {
-    this.setState({ showModal: true });
-  }
-
-  closeModal = () => {
-    this.setState({ showModal: false });
-  }
-
-  onEditable = node => {
-    const { selectionType } = this.state;
-    if (node && node.field === "") {
-      return { field: true, value: true };
-    }
-
-    if (node && selectionType === "relationship") {
-      return { field: false, value: false };
-    }
-
-    if (node && selectionType === "twin") {
-      let current = this.properties;
-      for (const p of node.path) {
-        if (NonPatchableFields.indexOf(p) > -1 || ("writable" in current && !current.writable)) {
-          return { field: false, value: false };
+                dispatch({
+                    type: pIActionTypes.setRelationshipDefinition,
+                    payload: relationshipDefinition
+                });
+            }
         }
 
-        current = current[p];
-        if (!current) {
-          break;
-        }
-      }
-    }
+        dispatch({
+            type: pIActionTypes.setSelectionType,
+            payload: selectionType
+        });
+        dispatch({
+            type: pIActionTypes.setSelection,
+            payload: selection
+        });
+        dispatch({
+            type: pIActionTypes.setIsSelectionLoading,
+            payload: false
+        });
+    };
 
-    return { field: false, value: true };
-  }
+    const subscribeCreateModel = () => {
+        eventService.subscribeCreateModel((_models) => {
+            dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+            dispatch({ type: pIActionTypes.setSelection, payload: null });
+        });
+    };
 
-  handleEditorChange = data => {
-    this.updated = data;
-    this.setState({ changed: true });
-  }
+    const subscribeDeleteModel = () => {
+        eventService.subscribeDeleteModel((_model) => {
+            dispatch({ type: pIActionTypes.setSelectionType, payload: null });
+            dispatch({ type: pIActionTypes.setSelection, payload: null });
+        });
+    };
 
-  onExpand = () => {
-    this.editor.expandAll();
-  }
+    const onUpdateTwin = useCallback(
+        async (patchData) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
 
-  onCollapse = () => {
-    this.editor.collapseAll();
-  }
+            try {
+                await apiService.updateTwin(patchData.id, patchData.patches);
+            } catch (err) {
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: err.details.error
+                });
+                return;
+            }
 
-  onUndo = () => {
-    this.editor.history.undo();
-    if (this.editor.history.index < 0) {
-      this.setState({ changed: false });
-    }
-  }
+            const updatedTwin = await apiService.getTwinById(patchData.id);
 
-  onRedo = () => {
-    this.editor.history.redo();
-    if (this.editor.history.index >= 0) {
-      this.setState({ changed: true });
-    }
-  }
+            dispatch({
+                type: pIActionTypes.setPatchInformation,
+                payload: patchData.patches
+            });
 
-  onSearchChange = (_, text) => {
-    if (this.editor) {
-      this.editor.search(text);
-    }
-  }
+            dispatch({
+                type: pIActionTypes.setSelection,
+                payload: updatedTwin
+            });
 
-  onSave = async () => {
-    const { changed, selection, selectionType } = this.state;
-    if (changed && selectionType === "twin") {
-      const deltaFromDefaults = compare(this.original, this.updated);
-      const deltaFromOriginal = compare(selection, this.updated);
-      const delta = reTypeDelta(this.properties, deltaFromOriginal.filter(x =>
-        deltaFromDefaults.some(y => y.path === x.path)
-          || deltaFromDefaults.some(y => y.path.startsWith(`${x.path}/`))));
-      try {
-        this.setState({ patch: delta });
-        const patch = JSON.stringify(delta, null, 2);
-        print("*** PI Changes:", "info");
-        print(patch, "info");
-        if (patch.length > 0) {
-          await this.patchTwin(delta);
-
-          const newData = await apiService.getTwinById(this.original.$dtId);
-          this.setContent(newData, selectionType, delta);
-
-          this.showModal();
-          this.setState({ changed: false });
-        }
-      } catch (exc) {
-        exc.customMessage = "Error in patching twin";
-        eventService.publishError(exc);
-      }
-    }
-  }
-
-  async patchTwin(res) {
-    this.setState({ isLoading: true });
-    try {
-      print(`*** Patching twin ${this.original.$dtId}`, "info");
-      await apiService.updateTwin(this.original.$dtId, res);
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  }
-
-  onClassName = ({ path }) => path.includes("telemetry") && path.length > 1 ? "jsoneditor-telemetry" : null
-
-  render() {
-    const { showModal, selection, changed, patch, isLoading, selectionType, schema } = this.state;
-    return (
-      <div className="pi-gridWrapper" style={{"--json-editor-empty-value": this.jsonEditorEmptyValue}}>
-        <div className="pi-grid">
-          <PropertyInspectorCommandBarComponent buttonClass="pi-toolbarButtons"
-            changed={changed}
-            selection={selection}
-            selectionType={selectionType}
-            onExpand={() => this.onExpand()}
-            onCollapse={() => this.onCollapse()}
-            onUndo={() => this.onUndo()}
-            onRedo={() => this.onRedo()}
-            onSave={() => this.onSave()} />
-          <TextField className="pi-filter" onChange={this.onSearchChange} placeholder={this.props.t("propertyInspectorComponent.searchPlaceholder")} />
-          <div className="pi-editor">
-            {selection && <Editor
-              ref={this.editorRef}
-              schema={schema}
-              mainMenuBar={false}
-              enableTransform={false}
-              enableSort={false}
-              history
-              onEditable={this.onEditable}
-              onChange={this.handleEditorChange}
-              onClassName={this.onClassName} />}
-          </div>
-          <PropertyInspectorPatchInformationComponent isVisible={showModal} patch={patch} onCloseModal={this.closeModal} />
-          {isLoading && <LoaderComponent />}
-        </div>
-      </div>
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: false
+            });
+        },
+        [dispatch, apiService]
     );
-  }
 
-}
+    const onUpdateRelationship = useCallback(
+        async (patchData) => {
+            dispatch({
+                type: pIActionTypes.setIsSelectionLoading,
+                payload: true
+            });
 
-export default withTranslation()(PropertyInspectorComponent);
+            try {
+                await apiService.updateRelationship(
+                    patchData.sourceTwinId,
+                    patchData.id,
+                    patchData.patches
+                );
+            } catch (err) {
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: err.details.error
+                });
+                return;
+            }
+
+            try {
+                const updatedRelationship = await apiService.getRelationship(
+                    patchData.sourceTwinId,
+                    patchData.id
+                );
+
+                dispatch({
+                    type: pIActionTypes.setPatchInformation,
+                    payload: patchData.patches
+                });
+
+                dispatch({
+                    type: pIActionTypes.setSelection,
+                    payload: updatedRelationship.body
+                });
+
+                dispatch({
+                    type: pIActionTypes.setIsSelectionLoading,
+                    payload: false
+                });
+            } catch (err) {
+                console.err(err);
+            }
+        },
+        [dispatch, apiService]
+    );
+
+    // On mount
+    useEffect(() => {
+        subscribeSelection();
+        subscribeCreateModel();
+        subscribeDeleteModel();
+    }, []);
+
+    if (state.isSelectionLoading) {
+        return <LoaderComponent />;
+    }
+
+    if (!state.selection) {
+        return null;
+    }
+
+    if (state.selectionType === 'twin') {
+        return (
+            <div className="property-inspector-container">
+                <PropertyInspectorPatchInformationComponent
+                    isVisible={state.isPatchInformationVisible}
+                    patch={state.patchInformation}
+                    onCloseModal={() =>
+                        dispatch({
+                            type: pIActionTypes.setIsPatchInformationVisible,
+                            payload: false
+                        })
+                    }
+                />
+
+                <StandalonePropertyInspector
+                    theme={'explorer'}
+                    inputData={{
+                        rootModel: state.rootAndExpandedModels.rootModel,
+                        expandedModels:
+                            state.rootAndExpandedModels.expandedModels,
+                        twin: state.selection
+                    }}
+                    onCommitChanges={onUpdateTwin}
+                    missingModelIds={state.missingModelIds}
+                />
+            </div>
+        );
+    } else if (state.selectionType === 'relationship') {
+        return (
+            <div className="property-inspector-container">
+                <PropertyInspectorPatchInformationComponent
+                    isVisible={state.isPatchInformationVisible}
+                    patch={state.patchInformation}
+                    onCloseModal={() =>
+                        dispatch({
+                            type: pIActionTypes.setIsPatchInformationVisible,
+                            payload: false
+                        })
+                    }
+                />
+
+                <StandalonePropertyInspector
+                    theme={'explorer'}
+                    inputData={{
+                        relationship: state.selection,
+                        relationshipDefinition: state.relationshipDefinition
+                    }}
+                    onCommitChanges={onUpdateRelationship}
+                    missingModelIds={state.missingModelIds}
+                />
+            </div>
+        );
+    } else {
+        return null;
+    }
+};
+
+export default React.memo(PropertyInspectorComponent);

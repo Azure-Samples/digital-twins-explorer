@@ -47,7 +47,7 @@ export class TwinViewerComponent extends Component {
     eventService.subscribeSelectedTwins(twins => {
       if (twins && twins.length > 0) {
         const twinIds = twins.map(twin => twin.id);
-        this.setState(prevState => ({ items: prevState.items.map(i => {
+        this.setState(prevState => ({ items: prevState.items.slice().map(i => {
           i.selected = twinIds.includes(i.$dtId);
           return i;
         }) }));
