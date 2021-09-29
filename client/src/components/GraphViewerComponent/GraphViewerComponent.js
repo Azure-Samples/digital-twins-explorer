@@ -129,6 +129,7 @@ class GraphViewerComponent extends React.Component {
     });
     eventService.subscribeClickRelationship(relationship => {
       eventService.publishSelection({ selection: relationship, selectionType: "relationship" });
+      this.cyRef.current.clickEdge(getUniqueRelationshipId(relationship));
     });
     eventService.subscribeClearGraphSelection(() => {
       this.cyRef.current.clearOverlay();

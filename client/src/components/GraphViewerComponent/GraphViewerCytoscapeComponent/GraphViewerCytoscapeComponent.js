@@ -902,6 +902,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.displayContextMenu("edge", x, y);
   }
 
+  clickEdge = edgeId => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", true);
+    cy.$id(edgeId).toggleClass("highlighted", true);
+    cy.$id(edgeId).toggleClass("opaque", false);
+  }
+
   rightClickNode = nodeId => {
     const { x, y } = this.graphControl.$id(nodeId).renderedPosition();
     this.contextNode = nodeId;
