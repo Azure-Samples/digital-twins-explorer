@@ -33,6 +33,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.navControlId = _uniqueId("graph-viewer-nav");
     this.selectedNodes = [];
+    this.selectedOutsideComponent = [];
     this.layout = "Klay";
     this.isSelectingOnOverlay = false;
     this.isFetchingTwinData = false;
@@ -497,6 +498,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     if (this.props.overlayResults && !this.isSelectingOnOverlay) {
       this.isSelectingOnOverlay = true;
     }
+    if (this.selectedOutsideComponent.length > 0) {
+      const selectedOutsideIds = this.selectedOutsideComponent.map(n => n.id);
+      this.selectedNodes = this.selectedNodes.filter(n => !selectedOutsideIds.includes(n.id));
+      this.clearHighlighting();
+    }
     this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
     this.highlightRelatedNodes();
     this.onNodeClicked();
@@ -522,15 +528,21 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
   }
 
-  selectNodes = nodeIds => {
+  selectNodes = (nodeIds, exterior = false) => {
     this.dimGraphElements();
     if (nodeIds && nodeIds.length > 0) {
       const cy = this.graphControl;
       this.selectedNodes = [];
+      if (exterior) {
+        this.selectedOutsideComponent = [];
+      }
       nodeIds.forEach(id => {
         const node = cy.elements(`node[id="${id}"]`);
         if (node) {
           this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
+          if (exterior) {
+            this.selectedOutsideComponent.push({ id: node.id(), modelId: node.data().modelId });
+          }
           cy.$id(node.data().id).toggleClass("selected", true);
           cy.$id(node.data().id).toggleClass("opaque", false);
           node.connectedEdges().forEach(edge => {

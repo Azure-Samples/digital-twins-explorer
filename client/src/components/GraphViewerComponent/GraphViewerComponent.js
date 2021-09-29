@@ -135,7 +135,7 @@ class GraphViewerComponent extends React.Component {
       this.cyRef.current.clearOverlay();
     });
     eventService.subscribeSelectTwins(twinIds => {
-      this.cyRef.current.selectNodes(twinIds);
+      this.cyRef.current.selectNodes(twinIds, true);
     });
   }
 
