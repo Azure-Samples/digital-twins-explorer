@@ -61,7 +61,7 @@
   }
   &:focus {
     border: solid 2px $buttonColor;
-    outline: none;
+    outline: 3px solid transparent;
   }
 }
 
@@ -81,7 +81,6 @@
   text-overflow: ellipsis;
   -webkit-line-clamp: 1;
   overflow: hidden;
-  white-space: nowrap;
 }
 
 .tv_listItemKey {

@@ -65,6 +65,7 @@ export const TwinViewerItem = ({ item, relationships, itemIndex, onSelect, isSel
                 <IconButton iconProps={{ iconName: isSelected ? "ChevronFold10" : "ChevronUnfold10" }}
                   iconOnly
                   tabIndex="-1"
+                  aria-expanded={isSelected}
                   ariaLabel={isSelected ? "Close" : "Open"}
                   className="twin-menu-button" />
               </div>

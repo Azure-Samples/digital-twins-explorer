@@ -25,6 +25,9 @@
       &:focus::after {
         display: none;
       }
+      div label::after{
+        color: var(--text-color-required);
+      }
     }
 
     .ms-Dropdown-container {

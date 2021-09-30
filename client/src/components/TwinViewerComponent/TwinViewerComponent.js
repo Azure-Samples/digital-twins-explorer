@@ -154,7 +154,7 @@ export class TwinViewerComponent extends Component {
       <div className="tv-grid">
         <div>
           <TextField className="tv-filter" onChange={this.onFilterChanged} styles={this.getStyles}
-            placeholder="Search" value={filterText} />
+            placeholder="Search" value={filterText} aria-live="assertive" aria-label="NO results found" />
         </div>
         <div data-is-scrollable="true" className="tv-modelListWrapper">
           {items.map((item, index) => {

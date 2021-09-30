@@ -71,6 +71,14 @@ export class ErrorMessageComponent extends Component {
     });
   }
 
+  componentDidUpdate() {
+    if (this.state.showModal) {
+      setTimeout(() => {
+        document.getElementById("error-message-header").focus();
+      }, 200);
+    }
+  }
+
   render() {
     const { showModal, errorMessage, stackErrorMessage, showFixAuth, showAuthSpinner, showAuthStatus, showAuthResponse} = this.state;
     let authComponent = "";
@@ -105,9 +113,9 @@ export class ErrorMessageComponent extends Component {
         isVisible={showModal}
         className="error-message">
         <div className="message-container">
-          <h2 className="heading-2"><span>!</span>Error</h2>
-          <p>{errorMessage}</p>
-          <p>Find more infomation on how to resolve issues like this here: <a href={MORE_INFORMATION_LINK} target="_blank" rel="noopener noreferrer">{MORE_INFORMATION_LINK}</a></p>
+          <h2 tabIndex="0" className="heading-2" id="error-message-header"><span>!</span>Error</h2>
+          <p tabIndex="0">{errorMessage}</p>
+          <p tabIndex="0">Find more information on how to resolve issues like this here: <a href={MORE_INFORMATION_LINK} target="_blank" rel="noopener noreferrer">{MORE_INFORMATION_LINK}</a></p>
           {stackErrorMessage && (
             <div className="error-description">
               <p dangerouslySetInnerHTML={{ __html: stackErrorMessage }} />

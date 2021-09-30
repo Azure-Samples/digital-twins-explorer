@@ -663,7 +663,7 @@ class ModelGraphViewerComponent extends React.Component {
               iconName={modelDetailIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}
               aria-label={this.props.t("modelGraphViewerComponent.toggleIcon")}
               role="button"
-              title="Toggle model details" />
+              title="Expand/Collapse" />
           </div>
           <ModelGraphViewerModelDetailComponent ref={this.modelDetail} />
           {modelDetailIsOpen && (

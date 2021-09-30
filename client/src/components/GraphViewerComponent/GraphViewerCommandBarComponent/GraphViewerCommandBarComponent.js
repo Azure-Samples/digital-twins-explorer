@@ -65,6 +65,7 @@ class GraphViewerCommandBarComponent extends Component {
       key: "showTwins",
       text: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showTwins"),
       ariaLabel: this.props.t("graphViewerCommandBarComponent.buttonGroupItems.showTwins"),
+      ariaChecked: true,
       iconProps: { iconName: "RedEye" },
       onClick: () => this.props.onShowAll(),
       iconOnly: true,
@@ -151,12 +152,13 @@ class GraphViewerCommandBarComponent extends Component {
       <Icon iconName="ExpansionLevel" />
       <TextField id="relExpansionLevelField"
         className="command-bar-input configuration-input numeric-input" value={this.state.relExpansionLevel}
-        onChange={this.onExpansionLevelChange} type="number" min="1" max="5" ariaLabel="Select expansion level" role="menuitem" />
+        onChange={this.onExpansionLevelChange} type="number" min="1" max="5" ariaLabel="Select expansion level" ariaLive="assertive" role="menuitem" />
     </div>
   )
 
   renderButton = props => (
     <CommandBarButton {...props}
+      tabIndex={0}
       styles={buttonStyles}
       style={{ backgroundColor: "#252526", minWidth: 0, ...props.style }} />
   )
@@ -166,9 +168,19 @@ class GraphViewerCommandBarComponent extends Component {
     this.setState({ relTypeLoading: type });
   }
 
+  readValueChange = () => {
+    //  Screen Reader: Read value change
+    const field = document.getElementById("relExpansionLevelField");
+    field.blur();
+    setTimeout(() => {
+      field.focus();
+    }, [ 100 ]);
+  }
+
   onExpansionLevelChange = evt => {
     this.setState({ relExpansionLevel: evt.target.value });
     settingsService.relExpansionLevel = evt.target.value;
+    this.readValueChange();
   }
 
   onImportGraphClicked = evt => {
@@ -204,19 +216,23 @@ class GraphViewerCommandBarComponent extends Component {
           <CommandBar className="gv-commandbar button-group light-command-bar"
             farItems={this.buttonGroupItems}
             buttonAs={this.renderButton}
-            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")}
+            ariaLive="assertive" />
           <CommandBar className="gv-commandbar light-command-bar"
             farItems={this.expansionLevelItems}
             buttonAs={this.renderRelationshipExpansionItem}
-            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")}
+            ariaLive="assertive" />
           <CommandBar className="gv-commandbar light-command-bar"
             farItems={this.expansionModeItems}
             buttonAs={this.renderButton}
-            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")}
+            ariaLive="assertive" />
           <CommandBar className="gv-commandbar light-command-bar"
             farItems={this.layoutItems}
             buttonAs={this.renderButton}
-            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")} />
+            ariaLabel={this.props.t("graphViewerCommandBarComponent.render.commandBarAriaLabel")}
+            ariaLive="assertive" />
         </div>
         <input id="model-file-input" type="file" name="name" className="gc-fileInput" ref={this.importModelRef}
           onChange={this.onImportGraphClicked} />

@@ -89,6 +89,9 @@ export class GraphViewerRelationshipCreateComponent extends Component {
 
   open = async () => {
     this.setState({ showModal: true, isLoading: true });
+    setTimeout(() => {
+      document.getElementById("create-relationship-heading").focus();
+    }, 200);
 
     const { selectedNode, selectedNodes } = this.props;
     const sourceModelId = selectedNodes.find(x => x.id !== selectedNode.id).modelId;
@@ -121,13 +124,15 @@ export class GraphViewerRelationshipCreateComponent extends Component {
 
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
-        <h2 className="heading-2">Create Relationship</h2>
+        <h2 className="heading-2" tabIndex="0" id="create-relationship-heading">Create Relationship</h2>
         <h4>Source ID</h4>
-        <TextField disabled readOnly id="sourceIdField" className="modal-input" styles={this.getStyles} value={sourceId} />
+        <TextField disabled readOnly id="sourceIdField" ariaLabel="Source ID" className="modal-input" styles={this.getStyles} value={sourceId} />
         <h4>Target ID</h4>
-        <TextField disabled readOnly id="targetIdField" className="modal-input" styles={this.getStyles} value={targetId} />
+        <TextField disabled readOnly id="targetIdField" ariaLabel="Target ID" className="modal-input" styles={this.getStyles} value={targetId} />
         <h4>Relationship</h4>
         <Dropdown
+          tabIndex="0"
+          ariaLabel="Select an option"
           required
           placeholder="Select an option"
           className="modal-input"
