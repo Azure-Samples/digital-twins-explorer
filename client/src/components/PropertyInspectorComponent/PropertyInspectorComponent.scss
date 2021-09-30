@@ -158,6 +158,7 @@
 div.jsoneditor-tree button.jsoneditor-button:focus {
   background-color: $backgroundColor2;
   outline: $outlineColor4 solid 0px;
+  border: $outlineColor4 solid 1px;
 }
 
 div.jsoneditor-value.jsoneditor-string {

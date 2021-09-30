@@ -22,6 +22,8 @@ export const GraphViewerCytoscapeLayouts = {
 };
 const SPACE_KEY_CODE = 32;
 const ENTER_KEY_CODE = 13;
+const ESC_KEY_CODE = 27;
+const TAB_KEY_CODE = 9;
 
 export class GraphViewerCytoscapeComponent extends React.Component {
 
@@ -183,6 +185,30 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         contextMenuClasses: [ "custom-context-menu" ]
       });
     }
+
+    const handleKeyDown = e => {
+      if (e.keyCode === ESC_KEY_CODE) {
+        const contextMenu = document.getElementsByClassName("custom-context-menu")[0];
+        if (contextMenu.style.display === "block") {
+          contextMenu.style.display = "none";
+        }
+      }
+
+      if (e.keyCode === TAB_KEY_CODE) {
+        const contextMenu = document.getElementsByClassName("custom-context-menu")[0];
+
+        const menuItems = Array.from(contextMenu.children);
+        const activeMenuItems = menuItems.filter(item => item.style.display !== "none");
+
+        if (activeMenuItems && document.activeElement === activeMenuItems[activeMenuItems.length - 1]) {
+          activeMenuItems[0].focus();
+          e.preventDefault();
+        }
+      }
+    };
+    window.addEventListener("keydown", e => {
+      handleKeyDown(e);
+    });
   }
 
   addTwins(twins) {

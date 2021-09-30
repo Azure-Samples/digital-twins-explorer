@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -56,6 +57,9 @@ const layoutConfig = {
   maxDrawerHeight: 300
 };
 
+
+const LEFT_ARROW_KEY_CODE = 37;
+const RIGHT_ARROW_KEY_CODE = 39;
 const CLOSING_BRACKET_KEY_CODE = 221;
 
 const contrastOptions = {
@@ -220,6 +224,32 @@ class App extends Component {
   };
 
 
+  handleModelViewerResizeKewDown = e => {
+    if (e.keyCode === LEFT_ARROW_KEY_CODE) {
+      this.setState(prevState => ({
+        layout: { ...prevState.layout, modelViewerWidth: layoutConfig.minItemWidth + (((this.resizeModelViewerEndX - 1) * 100) / window.innerWidth) }
+      }));
+      this.resizeModelViewerEndX = this.resizeModelViewerEndX - 1;
+    }
+
+    if (e.keyCode === RIGHT_ARROW_KEY_CODE) {
+      this.setState(prevState => ({
+        layout: { ...prevState.layout, modelViewerWidth: layoutConfig.minItemWidth + (((this.resizeModelViewerEndX + 1) * 100) / window.innerWidth) }
+      }));
+      this.resizeModelViewerEndX = this.resizeModelViewerEndX + 1;
+    }
+  }
+
+  handleModelViewerOnFocus = e => {
+    e.preventDefault();
+    window.addEventListener("keydown", this.handleModelViewerResizeKewDown)
+  }
+
+  handleModelViewerBlur = e => {
+    e.preventDefault();
+    window.removeEventListener("keydown", this.handleModelViewerOnFocus);
+  }
+
   handleDrawerResizeMouseMove = e => {
     this.resizeDrawerEndY = this.resizeDrawerStartY - e.screenY;
     if (this.resizeDrawerEndY >= layoutConfig.minDrawerHeight && this.resizeDrawerEndY <= layoutConfig.maxDrawerHeight) {
@@ -304,11 +334,11 @@ class App extends Component {
       <>
         <ErrorBoundary onError={this.goldenLayoutComponentError} fallbackRender={this.renderErrorPage}>
           <div className="main-grid">
-            <div className="header">
+            <div role="banner" className="header" >
               <Stack horizontal className="top-bar">
                 <div>
                   <img src={logo} width={20} height={20} alt="" />
-                  <span className="top-bar-title">Azure Digital Twins Explorer</span>
+                  <h1 className="top-bar-title">Azure Digital Twins Explorer</h1>
                 </div>
                 <AppCommandBar optionalComponents={optionalComponentsState}
                   optionalComponentsState={optionalComponentsState}
@@ -343,18 +373,22 @@ class App extends Component {
                   </div>
                   <div
                     className="draggable"
-                    onMouseDown={this.handleModelViewerResizeMouseDown} />
+                    tabIndex="0"
+                    onMouseDown={this.handleModelViewerResizeMouseDown}
+                    onFocus={this.handleModelViewerOnFocus}
+                    onBlur={this.handleModelViewerOnBlur}
+                    />
                   <div style={{ width: `calc(${100 - layout.modelViewerWidth}% - 3px)`, flex: 1 }}>
                     <Pivot aria-label="Use left and right arrow keys to navigate" selectedKey={mainContentSelectedKey}
                       className="tab-pivot" headersOnly onLinkClick={this.handleMainContentPivotChange}>
-                      <PivotItem style={{ height: "100%" }} itemKey="graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.graph")} />
-                      <PivotItem style={{ height: "100%" }} itemKey="model-graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.modelGraphViewer")} />
-                      {layout.showImport && <PivotItem style={{ height: "100%" }} itemKey="import" headerText={this.props.t("app.importComponentConfig.title")}
+                      <PivotItem style={{ height: "100%" }} itemKey="graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.graph")} ariaLabel={this.props.t("app.goldenLayoutConfig.graph")} ariaLive="assertive"  />
+                      <PivotItem style={{ height: "100%" }} itemKey="model-graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.modelGraphViewer")}  ariaLabel={this.props.t("app.goldenLayoutConfig.modelGraphViewer")} ariaLive="assertive" />
+                      {layout.showImport && <PivotItem style={{ height: "100%" }} itemKey="import" headerText={this.props.t("app.importComponentConfig.title")} ariaLabel={this.props.t("app.importComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
-                      {layout.showExport && <PivotItem style={{ height: "100%" }} itemKey="export" headerText={this.props.t("app.exportComponentConfig.title")}
+                      {layout.showExport && <PivotItem style={{ height: "100%" }} itemKey="export" headerText={this.props.t("app.exportComponentConfig.title")} ariaLabel={this.props.t("app.exportComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
                     </Pivot>
-                    <div className="tab-pivot-panel">
+                    <div className="tab-pivot-panel" role="main">
                       <div className={mainContentSelectedKey === "graph-viewer" ? "show" : "hidden"}>
                         <GraphViewerComponent />
                       </div>

@@ -45,12 +45,14 @@ const GraphViewerFilteringComponent = ({
               iconProps={{ iconName: "ZoomIn" }}
               title={t("graphViewerFilteringComponent.zoomIn")}
               ariaLabel={t("graphViewerFilteringComponent.zoomIn")}
+              ariaLive="assertive"
               onClick={onZoomIn}
               className="control-loadButtons" />
             <IconButton
               iconProps={{ iconName: "ZoomOut" }}
               title={t("graphViewerFilteringComponent.zoomOut")}
               ariaLabel={t("graphViewerFilteringComponent.zoomOut")}
+              ariaLive="assertive"
               onClick={onZoomOut}
               className="control-loadButtons" />
           </div>
@@ -59,6 +61,7 @@ const GraphViewerFilteringComponent = ({
               iconProps={{ iconName: "SetToCenter" }}
               title={t("graphViewerFilteringComponent.center")}
               ariaLabel={t("graphViewerFilteringComponent.center")}
+              ariaLive="assertive"
               onClick={onCenter}
               className="control-loadButtons" />
           </div>
@@ -67,6 +70,7 @@ const GraphViewerFilteringComponent = ({
               iconProps={{ iconName: "ZoomToFit" }}
               title={t("graphViewerFilteringComponent.zoomToFit")}
               ariaLabel={t("graphViewerFilteringComponent.zoomToFit")}
+              ariaLive="assertive"
               onClick={onZoomToFit}
               className="control-loadButtons" />
           </div>
@@ -75,6 +79,7 @@ const GraphViewerFilteringComponent = ({
               iconProps={{ iconName: "Filter" }}
               title={t("graphViewerFilteringComponent.filter")}
               ariaLabel={t("graphViewerFilteringComponent.filter")}
+              ariaLive="assertive"
               className="control-loadButtons"
               onClick={toggleFilter} />
           </div>

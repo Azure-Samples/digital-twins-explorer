@@ -46,11 +46,10 @@ export class GraphViewerRelationshipViewerComponent extends Component {
       return;
     }
 
-    this.setState({ isLoading: true, showModal: true }, () => {
-      setTimeout(() => {
-        document.getElementById("rel-detail-close-modal-button").focus();
-      }, 200);
-    });
+    this.setState({ isLoading: true, showModal: true });
+    setTimeout(() => {
+      document.getElementById("relationship-information-heading").focus();
+    }, 200);
     await this.getOutgoingRelationships(selectedNode.id);
     await this.getIncomingRelationships(selectedNode.id);
   }
@@ -95,7 +94,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
     const { incomingRelationships, outgoingRelationships, isLoading, showModal } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-relationship-view-modal">
-        <h2 className="heading-2"><Icon iconName="Relationship" />Relationship Information</h2>
+        <h2 className="heading-2" tabIndex="0" id="relationship-information-heading"><Icon iconName="Relationship" />Relationship Information</h2>
         {!!incomingRelationships
           && incomingRelationships.length > 0 && (
           <div className="relationship-type">
