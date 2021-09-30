@@ -61,7 +61,7 @@ const propertyInspectorReducer = produce((draft, action) => {
     }
 });
 
-const PropertyInspectorComponent = () => {
+const PropertyInspectorComponent = ({ isOpen }) => {
     const [state, dispatch] = useReducer(propertyInspectorReducer, {
         selectionType: null,
         selection: null,
@@ -343,7 +343,7 @@ const PropertyInspectorComponent = () => {
     }, []);
 
     if (state.isSelectionLoading) {
-        return <LoaderComponent />;
+        return isOpen ? <LoaderComponent /> : null;
     }
 
     if (!state.selection) {

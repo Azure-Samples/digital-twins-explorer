@@ -21,7 +21,7 @@ import { eventService } from "../../services/EventService";
 import { print } from "../../services/LoggingService";
 import { BatchService } from "../../services/BatchService";
 import { settingsService } from "../../services/SettingsService";
-import { REL_TYPE_OUTGOING, DETAIL_MIN_WIDTH } from "../../services/Constants";
+import { REL_TYPE_OUTGOING, DETAIL_MIN_WIDTH, PROPERTY_INSPECTOR_DEFAULT_WIDTH } from "../../services/Constants";
 import { getUniqueRelationshipId } from "../../utils/utilities";
 
 import "./GraphViewerComponent.scss";
@@ -44,7 +44,7 @@ class GraphViewerComponent extends React.Component {
       currentFilter: "filter",
       propertyInspectorIsOpen: true,
       canShowAllRelationships: false,
-      propInspectorDetailWidth: DETAIL_MIN_WIDTH,
+      propInspectorDetailWidth: PROPERTY_INSPECTOR_DEFAULT_WIDTH,
       couldNotDisplay: false,
       outputIsOpen: false,
       highlightingTerms: [],
@@ -936,7 +936,7 @@ class GraphViewerComponent extends React.Component {
               role="button"
               title={this.props.t("graphViewerComponent.toggleIcon")} />
           </div>
-          <PropertyInspectorComponent />
+          <PropertyInspectorComponent isOpen={propertyInspectorIsOpen} />
           {propertyInspectorIsOpen && (
             <div
               className="dragable"

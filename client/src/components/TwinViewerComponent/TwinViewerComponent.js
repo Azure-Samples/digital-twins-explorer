@@ -47,15 +47,19 @@ export class TwinViewerComponent extends Component {
     eventService.subscribeSelectedTwins(twins => {
       if (twins && twins.length > 0) {
         const twinIds = twins.map(twin => twin.id);
-        this.setState(prevState => ({ items: prevState.items.slice().map(i => {
-          i.selected = twinIds.includes(i.$dtId);
-          return i;
-        }) }));
+        this.setState(prevState => ({
+          items: prevState.items.map(i => ({
+            ...i,
+            selected: twinIds.includes(i.$dtId)
+          }))
+        }));
       } else if (twins.length === 0) {
-        this.setState(prevState => ({ items: prevState.items.map(i => {
-          i.selected = false;
-          return i;
-        }) }));
+        this.setState(prevState => ({
+          items: prevState.items.map(i => ({
+            ...i,
+            selected: false
+          }))
+        }));
       }
     });
     eventService.subscribeFocusTwinViewer(() => {
