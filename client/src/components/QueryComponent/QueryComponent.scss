@@ -239,13 +239,18 @@
   .close-icon {
     font-size: 14px;
     flex-shrink: 0;
-    color: rgb(0, 120, 212);
+    color: #0090ff;
     &:focus {
       outline: none;
     }
     &:hover {
       background: transparent;
     }
+  }
+
+  button {
+    background-color: transparent;
+    border: none;
   }
 }
 

@@ -53,6 +53,10 @@ export class ImportComponent extends Component {
     this.setState({ error: !this.data, isLoading: false, showImportModal: false });
   }
 
+  focus = async () => {
+    await this.cyRef.current.doLayout();
+  }
+
   onSaveClicked = async () => {
     this.setState({ isLoading: true });
 

@@ -5,6 +5,7 @@ import React from "react";
 import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
 import { Stack } from "office-ui-fabric-react";
 import ModelViewerItemCommandBarComponent from "../ModelViewerItemCommandBarComponent/ModelViewerItemCommandBarComponent";
+import { withTranslation } from "react-i18next";
 
 const TAB_KEY_CODE = 9;
 const ARROW_DOWN_KEY_CODE = 40;
@@ -41,7 +42,7 @@ const classNames = mergeStyleSets({
 });
 
 const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect,
-  onSetModelImage, onUpdateModelImage, modelImage, isSelected, onFocus, onBlur, onArrowDown, onArrowUp, setRef, onTab, showItemMenu }) => {
+  onSetModelImage, onUpdateModelImage, modelImage, isSelected, onFocus, onBlur, onArrowDown, onArrowUp, setRef, onTab, showItemMenu, t }) => {
   const uploadModelImageRef = React.createRef();
   const commandBar = React.createRef();
 
@@ -85,8 +86,8 @@ const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect
       <div className={`mv_listItem ${isSelected ? "mv_listItem_selected" : ""}`} data-selection-invoke>
         <Stack horizontal={false}>
           <Stack horizontal>
-            <div className="mv_listItemName" data-selection-invoke>{item.displayName}</div>
-            <div className="mv_buttonGroup">
+            <div className="mv_listItemName testClass" aria-label={`list-item-${item.displayName}`} role="listitem" data-selection-invoke>{item.displayName}</div>
+            <div className="mv_buttonGroup" title={t("modelViewerItem.moreButton")} aria-label={t("modelViewerItem.moreButton")}>
               <ModelViewerItemCommandBarComponent
                 item={item}
                 buttonClass="mv-loadButtons"
@@ -108,4 +109,5 @@ const ModelViewerItem = ({ item, itemIndex, onCreate, onView, onDelete, onSelect
   );
 };
 
-export default ModelViewerItem;
+export default withTranslation("translation", { withRef: true })(ModelViewerItem);
+

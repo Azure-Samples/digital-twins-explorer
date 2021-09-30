@@ -132,7 +132,7 @@
         }
     },
     "modelGraphViewerComponent": {
-        "toggleIcon": "Toggle model detail"
+        "toggleIcon": "Expand/Collapse"
     },
     "modelGraphViewerFilteringComponent": {
         "controlsButtonGroup": {
@@ -215,7 +215,8 @@
         "deleteModel": "Delete Model",
         "uploadModelImage": "Upload Model image",
         "viewModel": "View Model",
-        "createTwin": "Create a Twin"
+        "createTwin": "Create a Twin",
+        "moreButton": "More options"
     },
     "modelViewerItemCommandBarComponent": {
         "farItems": {

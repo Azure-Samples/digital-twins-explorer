@@ -192,6 +192,7 @@ export class ConfigurationFormComponent extends Component {
                   dropdown: { width: "100%" }
                 }} />
               <TextField
+                autoFocus
                 required
                 id="appAdtUrlField"
                 label={this.props.t("configurationFormComponent.appAdtUrlField")}

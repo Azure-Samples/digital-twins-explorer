@@ -142,6 +142,17 @@ class PropertyInspectorComponent extends Component {
     eventService.subscribeImport(() => this.initializeModelService());
   }
 
+  componentDidUpdate() {
+    setTimeout(() => {
+      const fields = [ ...document.getElementsByClassName("jsoneditor-field") ];
+      const value = [ ...document.getElementsByClassName("jsoneditor-value") ];
+      const elements = fields.concat(value);
+      for (const element of elements) {
+        element.tabIndex = 0;
+      }
+    }, [ 1000 ]);
+  }
+
   initializeModelService = () => {
     this.modelService = new ModelService();
   }

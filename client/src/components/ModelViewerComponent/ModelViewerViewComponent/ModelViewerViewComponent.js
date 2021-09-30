@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { DefaultButton, FocusZone, FocusZoneTabbableElements } from "office-ui-fabric-react";
+import { DefaultButton } from "office-ui-fabric-react";
 import Prism from "prismjs";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
@@ -10,7 +10,6 @@ import { apiService } from "../../../services/ApiService";
 import { print } from "../../../services/LoggingService";
 
 import "./ModelViewerViewComponent.scss";
-
 export class ModelViewerViewComponent extends Component {
 
   constructor(props) {
@@ -24,6 +23,9 @@ export class ModelViewerViewComponent extends Component {
 
   async open(item) {
     this.setState({ showModal: true, isLoading: true, model: null });
+    setTimeout(() => {
+      document.getElementById("model-information-heading").focus();
+    }, 200);
 
     let data = {};
     try {
@@ -46,23 +48,21 @@ export class ModelViewerViewComponent extends Component {
     const { model, showModal, isLoading } = this.state;
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="mv-model-view-modal">
-        <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation defaultActiveElement="#close-model-btn">
-          <form onSubmit={this.close}>
-            <h2 className="heading-2">{this.props.t("modelViewerViewComponent.heading")}</h2>
-            <div className="pre-wrapper modal-scroll">
-              {model && <pre>
-                <code className="language-json">
-                  {JSON.stringify(model, null, 1)}
-                </code>
-              </pre>}
-            </div>
-            <div className="btn-group">
-              <DefaultButton id="close-model-btn" className="modal-button close-button" type="submit" onClick={this.close}>
-                {this.props.t("modelViewerViewComponent.defaultButton")}
-              </DefaultButton>
-            </div>
-          </form>
-        </FocusZone>
+        <form onSubmit={this.close}>
+          <h2 className="heading-2" id="model-information-heading" tabIndex="0">{this.props.t("modelViewerViewComponent.heading")}</h2>
+          <div className="pre-wrapper modal-scroll">
+            {model && <pre tabIndex="0" id="code-container">
+              <code className="language-json">
+                {JSON.stringify(model, null, 1)}
+              </code>
+            </pre>}
+          </div>
+          <div className="btn-group">
+            <DefaultButton id="close-model-btn" className="modal-button close-button" type="submit" onClick={this.close}>
+              {this.props.t("modelViewerViewComponent.defaultButton")}
+            </DefaultButton>
+          </div>
+        </form>
       </ModalComponent>
     );
   }

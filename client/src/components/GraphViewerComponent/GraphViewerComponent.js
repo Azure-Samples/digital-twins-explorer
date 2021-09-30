@@ -129,12 +129,13 @@ class GraphViewerComponent extends React.Component {
     });
     eventService.subscribeClickRelationship(relationship => {
       eventService.publishSelection({ selection: relationship, selectionType: "relationship" });
+      this.cyRef.current.clickEdge(getUniqueRelationshipId(relationship));
     });
     eventService.subscribeClearGraphSelection(() => {
       this.cyRef.current.clearOverlay();
     });
     eventService.subscribeSelectTwins(twinIds => {
-      this.cyRef.current.selectNodes(twinIds);
+      this.cyRef.current.selectNodes(twinIds, true);
     });
   }
 
@@ -927,7 +928,7 @@ class GraphViewerComponent extends React.Component {
           {isLoading && <LoaderComponent message={`${Math.round(progress)}%`} cancel={() => this.canceled = true} />}
         </div>
         <div className="pi-wrap" style={{width: propertyInspectorIsOpen ? `${propInspectorDetailWidth}%` : 0}}>
-          <div className="pi-toggle" onClick={this.togglePropertyInspector}>
+          <div className="pi-toggle" tabIndex="0" onClick={this.togglePropertyInspector}>
             <Icon
               className="toggle-icon"
               iconName={propertyInspectorIsOpen ? "DoubleChevronRight" : "DoubleChevronLeft"}

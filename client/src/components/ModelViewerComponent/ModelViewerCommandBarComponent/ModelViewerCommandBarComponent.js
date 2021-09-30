@@ -23,7 +23,8 @@ class ModelViewerCommandBarComponent extends Component {
       iconProps: { iconName: "Photo2Add" },
       onClick: () => this.props.onUploadModelImagesClicked(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      role: "menuitem"
     },
     {
       key: "downloadModels",
@@ -32,7 +33,8 @@ class ModelViewerCommandBarComponent extends Component {
       iconProps: { iconName: "Refresh" },
       onClick: () => this.props.onDownloadModelsClicked(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      role: "menuitem"
     },
     {
       key: "uploadModel",
@@ -41,7 +43,8 @@ class ModelViewerCommandBarComponent extends Component {
       iconProps: { iconName: "Upload" },
       onClick: () => this.props.onUploadModelClicked(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      role: "menuitem"
     },
     {
       key: "uploadModelsDirectory",
@@ -50,7 +53,8 @@ class ModelViewerCommandBarComponent extends Component {
       iconProps: { iconName: "BulkUploadFolder" },
       onClick: () => this.props.onUploadModelsFolderClicked(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      role: "menuitem"
     },
     {
       key: "deleteModels",
@@ -59,7 +63,8 @@ class ModelViewerCommandBarComponent extends Component {
       iconProps: { iconName: "Delete" },
       onClick: () => this.delete.current.open(),
       iconOnly: true,
-      className: this.buttonClass
+      className: this.buttonClass,
+      role: "menuitem"
     }
   ]
 

@@ -22,6 +22,8 @@ export const GraphViewerCytoscapeLayouts = {
 };
 const SPACE_KEY_CODE = 32;
 const ENTER_KEY_CODE = 13;
+const ESC_KEY_CODE = 27;
+const TAB_KEY_CODE = 9;
 
 export class GraphViewerCytoscapeComponent extends React.Component {
 
@@ -33,6 +35,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl = null;
     this.navControlId = _uniqueId("graph-viewer-nav");
     this.selectedNodes = [];
+    this.selectedOutsideComponent = [];
     this.layout = "Klay";
     this.isSelectingOnOverlay = false;
     this.isFetchingTwinData = false;
@@ -182,6 +185,30 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         contextMenuClasses: [ "custom-context-menu" ]
       });
     }
+
+    const handleKeyDown = e => {
+      if (e.keyCode === ESC_KEY_CODE) {
+        const contextMenu = document.getElementsByClassName("custom-context-menu")[0];
+        if (contextMenu.style.display === "block") {
+          contextMenu.style.display = "none";
+        }
+      }
+
+      if (e.keyCode === TAB_KEY_CODE) {
+        const contextMenu = document.getElementsByClassName("custom-context-menu")[0];
+
+        const menuItems = Array.from(contextMenu.children);
+        const activeMenuItems = menuItems.filter(item => item.style.display !== "none");
+
+        if (activeMenuItems && document.activeElement === activeMenuItems[activeMenuItems.length - 1]) {
+          activeMenuItems[0].focus();
+          e.preventDefault();
+        }
+      }
+    };
+    window.addEventListener("keydown", e => {
+      handleKeyDown(e);
+    });
   }
 
   addTwins(twins) {
@@ -497,6 +524,11 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     if (this.props.overlayResults && !this.isSelectingOnOverlay) {
       this.isSelectingOnOverlay = true;
     }
+    if (this.selectedOutsideComponent.length > 0) {
+      const selectedOutsideIds = this.selectedOutsideComponent.map(n => n.id);
+      this.selectedNodes = this.selectedNodes.filter(n => !selectedOutsideIds.includes(n.id));
+      this.clearHighlighting();
+    }
     this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
     this.highlightRelatedNodes();
     this.onNodeClicked();
@@ -522,15 +554,21 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     cy.nodes().forEach(node => cy.$id(node.id()).toggleClass("highlight", false));
   }
 
-  selectNodes = nodeIds => {
+  selectNodes = (nodeIds, exterior = false) => {
     this.dimGraphElements();
     if (nodeIds && nodeIds.length > 0) {
       const cy = this.graphControl;
       this.selectedNodes = [];
+      if (exterior) {
+        this.selectedOutsideComponent = [];
+      }
       nodeIds.forEach(id => {
         const node = cy.elements(`node[id="${id}"]`);
         if (node) {
           this.selectedNodes.push({ id: node.id(), modelId: node.data().modelId });
+          if (exterior) {
+            this.selectedOutsideComponent.push({ id: node.id(), modelId: node.data().modelId });
+          }
           cy.$id(node.data().id).toggleClass("selected", true);
           cy.$id(node.data().id).toggleClass("opaque", false);
           node.connectedEdges().forEach(edge => {
@@ -900,6 +938,14 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     this.graphControl.$id(edgeId).emit("cxttap");
     const { x, y } = this.graphControl.$id(edgeId).renderedMidpoint();
     this.displayContextMenu("edge", x, y);
+  }
+
+  clickEdge = edgeId => {
+    const cy = this.graphControl;
+    cy.edges().toggleClass("highlighted", false);
+    cy.edges().toggleClass("opaque", true);
+    cy.$id(edgeId).toggleClass("highlighted", true);
+    cy.$id(edgeId).toggleClass("opaque", false);
   }
 
   rightClickNode = nodeId => {

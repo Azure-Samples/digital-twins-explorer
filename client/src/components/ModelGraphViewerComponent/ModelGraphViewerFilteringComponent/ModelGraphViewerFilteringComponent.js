@@ -32,12 +32,14 @@ const ModelGraphViewerFilteringComponent = ({
             iconProps={{ iconName: "Add" }}
             title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomIn")}
             ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomIn")}
+            ariaLive="assertive"
             onClick={onZoomIn}
             className="control-loadButtons" />
           <IconButton
             iconProps={{ iconName: "CalculatorSubtract" }}
             title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomOut")}
             ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomOut")}
+            ariaLive="assertive"
             onClick={onZoomOut}
             className="control-loadButtons" />
         </div>
@@ -46,6 +48,7 @@ const ModelGraphViewerFilteringComponent = ({
             iconProps={{ iconName: "ZoomToFit" }}
             title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomToFit")}
             ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.zoomToFit")}
+            ariaLive="assertive"
             onClick={onZoomToFit}
             className="control-loadButtons" />
         </div>
@@ -54,6 +57,7 @@ const ModelGraphViewerFilteringComponent = ({
             iconProps={{ iconName: "Filter" }}
             title={t("modelGraphViewerFilteringComponent.controlsButtonGroup.filter")}
             ariaLabel={t("modelGraphViewerFilteringComponent.controlsButtonGroup.filter")}
+            ariaLive="assertive"
             className="control-loadButtons"
             onClick={toggleFilter} />
         </div>

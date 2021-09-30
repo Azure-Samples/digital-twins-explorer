@@ -87,7 +87,16 @@ class GraphViewerTermManagementComponent extends Component {
     });
   }
 
-  onTermActiveChange = term => {
+  keepFocusOnToggle = i => {
+    setTimeout(() => {
+      let customToggle = document.getElementsByClassName(`${i}--toggle`)[0];
+      customToggle = customToggle.children[0];
+      customToggle = customToggle.children[0];
+      customToggle.focus();
+    }, [ 1 ]);
+  }
+
+  onTermActiveChange = (term, i) => {
     const { terms, onUpdateTerm } = this.props;
     const newTerms = [ ...terms ];
     newTerms.forEach(t => {
@@ -98,6 +107,7 @@ class GraphViewerTermManagementComponent extends Component {
         }
       }
     });
+    this.keepFocusOnToggle(i);
   }
 
   render() {
@@ -123,12 +133,12 @@ class GraphViewerTermManagementComponent extends Component {
             </div>
           </div>
           <div className="filter-terms">
-            {terms.map(term => (
+            {terms.map((term, i) => (
               <div className="filter-term" key={`${term.text}-${term.isActive ? "active" : "inactive"}`}>
                 <div className={`term-bar ${term.isActive ? "active" : ""}`}>
-                  <Toggle className="filter-toggle"
+                  <Toggle className={`filter-toggle ${i}--toggle`}
                     ariaLabel={term.text}
-                    checked={term.isActive} onChange={() => this.onTermActiveChange(term)} style={{
+                    checked={term.isActive} onChange={() => this.onTermActiveChange(term, i)} style={{
                       marginBottom: 0,
                       height: 12,
                       width: 24
@@ -146,7 +156,7 @@ class GraphViewerTermManagementComponent extends Component {
                         }}
                         iconProps={{
                           iconName: "More",
-                          style: { color: "#fff", fontSize: 12 }
+                          style: { color: "#000", fontSize: 12 }
                         }} />
                       {term.menuIsOpen && <div className="term-menu">
                         {this.menuItems.map(item => (

@@ -22,6 +22,7 @@
       justify-content: center;
       background: $backgroundColor2;
       cursor: pointer;
+      z-index: 1;
     }
   }
   &.pi-open {
@@ -325,6 +326,7 @@
         white-space: nowrap;
         overflow: hidden;
         flex: 1;
+        color: #000;
       }
     }
     .term-options {

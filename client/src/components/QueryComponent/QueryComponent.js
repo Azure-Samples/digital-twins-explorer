@@ -141,15 +141,16 @@ class QueryComponent extends Component {
   onRenderOption = item => (
     <div className="dropdown-option">
       <span>{item.key}</span>
-      <Icon
-        className="close-icon"
-        iconName="ChromeClose"
-        aria-hidden="true"
-        onClick={() => this.onRemoveQueryClick(item)}
-        aria-label={`Remove query ${item.key}`}
-        role="button"
-        title="Remove query"
-        tabIndex="0" />
+      <button tabIndex="0" type="button" onClick={() => this.onRemoveQueryClick(item)}>
+        <Icon
+          className="close-icon"
+          iconName="ChromeClose"
+          aria-hidden="true"
+          aria-label={`Remove query ${item.key}`}
+          role="button"
+          title="Remove query"
+          tabIndex="0" />
+      </button>
     </div>)
 
   onOverlayResultsChange = (e, checked) => {
@@ -179,7 +180,7 @@ class QueryComponent extends Component {
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
-                role="presentation"
+                role="combobox"
                 styles={{
                   dropdown: { width: 200 }
                 }}
@@ -187,19 +188,19 @@ class QueryComponent extends Component {
             </div>
             <FocusZone handleTabKey={FocusZoneTabbableElements.all} defaultActiveElement="#queryField">
               <form onSubmit={this.executeQuery}>
-                <TextField id="queryField" className="qc-query" styles={this.getStyles} value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
+                <TextField id="queryField" className="qc-query" styles={this.getStyles} role="search" value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
               </form>
             </FocusZone>
             <div className="qc-queryControls">
               <FocusZone onKeyUp={this.handleOverlayResultsKeyUp}>
                 <Checkbox label={this.props.t("queryComponent.overlayResults")} checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
               </FocusZone>
-              <DefaultButton className="query-button" onClick={this.executeQuery}>
+              <DefaultButton className="query-button" onClick={this.executeQuery} ariaLive="assertive">
                 {this.props.t("queryComponent.defaultButton")}
               </DefaultButton>
               <IconButton className="query-save-button"
                 iconProps={{ iconName: this.props.t("queryComponent.iconButton"), style: { color: "black" } }}
-                title={this.props.t("queryComponent.iconButton")} ariaLabel="Save query"
+                title={this.props.t("queryComponent.iconButton")} ariaLabel="Save query" ariaLive="assertive"
                 onClick={this.saveQueryButtonClicked} />
             </div>
           </div>
