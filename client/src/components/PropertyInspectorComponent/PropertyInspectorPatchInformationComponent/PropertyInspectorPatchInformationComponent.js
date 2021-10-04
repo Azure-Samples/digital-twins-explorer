@@ -8,6 +8,10 @@ import ModalComponent from "../../ModalComponent/ModalComponent";
 
 export class PropertyInspectorPatchInformationComponent extends Component {
 
+  componentDidMount() {
+    Prism.highlightAll();
+  }
+
   componentDidUpdate(prevProps) {
     if (prevProps.isVisible !== this.props.isVisible && this.props.isVisible) {
       Prism.highlightAll();
@@ -19,11 +23,13 @@ export class PropertyInspectorPatchInformationComponent extends Component {
     return (
       <ModalComponent isVisible={isVisible} className="pi-patch-modal">
         <h2 className="heading-2">Patch Information</h2>
-        <pre>
-          <code className="language-json">
-            {JSON.stringify(patch, null, 1)}
-          </code>
-        </pre>
+        <div className="patch-json-data">
+          <pre>
+            <code className="language-json">
+              {JSON.stringify(patch, null, 2)}
+            </code>
+          </pre>
+        </div>
         <div className="btn-group">
           <DefaultButton className="modal-button close-button" onClick={onCloseModal}>Close</DefaultButton>
         </div>

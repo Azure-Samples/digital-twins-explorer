@@ -21,3 +21,4 @@ export const AUTH_NOT_FOUND_MESSAGE = "Twin not found";
 export const TWIN_DATA_OWNER_RBAC_ID = "bcd981a7-7f74-457b-83e1-cceb9e632ffe";
 export const MORE_INFORMATION_LINK = "https://docs.microsoft.com/en-us/azure/digital-twins/";
 export const DETAIL_MIN_WIDTH = 24;
+export const PROPERTY_INSPECTOR_DEFAULT_WIDTH = 35;
