@@ -91,6 +91,7 @@ class App extends Component {
     this.modelGraphViewer = React.createRef();
     this.importRef = React.createRef();
     this.state = {
+      exportedQuery: "",
       isLoading: false,
       layout: {
         modelViewerWidth: 15,
@@ -121,8 +122,8 @@ class App extends Component {
         });
       });
     });
-    eventService.subscribeExport(() => {
-      this.setState({ showExport: true }, () => {
+    eventService.subscribeExport((evt) => {
+      this.setState(prevState => ({ layout: { ...prevState.layout, showExport: true }, exportedQuery: evt.query }), () => {
         this.setState({ mainContentSelectedKey: "export" });
       });
     });
@@ -399,7 +400,7 @@ class App extends Component {
                         <ImportComponent file={layout.importFile} ref={this.importRef} />
                       </div>}
                       {layout.showExport && <div className={mainContentSelectedKey === "export" ? "show" : "hidden"}>
-                        <ExportComponent />
+                        <ExportComponent query={this.state.exportedQuery}/>
                       </div>}
                     </div>
                   </div>
