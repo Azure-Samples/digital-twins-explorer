@@ -112,10 +112,12 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                         : [model.extends];
                     extendedModelIds.forEach((id) => addModelDependencies(id));
                 }
-                const componentIds = model.contents
-                    .filter((c) => c['@type'] === 'Component')
-                    .map((c) => c.schema);
-                componentIds.forEach((id) => addModelDependencies(id));
+                if (model.contents) {
+                    const componentIds = model.contents
+                        .filter((c) => c['@type'] === 'Component')
+                        .map((c) => c.schema);
+                    componentIds.forEach((id) => addModelDependencies(id));
+                }
             }
         };
 
