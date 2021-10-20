@@ -13,7 +13,7 @@ const pIActionTypes = {
     setSelectionType: 'setSelectionType',
     setSelection: 'setSelection',
     setRootAndExpandedModels: 'setRootAndExpandedModels',
-    setRelationshipDefinition: 'setRelationshipDefinition',
+    setRelationshipModel: 'setRelationshipModel',
     setIsSelectionLoading: 'setIsSelectionLoading',
     setIsPatchInformationVisible: 'setIsPatchInformationVisible',
     setPatchInformation: 'setPatchInformation',
@@ -32,8 +32,8 @@ const propertyInspectorReducer = produce((draft, action) => {
         case pIActionTypes.setRootAndExpandedModels:
             draft.rootAndExpandedModels = action.payload;
             break;
-        case pIActionTypes.setRelationshipDefinition:
-            draft.relationshipDefinition = action.payload;
+        case pIActionTypes.setRelationshipModel:
+            draft.relationshipModel = action.payload;
             break;
         case pIActionTypes.setIsSelectionLoading:
             draft.isSelectionLoading = action.payload;
@@ -66,7 +66,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
         selectionType: null,
         selection: null,
         rootAndExpandedModels: null,
-        relationshipDefinition: null,
+        relationshipModel: null,
         isSelectionLoading: false,
         isPatchInformationVisible: false,
         patchInformation: null,
@@ -181,7 +181,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                     payload: sourceTwin['$metadata']['$model']
                 });
                 dispatch({
-                    type: pIActionTypes.setRelationshipDefinition,
+                    type: pIActionTypes.setRelationshipModel,
                     payload: null
                 });
             } else {
@@ -189,7 +189,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                     models,
                     rootModel?.id
                 );
-                let relationshipDefinition = null;
+                let relationshipModel = null;
 
                 for (const model of expandedModels) {
                     if (model.contents) {
@@ -201,17 +201,17 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                                 type === 'Relationship' &&
                                 selection['$relationshipName'] === item.name
                             ) {
-                                relationshipDefinition = item;
+                                relationshipModel = model;
                                 break;
                             }
                         }
                     }
-                    if (relationshipDefinition) break;
+                    if (relationshipModel) break;
                 }
 
                 dispatch({
-                    type: pIActionTypes.setRelationshipDefinition,
-                    payload: relationshipDefinition
+                    type: pIActionTypes.setRelationshipModel,
+                    payload: relationshipModel
                 });
             }
         }
@@ -397,7 +397,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                     theme={'explorer'}
                     inputData={{
                         relationship: state.selection,
-                        relationshipDefinition: state.relationshipDefinition
+                        relationshipModel: state.relationshipModel
                     }}
                     onCommitChanges={onUpdateRelationship}
                     missingModelIds={state.missingModelIds}
