@@ -164,9 +164,9 @@ class ModelViewerComponent extends Component {
       const { items } = this.state;
       const modelService = new ModelService();
       const sortedModelsId = await modelService.getModelIdsForUpload(list);
-      sortedModels = sortedModelsId.map(id => list.filter(model => model["@id"] === id)[0]);
+      sortedModels = sortedModelsId.map(id => list.find(model => model["@id"] === id)).filter(m => !!m);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
-      if (sortedModels.length > 0) {
+      if (sortedModels && sortedModels.length > 0) {
         const chunks = modelService.chunkModelsList(sortedModels, 50);
         for (const chunk of chunks) {
           await this.createModels(chunk);
