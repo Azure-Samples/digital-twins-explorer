@@ -124,8 +124,8 @@
     },
     "modelGraphViewerCommandBarComponent": {
         "layoutItems": {
-            "text": "Run layout",
-            "ariaLabel": "run layout"
+            "text": "Choose layout",
+            "ariaLabel": "Choose layout"
         },
         "render": {
             "ariaLabel": "Use left and right arrow keys to navigate between commands"

@@ -18,6 +18,7 @@ import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
 import { settingsService } from "../../services/SettingsService";
+import { configService } from "../../services/ConfigService";
 
 import "./ModelViewerComponent.scss";
 
@@ -63,7 +64,16 @@ class ModelViewerComponent extends Component {
       }
     });
 
-    await this.retrieveModels();
+    let config = {};
+    try {
+      config = await configService.getConfig();
+    } catch (exc) {
+      config = {};
+    }
+
+    if (config.appAdtUrl) {
+      await this.retrieveModels();
+    }
 
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
@@ -102,7 +112,7 @@ class ModelViewerComponent extends Component {
 
     let list = [];
     try {
-      list = await apiService.queryModels();
+      list = await apiService.queryModels(true);
     } catch (exc) {
       exc.customMessage = "Error fetching models";
       eventService.publishError(exc);

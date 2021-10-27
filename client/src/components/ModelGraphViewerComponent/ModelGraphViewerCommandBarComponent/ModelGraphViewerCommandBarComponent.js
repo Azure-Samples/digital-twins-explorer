@@ -33,7 +33,7 @@ class ModelGraphViewerCommandBarComponent extends Component {
       text: this.props.t("modelGraphViewerCommandBarComponent.layoutItems.text"),
       ariaLabel: this.props.t("modelGraphViewerCommandBarComponent.layoutItems.ariaLabel"),
       iconOnly: true,
-      iconProps: { iconName: "ArrangeSendToBack" },
+      iconProps: { iconName: "ChooseLayout" },
       onClick: () => this.props.onLayoutClicked(),
       className: this.buttonClass,
       subMenuProps: {},

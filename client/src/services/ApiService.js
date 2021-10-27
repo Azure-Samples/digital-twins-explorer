@@ -326,8 +326,8 @@ class CachedApiService extends ApiService {
     return this.cache.models.find(m => m.id === id);
   }
 
-  async queryModels() {
-    if (!settingsService.caching) {
+  async queryModels(bypassCache = false) {
+    if (!settingsService.caching || bypassCache) {
       this.clearCache();
       return await super.queryModels();
     }

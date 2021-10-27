@@ -14,6 +14,7 @@ import {
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { eventService } from "../../services/EventService";
 import { settingsService } from "../../services/SettingsService";
+import { configService } from "../../services/ConfigService";
 
 import "./ConfigurationFormComponent.scss";
 
@@ -24,12 +25,13 @@ export class ConfigurationFormComponent extends Component {
     this.state = {
       showModal: false,
       appAdtUrl: "",
-      environmentOptions: []
+      environmentOptions: [],
+      isEnvironmentSelected: false
     };
     this.environments = settingsService.environments;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     eventService.subscribeConfigure(evt => {
       this.loadConfigurationSettings(evt);
     });
@@ -37,6 +39,17 @@ export class ConfigurationFormComponent extends Component {
       this.setState({
         environmentOptions: this.environments.map(env => env.name)
       });
+    }
+
+    let config = {};
+    try {
+      config = await configService.getConfig();
+    } catch (exc) {
+      config = {};
+    }
+
+    if (config.appAdtUrl) {
+      this.setState({ isEnvironmentSelected: true });
     }
   }
 
@@ -209,11 +222,11 @@ export class ConfigurationFormComponent extends Component {
                 onClick={this.saveConfigurationsSettings}>
                 {this.props.t("configurationFormComponent.saveButton")}
               </PrimaryButton>
-              <DefaultButton
+              {this.state.isEnvironmentSelected && <DefaultButton
                 className="modal-button cancel-button"
                 onClick={this.closeConfigurationSettings}>
                 {this.props.t("configurationFormComponent.cancelButton")}
-              </DefaultButton>
+              </DefaultButton>}
             </div>
           </form>
         </FocusZone>

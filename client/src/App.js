@@ -4,7 +4,7 @@
 
 import React, { Component } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { Pivot, PivotItem, Stack, Customizations, Icon } from "office-ui-fabric-react/lib/";
+import { Pivot, PivotItem, Stack, Customizations, Icon, Text } from "office-ui-fabric-react/lib/";
 import cytoscape from "cytoscape";
 import fcose from "cytoscape-fcose";
 import cola from "cytoscape-cola";
@@ -275,8 +275,7 @@ class App extends Component {
     window.addEventListener("mouseup", this.handleDrawerResizeMouseUp);
   };
 
-  handleMainContentPivotChange = item => {
-    const itemKey = item.props.itemKey;
+  handleMainContentPivotChange = itemKey => {
     if (itemKey === "model-graph-viewer") {
       this.modelGraphViewer.current.initialize();
     }
@@ -350,11 +349,8 @@ class App extends Component {
             </div>
             <Stack className="work-area">
               <div className="top-area">
-                <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot">
-                  <PivotItem headerText={this.props.t("app.goldenLayoutConfig.queryComponent")}>
-                    <QueryComponent />
-                  </PivotItem>
-                </Pivot>
+                <Text as={"h2"} variant={'small'} className="query-explorer-header" aria-label={this.props.t("app.goldenLayoutConfig.queryComponent")}>{this.props.t("app.goldenLayoutConfig.queryComponent")}</Text>
+                <QueryComponent onQueryExecuted={() => this.handleMainContentPivotChange('graph-viewer')}/>
               </div>
               <div className="main-area" style={{ height: `calc(100vh - 155px - ${(layout.showConsole || layout.showOutput) ? layout.drawerHeight : 0}%)` }}>
                 <Stack horizontal style={{ height: "100%" }}>
@@ -381,7 +377,7 @@ class App extends Component {
                     />
                   <div style={{ width: `calc(${100 - layout.modelViewerWidth}% - 3px)`, flex: 1 }}>
                     <Pivot aria-label="Use left and right arrow keys to navigate" selectedKey={mainContentSelectedKey}
-                      className="tab-pivot" headersOnly onLinkClick={this.handleMainContentPivotChange}>
+                      className="tab-pivot" headersOnly onLinkClick={(item) => this.handleMainContentPivotChange(item.props.itemKey)}>
                       <PivotItem style={{ height: "100%" }} itemKey="graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.graph")} ariaLabel={this.props.t("app.goldenLayoutConfig.graph")} ariaLive="assertive"  />
                       <PivotItem style={{ height: "100%" }} itemKey="model-graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.modelGraphViewer")}  ariaLabel={this.props.t("app.goldenLayoutConfig.modelGraphViewer")} ariaLive="assertive" />
                       {layout.showImport && <PivotItem style={{ height: "100%" }} itemKey="import" headerText={this.props.t("app.importComponentConfig.title")} ariaLabel={this.props.t("app.importComponentConfig.title")} ariaLive="assertive"

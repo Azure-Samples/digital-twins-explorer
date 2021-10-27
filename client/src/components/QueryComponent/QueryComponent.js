@@ -70,6 +70,9 @@ class QueryComponent extends Component {
   }
 
   executeQuery = event => {
+    if (typeof this.props.onQueryExecuted === "function") {
+      this.props.onQueryExecuted();
+    }
     event.preventDefault();
     print(`Requested query: ${this.state.selectedQuery}`);
     eventService.publishQuery(this.state.selectedQuery);
