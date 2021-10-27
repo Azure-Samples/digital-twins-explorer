@@ -59,6 +59,11 @@
   i {
     font-size: 16px;
     color: $textColorLight2;
+    svg {
+      path {
+        fill: white;
+      }
+    }
   }
   &:hover {
     color: $textColorLight1;

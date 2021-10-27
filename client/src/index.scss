@@ -420,7 +420,7 @@ code[class*="language-"], pre[class*="language-"] {
 .light-command-bar {
   .ms-CommandBarItem-link {
     .ms-Button-icon {
-      color: $textColorLight2;
+      color: white;
       
     }
     &.is-disabled {
@@ -430,7 +430,7 @@ code[class*="language-"], pre[class*="language-"] {
     }
     &:hover {
       .ms-Button-icon {
-        color: $textColorLight1;
+        color: white;
       }
     }
   }

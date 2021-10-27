@@ -67,7 +67,7 @@
     border-radius: 5px;
     i {
       font-size: 14px;
-      color: $textColorLight2;
+      color: white;
     }
   }
 
@@ -77,7 +77,12 @@
     margin-bottom: 8px;
     i {
       font-size: 18px;
-      color: $textColorLight2;
+      color: white;
+    }
+    svg {
+      path{
+        fill: white;
+      }
     }
   }
 
