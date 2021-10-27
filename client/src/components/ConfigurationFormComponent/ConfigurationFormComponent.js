@@ -66,6 +66,7 @@ export class ConfigurationFormComponent extends Component {
     };
     if (this.validateConfig(config)) {
       this.saveEnvironment(config);
+      configService.setConfig(config);
       eventService.publishConfigure({ type: "end", config });
       this.resetModalState();
     }

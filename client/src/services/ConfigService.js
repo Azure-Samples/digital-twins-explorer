@@ -3,25 +3,29 @@
 
 import { eventService } from "./EventService";
 import { storageService } from "./StorageService";
-import { apiService } from "./ApiService";
 
 const StorageKeyName = "configuration";
 
 class ConfigService {
 
   constructor() {
-    eventService.subscribeConfigure(evt => {
-      if (evt.type === "end" && evt.config) {
-        storageService.setLocalStorageObject(StorageKeyName, evt.config);
-        apiService.clearCache();
-      }
-    });
+    this._config = null;
   }
 
-  getConfig(force) {
-    const config = storageService.getLocalStorageObject(StorageKeyName);
-    if (config && !force) {
-      return config;
+  setConfig(config) {
+    this._config = config;
+    storageService.setLocalStorageObject(StorageKeyName, config);
+    eventService.publishClearCache();
+  }
+
+  getConfig() {
+    if (this._config) {
+      return this._config;
+    }
+
+    const localStorageConfig = storageService.getLocalStorageObject(StorageKeyName);
+    if (localStorageConfig) {
+      return localStorageConfig;
     }
 
     return new Promise((resolve, reject) => {
@@ -29,8 +33,7 @@ class ConfigService {
         if (evt.type === "end") {
           eventService.unsubscribeConfigure(callback);
           if (evt.config) {
-            storageService.setLocalStorageObject(StorageKeyName, evt.config);
-            apiService.clearCache();
+            this.setConfig(evt.config);
             resolve(evt.config);
           } else {
             const e = new Error("Configuration aborted");
@@ -41,7 +44,7 @@ class ConfigService {
       };
 
       eventService.subscribeConfigure(callback);
-      eventService.publishConfigure({ type: "start", config });
+      eventService.publishConfigure({ type: "start" });
     });
   }
 
