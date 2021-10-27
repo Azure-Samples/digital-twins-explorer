@@ -188,7 +188,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   getExtendRelationships = list =>
     list.flatMap(m =>
-      m.bases.map(b => ({
+      m.bases.slice(0, 1).map(b => ({
         sourceId: m.id,
         targetId: b,
         relationshipName: "Extends",
@@ -245,7 +245,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   deselectModel = () => {
     if (this.canDeselect) {
-      this.modelDetail.current.clear();
+      this.modelDetail.current?.clear();
       const { selectedModel } = this.state;
       if (selectedModel) {
         this.cyRef.current.emitNodeEvent(selectedModel.key, "unselect");
