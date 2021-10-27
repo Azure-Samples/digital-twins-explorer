@@ -38,6 +38,14 @@
             background: #fff;
           }
         }
+        &.is-checked {
+          button {
+            background-color: $buttonColor;
+            span{
+              background: var(--toggle-knob-active);
+            }
+          }
+        }
       }
     }
   }

@@ -186,7 +186,7 @@ body {
   }
   .ms-Toggle-background {
     border-color: transparent;
-    background: $textColorLight2;
+    background: $backgroundColor3;
     .ms-Toggle-thumb {
       background: white;
     }
@@ -194,6 +194,9 @@ body {
   &.is-checked {
     .ms-Toggle-background {
       background: $buttonColor;
+    }
+    .ms-Toggle-thumb {
+      background: var(--toggle-knob-active);
     }
   }
 }

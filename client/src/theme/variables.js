@@ -23,7 +23,8 @@ export default {
     "--text-color-light3": "#aaaaaa",
     "--icon-hover-color": "#A3D7FF",
     "--scrollbar-color": "#8C8C8C",
-    "--dark-fabric-primary": "#60aaff"
+    "--dark-fabric-primary": "#60aaff",
+    "--toggle-knob-active": "#fff"
   },
   "high-contrast": {
     "--background-color1": "#1e1e1e",
@@ -49,6 +50,7 @@ export default {
     "--text-color-light3": "#aaaaaa",
     "--icon-hover-color": "#D6EEFF",
     "--scrollbar-color": "#B8B8B8",
-    "--dark-fabric-primary": "#fff"
+    "--dark-fabric-primary": "#fff",
+    "--toggle-knob-active": "#000"
   }
 };
