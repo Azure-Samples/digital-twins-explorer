@@ -319,8 +319,10 @@ export class ModelService {
     if (!contents.displayName) {
       contents.displayName = getModelDisplayName(vertex);
     }
-    contents.description = getModelDescription(vertex);
-    contents.isDefined = vertex.hasAttributeValue("is_defined", true);
+    if (!isExtended) {
+      contents.description = getModelDescription(vertex);
+      contents.isDefined = vertex.hasAttributeValue("is_defined", true);
+    }
 
     vertex
       .getOutgoing("dtmi:dtdl:property:contents;2")
