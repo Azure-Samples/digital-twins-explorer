@@ -313,7 +313,7 @@ export class ModelService {
     return contents;
   }
 
-  _mapModel(vertex, contents) {
+  _mapModel(vertex, contents, isExtended = false) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
 
     if (!contents.displayName) {
@@ -356,7 +356,7 @@ export class ModelService {
           const component = this._getModel(inferSchema(x.toVertex));
           component.name = getPropertyName(x.toVertex);
           component.schema = inferSchema(x.toVertex);
-          safeAdd(contents.components, component);
+          safeAdd(contents.components, {...component, isExtended});
         }
       });
 
@@ -365,7 +365,7 @@ export class ModelService {
       .items()
       .forEach(x => {
         contents.bases.push(x.toVertex.id);
-        this._mapModel(x.toVertex, contents);
+        this._mapModel(x.toVertex, contents, true);
       });
 
     contents.componentProperties = this._getChildComponentProperties(contents);

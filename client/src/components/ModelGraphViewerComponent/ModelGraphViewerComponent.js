@@ -178,7 +178,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   getComponentRelationships = list =>
     list.flatMap(m =>
-      m.components.map(c => ({
+      m.components.filter(c => !c.isExtended).map(c => ({
         sourceId: m.id,
         targetId: c.schema,
         relationshipName: c.name,
