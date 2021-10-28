@@ -112,7 +112,7 @@ body {
 }
 
 .work-area {
-  grid-row: 3;
+  position: relative;
   height: calc(100vh - 52px);
   color: white;
   width: 100vw;

@@ -38,6 +38,7 @@ import logo from "./assets/logo192.png";
 
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
+import ModelUploadMessageBar from "./components/ModelUploadMessageBar/ModelUploadMessageBar";
 
 cytoscape.use(klay);
 cytoscape.use(dagre);
@@ -102,6 +103,7 @@ class App extends Component {
         showOutput: false,
         showConsole: false
       },
+      modelUploadResults: null,
       mainContentSelectedKey: "graph-viewer",
       leftPanelSelectedKey: "models",
       contrast: contrastOptions.normal
@@ -348,6 +350,11 @@ class App extends Component {
               </Stack>
             </div>
             <Stack className="work-area">
+              <ModelUploadMessageBar
+                modelUploadResults={this.state.modelUploadResults}
+                onDismiss={() => this.setState({ modelUploadResults: null })}
+                t={this.props.t}
+              />
               <div className="top-area">
                 <Text as={"h2"} variant={'small'} className="query-explorer-header" aria-label={this.props.t("app.goldenLayoutConfig.queryComponent")}>{this.props.t("app.goldenLayoutConfig.queryComponent")}</Text>
                 <QueryComponent onQueryExecuted={() => this.handleMainContentPivotChange('graph-viewer')}/>
@@ -364,7 +371,10 @@ class App extends Component {
                         <TwinViewerComponent />
                       </div>
                       <div className={leftPanelSelectedKey === "models" ? "show" : "hidden"}>
-                        <ModelViewerComponent showItemMenu={mainContentSelectedKey === "graph-viewer"} />
+                        <ModelViewerComponent
+                          showItemMenu={mainContentSelectedKey === "graph-viewer"}
+                          onModelUploadSuccess={(modelUploadResults) => this.setState({ modelUploadResults })}
+                        />
                       </div>
                     </div>
                   </div>

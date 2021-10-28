@@ -19,6 +19,12 @@
         },
         "errorPage": "Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue."
     },
+    "modelUploadMessaging": {
+        "modelUploadSuccessMessage": "{{modelCount}} models uploaded successfully.",
+        "modelUploadDetailsHeader": "{{modelCount}} models uploaded",
+        "closeButton": "Close",
+        "viewDetails": "View details"
+    },
     "appCommandBar" : {
         "keyboardShortcuts": {
             "ariaLabel": "keyboard shortcuts",
