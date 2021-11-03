@@ -612,7 +612,7 @@ class ModelGraphViewerComponent extends React.Component {
           <div className="gc-wrap">
             <ModelGraphViewerRelationshipsToggle
               setFirstItemRef={ref => this.relationshipsToggle = ref}
-              onKeyDown={this.onRelationshipsToggleKeyDown}
+              onKeyDown={() => null}
               onRelationshipsToggleChange={this.onRelationshipsToggleChange}
               onInheritancesToggleChange={this.onInheritancesToggleChange}
               onComponentsToggleChange={this.onComponentsToggleChange}
