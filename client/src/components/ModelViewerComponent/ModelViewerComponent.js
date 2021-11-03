@@ -18,6 +18,7 @@ import { apiService } from "../../services/ApiService";
 import { eventService } from "../../services/EventService";
 import { ModelService } from "../../services/ModelService";
 import { settingsService } from "../../services/SettingsService";
+import { configService } from "../../services/ConfigService";
 
 import "./ModelViewerComponent.scss";
 
@@ -63,7 +64,16 @@ class ModelViewerComponent extends Component {
       }
     });
 
-    await this.retrieveModels();
+    let config = {};
+    try {
+      config = await configService.getConfig();
+    } catch (exc) {
+      config = {};
+    }
+
+    if (config.appAdtUrl) {
+      await this.retrieveModels();
+    }
 
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
@@ -102,7 +112,7 @@ class ModelViewerComponent extends Component {
 
     let list = [];
     try {
-      list = await apiService.queryModels();
+      list = await apiService.queryModels(true);
     } catch (exc) {
       exc.customMessage = "Error fetching models";
       eventService.publishError(exc);
@@ -154,8 +164,12 @@ class ModelViewerComponent extends Component {
 
     this.setState({ isLoading: false, isUploadingModels: false });
     await this.retrieveModels();
-    this.uploadModelRef.current.value = "";
-    this.uploadModelFolderRef.current.value = "";
+    if (this.uploadModelRef.current) {
+      this.uploadModelRef.current.value = "";
+    }
+    if (this.uploadModelFolderRef.current) {
+      this.uploadModelFolderRef.current.value = "";
+    }
   }
 
   addModels = async list => {
@@ -166,11 +180,19 @@ class ModelViewerComponent extends Component {
       const sortedModelsId = await modelService.getModelIdsForUpload(list);
       sortedModels = sortedModelsId.map(id => list.find(model => model["@id"] === id)).filter(m => !!m);
       sortedModels = sortedModels.filter(model => !items.some(item => item.key === model["@id"]));
+      let uploadResults = [];
       if (sortedModels && sortedModels.length > 0) {
         const chunks = modelService.chunkModelsList(sortedModels, 50);
         for (const chunk of chunks) {
-          await this.createModels(chunk);
+          const res = await this.createModels(chunk);
+          if (Array.isArray(res)) {
+            uploadResults = [ ...uploadResults, ...res ];
+          }
         }
+      }
+
+      if (typeof this.props.onModelUploadSuccess === "function" && uploadResults.length > 0) {
+        this.props.onModelUploadSuccess(uploadResults);
       }
     } catch (exc) {
       exc.customMessage = "Upload error";
@@ -184,10 +206,12 @@ class ModelViewerComponent extends Component {
         print("*** Upload result:", "info");
         print(JSON.stringify(res, null, 2), "info");
         eventService.publishCreateModel(models);
+        return res;
       })
       .catch(exc => {
         exc.customMessage = "Error adding models";
         eventService.publishError(exc);
+        throw exc;
       });
   }
 

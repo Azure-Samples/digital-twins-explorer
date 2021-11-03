@@ -178,7 +178,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   getComponentRelationships = list =>
     list.flatMap(m =>
-      m.components.map(c => ({
+      m.components.filter(c => !c.isExtended).map(c => ({
         sourceId: m.id,
         targetId: c.schema,
         relationshipName: c.name,
@@ -188,7 +188,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   getExtendRelationships = list =>
     list.flatMap(m =>
-      m.bases.map(b => ({
+      m.rootBases.map(b => ({
         sourceId: m.id,
         targetId: b,
         relationshipName: "Extends",
@@ -245,7 +245,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   deselectModel = () => {
     if (this.canDeselect) {
-      this.modelDetail.current.clear();
+      this.modelDetail.current?.clear();
       const { selectedModel } = this.state;
       if (selectedModel) {
         this.cyRef.current.emitNodeEvent(selectedModel.key, "unselect");
@@ -612,7 +612,7 @@ class ModelGraphViewerComponent extends React.Component {
           <div className="gc-wrap">
             <ModelGraphViewerRelationshipsToggle
               setFirstItemRef={ref => this.relationshipsToggle = ref}
-              onKeyDown={this.onRelationshipsToggleKeyDown}
+              onKeyDown={() => null}
               onRelationshipsToggleChange={this.onRelationshipsToggleChange}
               onInheritancesToggleChange={this.onInheritancesToggleChange}
               onComponentsToggleChange={this.onComponentsToggleChange}

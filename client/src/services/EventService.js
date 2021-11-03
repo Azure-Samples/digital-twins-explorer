@@ -41,6 +41,18 @@ class EventService {
     this._off("configure", callback);
   }
 
+  publishClearCache(evt) {
+    this._emit("clearcache", evt);
+  }
+
+  subscribeClearCache(callback) {
+    this._on("clearcache", callback);
+  }
+
+  unsubscribeClearCache(callback) {
+    this._off("clearcache", callback);
+  }
+
   publishPreferences(evt) {
     this._emit("preferences", evt);
   }

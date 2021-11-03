@@ -11,7 +11,7 @@ class SettingsService {
 
   constructor() {
     this.settings = storageService.getLocalStorageObject(StorageKeyName)
-      || { caching: true, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal" };
+      || { caching: false, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal" };
   }
 
   get caching() {

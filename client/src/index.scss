@@ -112,8 +112,7 @@ body {
 }
 
 .work-area {
-  grid-row: 3;
-  padding-top: 4px;
+  position: relative;
   height: calc(100vh - 52px);
   color: white;
   width: 100vw;
@@ -187,7 +186,7 @@ body {
   }
   .ms-Toggle-background {
     border-color: transparent;
-    background: $textColorLight2;
+    background: $backgroundColor3;
     .ms-Toggle-thumb {
       background: white;
     }
@@ -195,6 +194,9 @@ body {
   &.is-checked {
     .ms-Toggle-background {
       background: $buttonColor;
+    }
+    .ms-Toggle-thumb {
+      background: var(--toggle-knob-active);
     }
   }
 }
@@ -319,6 +321,16 @@ code[class*="language-"], pre[class*="language-"] {
     }
   }
 }
+.top-area{
+  background-color: var(--background-color5);
+  position: relative;
+}
+.query-explorer-header{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  margin: 0px;
+}
 
 .draggable {
   width: 3px;
@@ -341,20 +353,17 @@ code[class*="language-"], pre[class*="language-"] {
   height: 100%;
 }
 .tab-pivot {
-  div[role=tabpanel] {
-    height: calc(100% - 35px);
-    background-color: $backgroundColor5;
+  div[role=tablist] {
+    background-color: $backgroundColor4;
     >div {
       height: 100%;
     }
   }
   .ms-Pivot-link {
-    height: 30px;
-    background-color: $backgroundColor5;
+    height: 36px;
     font-size: 12px;
-    margin-top: 5px;
-    &::before {
-      display: none;
+    &.is-selected{
+      font-weight: bolder;
     }
   }
 }
@@ -414,7 +423,7 @@ code[class*="language-"], pre[class*="language-"] {
 .light-command-bar {
   .ms-CommandBarItem-link {
     .ms-Button-icon {
-      color: $textColorLight2;
+      color: white;
       
     }
     &.is-disabled {
@@ -424,7 +433,7 @@ code[class*="language-"], pre[class*="language-"] {
     }
     &:hover {
       .ms-Button-icon {
-        color: $textColorLight1;
+        color: white;
       }
     }
   }

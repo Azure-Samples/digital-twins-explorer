@@ -231,6 +231,7 @@ export class ModelService {
         relationships: [],
         telemetries: [],
         bases: [],
+        rootBases: [],
         components: []
       };
       this._mapModel(model, contents);
@@ -300,6 +301,7 @@ export class ModelService {
       relationships: [],
       telemetries: [],
       bases: [],
+      rootBases: [],
       components: [],
       isDefined: false
     };
@@ -313,14 +315,16 @@ export class ModelService {
     return contents;
   }
 
-  _mapModel(vertex, contents) {
+  _mapModel(vertex, contents, isExtended = false) {
     const safeAdd = (collection, item) => Object.keys(item).every(x => item[x] !== null) && collection.push(item);
 
     if (!contents.displayName) {
       contents.displayName = getModelDisplayName(vertex);
     }
-    contents.description = getModelDescription(vertex);
-    contents.isDefined = vertex.hasAttributeValue("is_defined", true);
+    if (!isExtended) {
+      contents.description = getModelDescription(vertex);
+      contents.isDefined = vertex.hasAttributeValue("is_defined", true);
+    }
 
     vertex
       .getOutgoing("dtmi:dtdl:property:contents;2")
@@ -356,7 +360,7 @@ export class ModelService {
           const component = this._getModel(inferSchema(x.toVertex));
           component.name = getPropertyName(x.toVertex);
           component.schema = inferSchema(x.toVertex);
-          safeAdd(contents.components, component);
+          safeAdd(contents.components, {...component, isExtended});
         }
       });
 
@@ -365,7 +369,10 @@ export class ModelService {
       .items()
       .forEach(x => {
         contents.bases.push(x.toVertex.id);
-        this._mapModel(x.toVertex, contents);
+        if (!isExtended) {
+          contents.rootBases.push(x.toVertex.id);
+        }
+        this._mapModel(x.toVertex, contents, true);
       });
 
     contents.componentProperties = this._getChildComponentProperties(contents);

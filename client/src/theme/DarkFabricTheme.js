@@ -3,6 +3,9 @@
 
 import { createTheme } from "office-ui-fabric-react/lib/";
 
+const darkFabricThemeSemanticColors = {};
+const darkFabricThemeHighContrastSemanticColors = {};
+
 export const darkFabricTheme = createTheme({
   palette: {
     themePrimary: "#60aaff",
@@ -27,7 +30,8 @@ export const darkFabricTheme = createTheme({
     neutralDark: "#f4f4f4",
     black: "#f8f8f8",
     white: "#161616"
-  }
+  },
+  semanticColors: darkFabricThemeSemanticColors
 });
 
 export const darkFabricThemeHighContrast = createTheme({
@@ -54,5 +58,6 @@ export const darkFabricThemeHighContrast = createTheme({
     neutralDark: "#f4f4f4",
     black: "#f8f8f8",
     white: "#161616"
-  }
+  },
+  semanticColors: darkFabricThemeHighContrastSemanticColors
 });

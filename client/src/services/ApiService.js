@@ -8,6 +8,8 @@ import { configService } from "./ConfigService";
 import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
 import { print } from "./LoggingService";
 import { settingsService } from "./SettingsService";
+import { eventService } from "./EventService";
+
 
 const getAllTwinsQuery = "SELECT * FROM digitaltwins";
 
@@ -302,6 +304,9 @@ class CachedApiService extends ApiService {
   constructor() {
     super();
     this.cache = { relationships: {}, models: [] };
+    eventService.subscribeClearCache(() => {
+      this.clearCache();
+    });
   }
 
   async addModels(models) {
@@ -326,8 +331,8 @@ class CachedApiService extends ApiService {
     return this.cache.models.find(m => m.id === id);
   }
 
-  async queryModels() {
-    if (!settingsService.caching) {
+  async queryModels(bypassCache = false) {
+    if (!settingsService.caching || bypassCache) {
       this.clearCache();
       return await super.queryModels();
     }
