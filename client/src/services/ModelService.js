@@ -231,6 +231,7 @@ export class ModelService {
         relationships: [],
         telemetries: [],
         bases: [],
+        rootBases: [],
         components: []
       };
       this._mapModel(model, contents);
@@ -300,6 +301,7 @@ export class ModelService {
       relationships: [],
       telemetries: [],
       bases: [],
+      rootBases: [],
       components: [],
       isDefined: false
     };
@@ -367,6 +369,9 @@ export class ModelService {
       .items()
       .forEach(x => {
         contents.bases.push(x.toVertex.id);
+        if (!isExtended) {
+          contents.rootBases.push(x.toVertex.id);
+        }
         this._mapModel(x.toVertex, contents, true);
       });
 

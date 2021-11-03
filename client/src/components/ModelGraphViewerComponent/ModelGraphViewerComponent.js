@@ -188,7 +188,7 @@ class ModelGraphViewerComponent extends React.Component {
 
   getExtendRelationships = list =>
     list.flatMap(m =>
-      m.bases.slice(0, 1).map(b => ({
+      m.rootBases.map(b => ({
         sourceId: m.id,
         targetId: b,
         relationshipName: "Extends",

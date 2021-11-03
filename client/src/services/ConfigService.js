@@ -20,12 +20,12 @@ class ConfigService {
 
   getConfig() {
     if (this._config) {
-      return this._config;
+      return Promise.resolve(this._config);
     }
 
     const localStorageConfig = storageService.getLocalStorageObject(StorageKeyName);
     if (localStorageConfig) {
-      return localStorageConfig;
+      return Promise.resolve(localStorageConfig);
     }
 
     return new Promise((resolve, reject) => {
