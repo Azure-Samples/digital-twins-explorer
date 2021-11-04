@@ -39,6 +39,7 @@ import logo from "./assets/logo192.png";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import ModelUploadMessageBar from "./components/ModelUploadMessageBar/ModelUploadMessageBar";
+import ErrorPage from "./components/ErrorPage/ErrorPage";
 
 cytoscape.use(klay);
 cytoscape.use(dagre);
@@ -302,11 +303,6 @@ class App extends Component {
       () => this.setCurrentContrast());
   }
 
-  renderErrorPage = () => (
-    <div className="error-page">
-      <span>{this.props.t("errorPage")}</span>
-    </div>)
-
   renderClosablePivotItem = item => (
     <div>
       <span>{item.headerText}</span>
@@ -334,7 +330,7 @@ class App extends Component {
     });
     return (
       <>
-        <ErrorBoundary onError={this.goldenLayoutComponentError} fallbackRender={this.renderErrorPage}>
+        <ErrorBoundary FallbackComponent={ErrorPage}>
           <div className="main-grid">
             <div role="banner" className="header" >
               <Stack horizontal className="top-bar">
