@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useState, useReducer } from 'react';
 import { eventService } from '../../services/EventService';
 import { apiService } from '../../services/ApiService';
 import { StandalonePropertyInspector } from '@microsoft/iot-cardboard-js';
@@ -8,6 +8,7 @@ import produce from 'immer';
 import '@microsoft/iot-cardboard-js/themes.css';
 import './PropertyInspectorComponent.scss';
 import LoaderComponent from '../LoaderComponent/LoaderComponent';
+import ErrorPage from '../ErrorPage/ErrorPage';
 
 const pIActionTypes = {
     setSelectionType: 'setSelectionType',
@@ -61,7 +62,7 @@ const propertyInspectorReducer = produce((draft, action) => {
     }
 });
 
-const PropertyInspectorComponent = ({ isOpen }) => {
+const PropertyInspectorComponent = ({ isOpen, onErrorBoundary }) => {
     const [state, dispatch] = useReducer(propertyInspectorReducer, {
         selectionType: null,
         selection: null,
@@ -376,6 +377,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                     }}
                     onCommitChanges={onUpdateTwin}
                     missingModelIds={state.missingModelIds}
+                    onErrorBoundary={onErrorBoundary}
                 />
             </div>
         );
@@ -401,6 +403,7 @@ const PropertyInspectorComponent = ({ isOpen }) => {
                     }}
                     onCommitChanges={onUpdateRelationship}
                     missingModelIds={state.missingModelIds}
+                    onErrorBoundary={onErrorBoundary}
                 />
             </div>
         );
@@ -409,4 +412,38 @@ const PropertyInspectorComponent = ({ isOpen }) => {
     }
 };
 
-export default React.memo(PropertyInspectorComponent);
+const PropertyInspectorErrorContainer = (props) => {
+    const [error, setError] = useState(null);
+    const [key, setKey] = useState(1);
+
+    const subscribeSelection = () => {
+        eventService.subscribeSelection((payload) => {
+            if (!payload || !payload.selection) {
+                setError(null);
+            }
+        });
+    };
+
+    useEffect(() => {
+        subscribeSelection();
+    }, [])
+
+    if (error) {
+        return (
+            <div className="property-inspector-container">
+                <ErrorPage
+                    error={error}
+                    resetErrorBoundary={() => {
+                        setKey(prevKey => prevKey + 1);
+                        setError(null);
+                    }}
+                    isGlobalBoundary={false}
+                />
+            </div>
+        )
+    } else {
+        return <PropertyInspectorComponent {...props} key={key} onErrorBoundary={(error) => setError(error)} />
+    }
+}
+
+export default React.memo(PropertyInspectorErrorContainer);
