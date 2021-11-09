@@ -5,12 +5,12 @@ import logo from "../../assets/logo192.png";
 import "./ErrorPage.scss";
 import { useTranslation } from "react-i18next";
 
-const ErrorPage = ({ error, resetErrorBoundary }) => {
+const ErrorPage = ({ error, resetErrorBoundary, isGlobalBoundary = true }) => {
     const { t } = useTranslation();
 
     return (
         <div className="error-page-container">
-            <div className="error-page-content">
+            <div className={`error-page-content ${isGlobalBoundary && 'error-page-is-global'}`}>
                 <img className="error-page-logo" src={logo} alt="Azure Digital Twins" />
                 <h2 className="error-page-header">{t('errorBoundary.modalHeader')}</h2>
                 <div className="error-page-details">
@@ -24,7 +24,7 @@ const ErrorPage = ({ error, resetErrorBoundary }) => {
                     </div>
                 </div>
                 <div className="error-page-action-buttons">
-                    <DefaultButton onClick={resetErrorBoundary}>{t('errorBoundary.tryAgain')}</DefaultButton>
+                    <DefaultButton onClick={() => typeof resetErrorBoundary === 'function' ? resetErrorBoundary() : null}>{t('errorBoundary.tryAgain')}</DefaultButton>
                 </div>
             </div>
         </div>

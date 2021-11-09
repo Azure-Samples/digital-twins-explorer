@@ -5,7 +5,7 @@
   "dependencies": {
     "@azure/digital-twins-core": "^1.0.3",
     "@azure/identity": "^1.2.4",
-    "@microsoft/iot-cardboard-js": "^1.0.0-beta.54",
+    "@microsoft/iot-cardboard-js": "file:../../iot-cardboard-js/build_artifacts/microsoft-iot-cardboard-js-0.0.0-development.tgz",
     "@microsoft/signalr": "^3.1.11",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",

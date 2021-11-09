@@ -19,13 +19,15 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: 80px;
     margin: auto;
     max-width: 800px;
     color: white;
     padding: 20px;
-    background-color: #2e2e2e;
     border-radius: 8px;
+    &.error-page-is-global{
+        top: 80px;
+        background-color: #2e2e2e;
+    }
 }
 
 .error-page-message-header {
