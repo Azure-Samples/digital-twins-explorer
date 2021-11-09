@@ -24,7 +24,10 @@ const ErrorPage = ({ error, resetErrorBoundary, isGlobalBoundary = true }) => {
                     </div>
                 </div>
                 <div className="error-page-action-buttons">
-                    <DefaultButton onClick={() => typeof resetErrorBoundary === 'function' ? resetErrorBoundary() : null}>{t('errorBoundary.tryAgain')}</DefaultButton>
+                    {
+                        typeof resetErrorBoundary === 'function' &&
+                        <DefaultButton onClick={() => resetErrorBoundary()}>{t('errorBoundary.tryAgain')}</DefaultButton>
+                    }
                 </div>
             </div>
         </div>
