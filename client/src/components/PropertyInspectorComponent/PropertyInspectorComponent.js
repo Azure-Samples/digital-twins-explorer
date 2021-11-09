@@ -416,6 +416,18 @@ const PropertyInspectorErrorContainer = (props) => {
     const [error, setError] = useState(null);
     const [key, setKey] = useState(1);
 
+    const subscribeSelection = () => {
+        eventService.subscribeSelection((payload) => {
+            if (!payload || !payload.selection) {
+                setError(null);
+            }
+        });
+    };
+
+    useEffect(() => {
+        subscribeSelection();
+    }, [])
+
     if (error) {
         return (
             <div className="property-inspector-container">

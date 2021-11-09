@@ -10,7 +10,7 @@ const ErrorPage = ({ error, resetErrorBoundary, isGlobalBoundary = true }) => {
 
     return (
         <div className="error-page-container">
-            <div className={`error-page-content ${isGlobalBoundary && 'error-page-is-global'}`}>
+            <div className={`error-page-content ${isGlobalBoundary ? 'error-page-is-global' : ''}`}>
                 <img className="error-page-logo" src={logo} alt="Azure Digital Twins" />
                 <h2 className="error-page-header">{t('errorBoundary.modalHeader')}</h2>
                 <div className="error-page-details">
