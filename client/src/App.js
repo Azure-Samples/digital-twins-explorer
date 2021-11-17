@@ -414,7 +414,7 @@ class App extends Component {
                   onMouseDown={this.handleDrawerResizeMouseDown} />
                 <div className="bottom-area-content">
                   {layout.showOutput && <div>
-                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height">
+                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height output-console">
                       <PivotItem
                         headerText={this.props.t("app.optionalComponents.output")}>
                         <OutputComponent />
@@ -422,7 +422,7 @@ class App extends Component {
                     </Pivot>
                   </div>}
                   {layout.showConsole && <div>
-                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height">
+                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height output-console">
                       <PivotItem
                         headerText={this.props.t("app.optionalComponents.console")}>
                         <ConsoleComponent />
