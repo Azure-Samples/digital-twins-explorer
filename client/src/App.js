@@ -156,6 +156,14 @@ class App extends Component {
       }
     });
     eventService.subscribeLoading(isLoading => this.setState({ isLoading }));
+
+    eventService.subscribeConfigure(async evt => {
+      if (evt.type === "end" && evt.config) {
+        await this.setPosisbleDisplayNameProperties();
+        await this.applyStoredDisplayNameProperty();
+      }
+    });
+    
     window.addEventListener("keydown", e => {
       if (e.keyCode === CLOSING_BRACKET_KEY_CODE && e.ctrlKey) {
         eventService.publishClearGraphSelection();
