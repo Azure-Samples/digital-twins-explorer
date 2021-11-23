@@ -19,6 +19,12 @@
         },
         "errorPage": "Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue."
     },
+    "errorBoundary": {
+        "modalHeader": "Something went wrong...",
+        "messageHeader": "Message",
+        "stackHeader": "Stack",
+        "tryAgain": "Try again"
+    },
     "modelUploadMessaging": {
         "modelUploadSuccessMessage": "{{modelCount}} models uploaded successfully.",
         "modelUploadDetailsHeader": "{{modelCount}} models uploaded",

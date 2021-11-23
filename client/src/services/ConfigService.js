@@ -9,7 +9,10 @@ const StorageKeyName = "configuration";
 class ConfigService {
 
   constructor() {
-    this._config = null;
+    const initConfig = async () => {
+      this._config = await this.getConfig();
+    };
+    initConfig();
   }
 
   setConfig(config) {

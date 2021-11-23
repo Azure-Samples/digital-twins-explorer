@@ -41,6 +41,7 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import ModelUploadMessageBar from "./components/ModelUploadMessageBar/ModelUploadMessageBar";
 import { STRING_DTDL_TYPE } from "./services/Constants";
+import ErrorPage from "./components/ErrorPage/ErrorPage";
 
 cytoscape.use(klay);
 cytoscape.use(dagre);
@@ -347,11 +348,6 @@ class App extends Component {
       () => this.setCurrentContrast());
   }
 
-  renderErrorPage = () => (
-    <div className="error-page">
-      <span>{this.props.t("errorPage")}</span>
-    </div>)
-
   renderClosablePivotItem = item => (
     <div>
       <span>{item.headerText}</span>
@@ -379,7 +375,7 @@ class App extends Component {
     });
     return (
       <>
-        <ErrorBoundary onError={this.goldenLayoutComponentError} fallbackRender={this.renderErrorPage}>
+        <ErrorBoundary FallbackComponent={ErrorPage}>
           <div className="main-grid">
             <div role="banner" className="header" >
               <Stack horizontal className="top-bar">
@@ -463,7 +459,7 @@ class App extends Component {
                   onMouseDown={this.handleDrawerResizeMouseDown} />
                 <div className="bottom-area-content">
                   {layout.showOutput && <div>
-                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height">
+                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height output-console">
                       <PivotItem
                         headerText={this.props.t("app.optionalComponents.output")}>
                         <OutputComponent />
@@ -471,7 +467,7 @@ class App extends Component {
                     </Pivot>
                   </div>}
                   {layout.showConsole && <div>
-                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height">
+                    <Pivot aria-label="Use left and right arrow keys to navigate" className="tab-pivot full-height output-console">
                       <PivotItem
                         headerText={this.props.t("app.optionalComponents.console")}>
                         <ConsoleComponent />

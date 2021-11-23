@@ -1,0 +1,59 @@
+@import "../../theme/theme.scss";
+
+.error-page-container{
+    height: 100vh;
+    width: 100%;
+}
+
+.error-page-header{
+    margin-top: 0px;
+    margin-bottom: 32px;
+}
+
+.error-page-message-header,
+.error-page-stack-header{
+    margin-bottom: 8px;
+}
+
+.error-page-content{
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 800px;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    &.error-page-is-global{
+        top: 80px;
+        background-color: #2e2e2e;
+    }
+}
+
+.error-page-message-header {
+    margin-top: 0px;
+}
+
+.error-page-details{
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.error-page-action-buttons{
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.error-page-logo{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 48px;
+    height: 48px;
+}
+
+pre {
+    margin: 0;
+    user-select: text;
+}

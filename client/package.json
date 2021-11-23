@@ -5,7 +5,7 @@
   "dependencies": {
     "@azure/digital-twins-core": "^1.0.3",
     "@azure/identity": "^1.2.4",
-    "@microsoft/iot-cardboard-js": "^1.0.0-beta.54",
+    "@microsoft/iot-cardboard-js": "^1.0.0-beta.57",
     "@microsoft/signalr": "^3.1.11",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
@@ -39,7 +39,7 @@
     "react-console-emulator": "^4.0.1",
     "react-cytoscapejs": "^1.2.1",
     "react-dom": "^17.0.1",
-    "react-error-boundary": "^2.0.1",
+    "react-error-boundary": "^3.1.4",
     "react-excel-renderer": "^1.1.0",
     "react-i18next": "^11.8.13",
     "react-router-dom": "^5.1.2",

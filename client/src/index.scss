@@ -366,6 +366,14 @@ code[class*="language-"], pre[class*="language-"] {
       font-weight: bolder;
     }
   }
+  &.output-console {
+    div[role=tabpanel]{
+      height: 100%;
+    }
+    div[role=tabpanel] > div {
+      height: 100%;
+    }
+  }
 }
 .tab-pivot-panel {
   height: calc(100% - 35px);
