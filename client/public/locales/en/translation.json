@@ -96,6 +96,10 @@
             "ariaLabel": "Choose layout",
             "text": "Choose layout"
         },
+        "displayName": {
+            "ariaLabel": "Select display name property",
+            "text": "Select display name property"
+        },
         "render": {
             "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
         }

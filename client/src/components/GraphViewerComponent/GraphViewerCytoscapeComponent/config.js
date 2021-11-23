@@ -23,7 +23,7 @@ export const graphStyles = [ // the stylesheet for the graph
       "width": "20px",
       "height": "20px",
       "background-color": "#666",
-      "label": "data(id)",
+      "label": "data(label)",
       "border-color": "#ccc",
       "border-width": 2,
       "color": "#ccc",

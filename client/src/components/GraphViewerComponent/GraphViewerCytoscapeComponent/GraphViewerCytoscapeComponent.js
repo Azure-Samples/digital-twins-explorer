@@ -211,14 +211,29 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.displayNameProperty !== this.props.displayNameProperty) {
+      if (this.graphControl) {
+        this.graphControl.nodes().forEach(twin => {
+          twin.data("label", twin.data().properties?.[this.props.displayNameProperty] ?? `*${twin.data().id}`);
+        });
+      }
+    }
+  }
+
+  getLabel(twin) {
+    return twin[this.props.displayNameProperty] ?? `*${twin.$dtId}`;
+  }
+
   addTwins(twins) {
     const mapped = twins
-      .filter(x => this.graphControl.$id(x.$dtId).length === 0)
-      .map(x => ({
+      .filter(twin => this.graphControl.$id(twin.$dtId).length === 0)
+      .map(twin => ({
         data: {
-          id: x.$dtId,
-          label: x.$dtId,
-          modelId: x.$metadata.$model,
+          id: twin.$dtId,
+          label: this.getLabel(twin),
+          properties: twin,
+          modelId: twin.$metadata.$model,
           category: "Twin"
         }
       }));

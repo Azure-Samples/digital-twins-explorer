@@ -761,7 +761,10 @@ class GraphViewerComponent extends React.Component {
           onZoomToFitClicked={() => this.cyRef.current.zoomToFit()}
           onCenterClicked={() => this.cyRef.current.center()}
           onLayoutChanged={this.onLayoutChanged}
-          onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()} />
+          onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()}
+          setSelectedDisplayNameProperty={this.props.setSelectedDisplayNameProperty}
+          selectedDisplayNameProperty={this.props.selectedDisplayNameProperty}
+          displayNameProperties={this.props.displayNameProperties} />
         <GraphViewerRelationshipCreateComponent ref={this.create}
           selectedNode={selectedNode} selectedNodes={selectedNodes}
           onCreate={this.onRelationshipCreate} />
@@ -878,6 +881,7 @@ class GraphViewerComponent extends React.Component {
               onConfirmRelationshipDelete={this.onConfirmRelationshipDelete}
               isHighlighting={highlightingTerms && highlightingTerms.length > 0}
               highlightFilteredNodes={this.highlightNodes}
+              displayNameProperty={this.props.selectedDisplayNameProperty}
               onNodeMouseEnter={this.onNodeMouseEnter} />
             {couldNotDisplay && <div className={`alert-no-display ${outputIsOpen ? "output" : ""} ${noResults ? "no-results" : ""}`}>
               <div className="alert--info">i</div>

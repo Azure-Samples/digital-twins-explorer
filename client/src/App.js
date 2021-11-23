@@ -32,6 +32,7 @@ import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 
 import { eventService } from "./services/EventService";
 import { settingsService } from "./services/SettingsService";
+import { ModelService } from "./services/ModelService";
 import themeVariables from "./theme/variables";
 import { darkFabricTheme, darkFabricThemeHighContrast } from "./theme/DarkFabricTheme";
 import logo from "./assets/logo192.png";
@@ -39,6 +40,7 @@ import logo from "./assets/logo192.png";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import ModelUploadMessageBar from "./components/ModelUploadMessageBar/ModelUploadMessageBar";
+import { STRING_DTDL_TYPE } from "./services/Constants";
 
 cytoscape.use(klay);
 cytoscape.use(dagre);
@@ -106,7 +108,9 @@ class App extends Component {
       modelUploadResults: null,
       mainContentSelectedKey: "graph-viewer",
       leftPanelSelectedKey: "models",
-      contrast: contrastOptions.normal
+      contrast: contrastOptions.normal,
+      possibleDisplayNameProperties: [],
+      selectedDisplayNameProperty: ""
     };
     for (const x of this.optionalComponents) {
       this.state[x.id] = { visible: false };
@@ -114,7 +118,7 @@ class App extends Component {
     this.setCurrentContrast();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     eventService.subscribeImport(evt => {
       this.setState(prevState => ({ layout: { ...prevState.layout, showImport: true, importFile: evt.file } }), () => {
         this.setState({ mainContentSelectedKey: "import" }, () => {
@@ -159,6 +163,8 @@ class App extends Component {
       }
     });
     this.applyStoredContrast();
+    await this.setPosisbleDisplayNameProperties();
+    await this.applyStoredDisplayNameProperty();
   }
 
   applyStoredContrast = () => {
@@ -167,6 +173,13 @@ class App extends Component {
       this.setState({ contrast },
         () => this.setCurrentContrast());
     }
+  }
+
+  applyStoredDisplayNameProperty = () => {
+    (async () => {
+      const prospectiveDisplayName = await settingsService.selectedDisplayNameProperty;
+      this.setSelectedDisplayNameProperty(prospectiveDisplayName);
+    })();
   }
 
   setCurrentContrast = () => {
@@ -183,6 +196,38 @@ class App extends Component {
     Object.keys(theme).forEach(key => {
       document.documentElement.style.setProperty(key, theme[key]);
     });
+  }
+
+  setSelectedDisplayNameProperty = (propertyName) => { 
+    (async () => {
+      settingsService.selectedDisplayNameProperty = propertyName;
+      this.setState({selectedDisplayNameProperty: propertyName});  
+    })();
+  }
+
+  setPosisbleDisplayNameProperties = () => {
+    (async () => {
+      const modelService = new ModelService();
+      const models = await modelService.getAllModels();
+      const displayNameDict = {};
+      models.forEach((model) => {
+        model.properties.forEach((propertyObject) => {
+          if (propertyObject.schema === STRING_DTDL_TYPE) {
+            displayNameDict[propertyObject.name] = displayNameDict[propertyObject.name] ? displayNameDict[propertyObject.name] + 1 : 1;
+          }
+        });
+      });
+      const orderedNames = Object.keys(displayNameDict).sort((a, b) => {
+        if (displayNameDict[a] < displayNameDict[b]) {
+          return 1;
+        }
+        if (displayNameDict[a] > displayNameDict[b]) {
+          return -1;
+        }
+        return 0;
+      })
+      this.setState({"possibleDisplayNameProperties": orderedNames});
+    })();
   }
 
   toggleOptionalComponent = id => {
@@ -327,7 +372,7 @@ class App extends Component {
   }
 
   render() {
-    const { isLoading, layout, mainContentSelectedKey, leftPanelSelectedKey, contrast } = this.state;
+    const { isLoading, layout, mainContentSelectedKey, leftPanelSelectedKey, contrast, selectedDisplayNameProperty, possibleDisplayNameProperties } = this.state;
     const optionalComponentsState = this.optionalComponents.map(p => {
       p.show = layout[p.showProp];
       return p;
@@ -397,7 +442,7 @@ class App extends Component {
                     </Pivot>
                     <div className="tab-pivot-panel" role="main">
                       <div className={mainContentSelectedKey === "graph-viewer" ? "show" : "hidden"}>
-                        <GraphViewerComponent />
+                        <GraphViewerComponent selectedDisplayNameProperty={selectedDisplayNameProperty} displayNameProperties={possibleDisplayNameProperties} setSelectedDisplayNameProperty={this.setSelectedDisplayNameProperty}/>
                       </div>
                       <div className={mainContentSelectedKey === "model-graph-viewer" ? "show" : "hidden"}>
                         <ModelGraphViewerComponent ref={this.modelGraphViewer} />
