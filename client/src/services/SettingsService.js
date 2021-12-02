@@ -7,7 +7,7 @@ import { configService } from "./ConfigService";
 
 const StorageKeyName = "settings";
 const EnvStorageKeyName = "environments";
-const DefuaultDisplayName = "$dtId";
+const DefaultDisplayName = "$dtId";
 
 class SettingsService {
 
@@ -21,7 +21,7 @@ class SettingsService {
     return (async () => {
       const { appAdtUrl } = await configService.getConfig();
       const selectedDisplayNameProperty = this.settings.selectedDisplayNameProperty[appAdtUrl];
-      return selectedDisplayNameProperty ?? DefuaultDisplayName;
+      return selectedDisplayNameProperty ?? DefaultDisplayName;
     })();
   }
 
