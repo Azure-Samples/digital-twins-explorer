@@ -16,7 +16,7 @@ urlFragment: digital-twins-explorer
 
 <img src="https://raw.githubusercontent.com/Azure-Samples/digital-twins-explorer/main/media/digital-twins-explorer.png" alt="Image of digital-twins-explorer"/>
 
-Azure Digital Twins Explorer is written as a single-page JavaScript application. This repository holds the code for the hosted version of Azure Digital Twins Explorer, which is accessible through the [Azure portal](https://portal.azure.com) and at [explorer.digitaltwins.azure.net](explorer.digitaltwins.azure.net). You can also run the application locally as a node.js application.
+Azure Digital Twins Explorer is written as a single-page JavaScript application. This repository holds the code for the hosted version of Azure Digital Twins Explorer, which is accessible through the [Azure portal](https://portal.azure.com) and at [explorer.digitaltwins.azure.net](https://explorer.digitaltwins.azure.net). You can also run the application locally as a node.js application.
 
 This README contains information and guidance specific to hosting this codebase locally, including:
 * [Instructions to run the sample locally](#run-azure-digital-twins-explorer-locally)
@@ -100,7 +100,7 @@ In addition to local operation, you can also run Azure Digital Twins Explorer as
     1. Click **Access Control (IAM)** from the left blade.
     1. Click **+ Add** then **Add role assignment**.
     1. Select **Azure Digital Twins Data Owner** as the Role.
-    1. Assign accesss to **System assigned managed identity - Functions App**.
+    1. Assign access to **System assigned managed identity - Functions App**.
     1. Select your **Functions App** from the list.
     1. Click **Save**.
 
