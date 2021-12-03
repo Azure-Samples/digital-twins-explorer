@@ -226,16 +226,27 @@ class App extends Component {
           }
         });
       });
-      const orderedNames = Object.keys(displayNameDict).sort((a, b) => {
-        if (displayNameDict[a] < displayNameDict[b]) {
-          return 1;
+
+      // Map dictionary into list of lists segmented by occurence count
+      const nameByCount = {};
+      Object.keys(displayNameDict).forEach(key => {
+        const count = displayNameDict[key];
+        if (nameByCount[count]) {
+          nameByCount[count].push({ displayName: key, count })
+        } else {
+          nameByCount[count] = [{ displayName: key, count }];
         }
-        if (displayNameDict[a] > displayNameDict[b]) {
-          return -1;
-        }
-        return 0;
       })
-      this.setState({"possibleDisplayNameProperties": orderedNames});
+
+      // Sort counts in descending order
+      const sortedCounts = Object.keys(nameByCount).sort().reverse();
+
+      // Flatten descending counts, sorted alphabetically within each count, into result array
+      const displayNameProperties = sortedCounts.map(count =>
+        nameByCount[count].sort((a, b) => a.displayName.localeCompare(b.displayName))
+      ).flat();
+
+      this.setState({"possibleDisplayNameProperties": displayNameProperties});
     })();
   }
 

@@ -174,10 +174,11 @@ class GraphViewerCommandBarComponent extends Component {
       text: DEFAULT_DISPLAY_NAME_PROPERTY,
       key: DEFAULT_DISPLAY_NAME_PROPERTY
     },
-    ...this.props.displayNameProperties.map(displayName => (
+    ...this.props.displayNameProperties.map(property => (
       {
-        key: displayName,
-        text: displayName
+        key: property.displayName,
+        text: property.displayName,
+        data: property
       })) ];
 
     const onChange = (_e, option) => {
@@ -198,6 +199,15 @@ class GraphViewerCommandBarComponent extends Component {
         onRenderUpperContent={() => (<div className="display-name-combobox-fallback-description">
           {this.props.t("graphViewerCommandBarComponent.displayName.fallbackLabelDescription")}
         </div>)}
+        onRenderOption={optionProps => (
+          <div>
+            {optionProps.text}
+            {optionProps.data && <span
+              title={this.props.t("graphViewerCommandBarComponent.displayName.occurrenceTitle")}
+              className="display-name-occurrence-count">
+              ({optionProps.data.count})
+            </span>}
+          </div>)}
         styles={{
           root: {
             "&::after": {

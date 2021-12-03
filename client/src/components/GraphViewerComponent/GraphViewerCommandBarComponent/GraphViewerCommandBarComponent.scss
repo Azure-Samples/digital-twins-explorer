@@ -64,10 +64,16 @@
   padding-right: 4px;
 }
 
+.display-name-occurrence-count{
+  margin-left: 4px;
+  font-size: .8rem;
+  color: var(--text-color-light3);
+}
+
 .display-name-combobox-fallback-description{
   padding: 8px;
   border-bottom: 1px solid grey;
-  color: grey;
+  color: var(--text-color-light3);
 }
 
 .display-name-icon{

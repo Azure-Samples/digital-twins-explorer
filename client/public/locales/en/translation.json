@@ -105,7 +105,8 @@
         "displayName": {
             "ariaLabel": "Select twin display name property",
             "text": "Select twin display name property",
-            "fallbackLabelDescription": "$dtId prefixed by * will be displayed if a twin doesn't have the selected display name property"
+            "fallbackLabelDescription": "$dtId prefixed by * will be displayed if a twin doesn't have the selected display name property",
+            "occurrenceTitle": "The count of models with this property present"
         },
         "render": {
             "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
