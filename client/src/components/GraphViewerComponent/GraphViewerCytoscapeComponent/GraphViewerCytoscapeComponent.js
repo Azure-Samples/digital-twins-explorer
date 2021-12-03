@@ -214,9 +214,15 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.displayNameProperty !== this.props.displayNameProperty) {
       if (this.graphControl) {
+        let isDisplayNameAsteriskPresent = false;
         this.graphControl.nodes().forEach(twin => {
-          twin.data("label", twin.data().properties?.[this.props.displayNameProperty] ?? `*${twin.data().id}`);
+          const label = twin.data().properties?.[this.props.displayNameProperty];
+          if (!label) {
+            isDisplayNameAsteriskPresent = true;
+          }
+          twin.data("label", label ?? `*${twin.data().id}`);
         });
+        this.props.setIsDisplayNameAsteriskPresent(isDisplayNameAsteriskPresent);
       }
     }
   }
@@ -226,18 +232,26 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   }
 
   addTwins(twins) {
+    let isDisplayNameAsteriskPresent = false;
     const mapped = twins
       .filter(twin => this.graphControl.$id(twin.$dtId).length === 0)
-      .map(twin => ({
-        data: {
-          id: twin.$dtId,
-          label: this.getLabel(twin),
-          properties: twin,
-          modelId: twin.$metadata.$model,
-          category: "Twin"
+      .map(twin => {
+        const label = this.getLabel(twin);
+        if (!label) {
+          isDisplayNameAsteriskPresent = true;
         }
-      }));
+        return ({
+          data: {
+            id: twin.$dtId,
+            label: this.getLabel(twin),
+            properties: twin,
+            modelId: twin.$metadata.$model,
+            category: "Twin"
+          }
+        });
+      });
 
+    this.props.setIsDisplayNameAsteriskPresent(isDisplayNameAsteriskPresent);
     this.graphControl.add(mapped);
   }
 

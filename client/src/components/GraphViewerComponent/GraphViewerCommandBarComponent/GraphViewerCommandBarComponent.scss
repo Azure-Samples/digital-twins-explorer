@@ -71,9 +71,11 @@
 }
 
 .display-name-combobox-fallback-description{
+  max-width: fit-content;
   padding: 8px;
   border-bottom: 1px solid grey;
   color: var(--text-color-light3);
+  font-style: italic;
 }
 
 .display-name-icon{

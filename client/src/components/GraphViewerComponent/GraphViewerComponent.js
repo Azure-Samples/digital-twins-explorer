@@ -51,7 +51,8 @@ class GraphViewerComponent extends React.Component {
       filteringTerms: [],
       highlightedNodes: [],
       filteredNodes: [],
-      noResults: false
+      noResults: false,
+      isDisplayNameAsteriskPresent: false
     };
     this.view = React.createRef();
     this.create = React.createRef();
@@ -764,6 +765,7 @@ class GraphViewerComponent extends React.Component {
           onGetCurrentNodes={() => this.cyRef.current.graphControl.nodes()}
           setSelectedDisplayNameProperty={this.props.setSelectedDisplayNameProperty}
           selectedDisplayNameProperty={this.props.selectedDisplayNameProperty}
+          isDisplayNameAsteriskPresent={this.state.isDisplayNameAsteriskPresent}
           displayNameProperties={this.props.displayNameProperties} />
         <GraphViewerRelationshipCreateComponent ref={this.create}
           selectedNode={selectedNode} selectedNodes={selectedNodes}
@@ -882,6 +884,7 @@ class GraphViewerComponent extends React.Component {
               isHighlighting={highlightingTerms && highlightingTerms.length > 0}
               highlightFilteredNodes={this.highlightNodes}
               displayNameProperty={this.props.selectedDisplayNameProperty}
+              setIsDisplayNameAsteriskPresent={isPresent => this.setState({ isDisplayNameAsteriskPresent: isPresent })}
               onNodeMouseEnter={this.onNodeMouseEnter} />
             {couldNotDisplay && <div className={`alert-no-display ${outputIsOpen ? "output" : ""} ${noResults ? "no-results" : ""}`}>
               <div className="alert--info">i</div>
