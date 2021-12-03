@@ -195,6 +195,9 @@ class GraphViewerCommandBarComponent extends Component {
         options={options}
         autoComplete="on"
         useComboBoxAsMenuWidth
+        onRenderUpperContent={() => (<div className="display-name-combobox-fallback-description">
+          {this.props.t("graphViewerCommandBarComponent.displayName.fallbackLabelDescription")}
+        </div>)}
         styles={{
           root: {
             "&::after": {
