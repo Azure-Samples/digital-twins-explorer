@@ -216,35 +216,40 @@ class App extends Component {
 
   setPossibleDisplayNameProperties = () => {
     (async () => {
-      const modelService = new ModelService();
-      const models = await modelService.getAllModels();
-      const displayNameDict = {};
-      models.forEach((model) => {
-        model.properties.forEach((propertyObject) => {
-          if (propertyObject.schema === STRING_DTDL_TYPE) {
-            displayNameDict[propertyObject.name] = displayNameDict[propertyObject.name] ? displayNameDict[propertyObject.name] + 1 : 1;
-          }
+      let displayNameProperties = [];
+      try {
+        const modelService = new ModelService();
+        const models = await modelService.getAllModels();
+        const displayNameDict = {};
+        models.forEach((model) => {
+          model.properties.forEach((propertyObject) => {
+            if (propertyObject.schema === STRING_DTDL_TYPE) {
+              displayNameDict[propertyObject.name] = displayNameDict[propertyObject.name] ? displayNameDict[propertyObject.name] + 1 : 1;
+            }
+          });
         });
-      });
 
-      // Map dictionary into list of lists segmented by occurence count
-      const nameByCount = {};
-      Object.keys(displayNameDict).forEach(key => {
-        const count = displayNameDict[key];
-        if (nameByCount[count]) {
-          nameByCount[count].push({ displayName: key, count })
-        } else {
-          nameByCount[count] = [{ displayName: key, count }];
-        }
-      })
+        // Map dictionary into list of lists segmented by occurence count
+        const nameByCount = {};
+        Object.keys(displayNameDict).forEach(key => {
+          const count = displayNameDict[key];
+          if (nameByCount[count]) {
+            nameByCount[count].push({ displayName: key, count })
+          } else {
+            nameByCount[count] = [{ displayName: key, count }];
+          }
+        })
 
-      // Sort counts in descending order
-      const sortedCounts = Object.keys(nameByCount).map(key => Number(key)).sort((a,b) => a - b).reverse();
+        // Sort counts in descending order
+        const sortedCounts = Object.keys(nameByCount).map(key => Number(key)).sort((a, b) => a - b).reverse();
 
-      // Flatten descending counts, sorted alphabetically within each count, into result array
-      const displayNameProperties = sortedCounts.map(count =>
-        nameByCount[count].sort((a, b) => a.displayName.localeCompare(b.displayName, undefined, {sensitivity: 'base'}))
-      ).flat();
+        // Flatten descending counts, sorted alphabetically within each count, into result array
+        displayNameProperties = sortedCounts.map(count =>
+          nameByCount[count].sort((a, b) => a.displayName.localeCompare(b.displayName, undefined, { sensitivity: 'base' }))
+        ).flat();
+      } catch (err) {
+        console.error(err);
+      }
 
       this.setState({"possibleDisplayNameProperties": displayNameProperties});
     })();
