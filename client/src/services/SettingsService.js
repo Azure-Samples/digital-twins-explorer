@@ -20,7 +20,7 @@ class SettingsService {
   get selectedDisplayNameProperty() {
     return (async () => {
       const { appAdtUrl } = await configService.getConfig();
-      const selectedDisplayNameProperty = this.settings.selectedDisplayNameProperty[appAdtUrl];
+      const selectedDisplayNameProperty = this.settings?.selectedDisplayNameProperty?.[appAdtUrl];
       return selectedDisplayNameProperty ?? DefaultDisplayName;
     })();
   }
@@ -28,7 +28,13 @@ class SettingsService {
   set selectedDisplayNameProperty(selectedDisplayNameProperty) {
     (async () => {
       const { appAdtUrl } = await configService.getConfig();
-      this.settings.selectedDisplayNameProperty[appAdtUrl] = selectedDisplayNameProperty;
+      if (this.settings.selectedDisplayNameProperty) {
+        this.settings.selectedDisplayNameProperty[appAdtUrl] = selectedDisplayNameProperty;
+      } else {
+        this.settings.selectedDisplayNameProperty = {
+          [appAdtUrl]: selectedDisplayNameProperty
+        };
+      }
       this.save();
     })();
   }

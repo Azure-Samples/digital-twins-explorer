@@ -159,7 +159,7 @@ class App extends Component {
 
     eventService.subscribeConfigure(async evt => {
       if (evt.type === "end" && evt.config) {
-        await this.setPosisbleDisplayNameProperties();
+        await this.setPossibleDisplayNameProperties();
         await this.applyStoredDisplayNameProperty();
       }
     });
@@ -172,7 +172,7 @@ class App extends Component {
       }
     });
     this.applyStoredContrast();
-    await this.setPosisbleDisplayNameProperties();
+    await this.setPossibleDisplayNameProperties();
     await this.applyStoredDisplayNameProperty();
   }
 
@@ -214,7 +214,7 @@ class App extends Component {
     })();
   }
 
-  setPosisbleDisplayNameProperties = () => {
+  setPossibleDisplayNameProperties = () => {
     (async () => {
       const modelService = new ModelService();
       const models = await modelService.getAllModels();
