@@ -153,7 +153,7 @@ class GraphViewerCommandBarComponent extends Component {
       text: this.props.t("graphViewerCommandBarComponent.displayName.ariaLabel"),
       ariaLabel: this.props.t("graphViewerCommandBarComponent.displayName.ariaLabel"),
       iconOnly: true,
-      iconProps: { iconName: "ChooseLayout" },
+      iconProps: { iconName: "Rename" },
       className: this.buttonClass,
       subMenuProps: {},
       style: dropdownButtonStyles
@@ -180,16 +180,28 @@ class GraphViewerCommandBarComponent extends Component {
         text: displayName
       })) ];
 
-    const onChange = (e, option) => {
-      this.props.setSelectedDisplayNameProperty(option.key);
+    const onChange = (_e, option) => {
+      if (option) {
+        this.props.setSelectedDisplayNameProperty(option.key);
+      }
     };
 
     return (<div className="display-name-container">
+      <Icon iconName="Rename" className="display-name-icon" />
       <ComboBox
+        scrollSelectedToTop={1}
         selectedKey={this.props.selectedDisplayNameProperty}
         className="display-name-combobox"
         options={options}
+        autoComplete="on"
         useComboBoxAsMenuWidth
+        styles={{
+          root: {
+            "&::after": {
+              border: "1px solid #353535"
+            }
+          }
+        }}
         onChange={onChange} />
     </div>);
   }

@@ -61,6 +61,15 @@
   border-radius: 5px;
   height: 30px;
   padding: 0px 4px;
+  padding-right: 4px;
+}
+
+.display-name-icon{
+  margin-right: 8px;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+  color: white;
 }
 
 .expansion-level-option {
