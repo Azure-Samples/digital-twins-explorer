@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { CommandBar, TextField, Icon, CommandBarButton } from "office-ui-fabric-react";
+import { CommandBar, TextField, Icon, CommandBarButton, ComboBox, DirectionalHint } from "office-ui-fabric-react";
 import { withTranslation } from "react-i18next";
 
 import { eventService } from "../../../services/EventService";
 import { settingsService } from "../../../services/SettingsService";
-import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL } from "../../../services/Constants";
+import { REL_TYPE_OUTGOING, REL_TYPE_INCOMING, REL_TYPE_ALL, DEFAULT_DISPLAY_NAME_PROPERTY } from "../../../services/Constants";
 
 import "./GraphViewerCommandBarComponent.scss";
 
@@ -147,6 +147,19 @@ class GraphViewerCommandBarComponent extends Component {
     }
   ]
 
+  displayNameItems = [
+    {
+      key: "displayName",
+      text: this.props.t("graphViewerCommandBarComponent.displayName.ariaLabel"),
+      ariaLabel: this.props.t("graphViewerCommandBarComponent.displayName.ariaLabel"),
+      iconOnly: true,
+      iconProps: { iconName: "Rename" },
+      className: this.buttonClass,
+      subMenuProps: {},
+      style: dropdownButtonStyles
+    }
+  ]
+
   renderRelationshipExpansionItem = () => (
     <div className="expansion-level-option">
       <Icon iconName="ExpansionLevel" />
@@ -155,6 +168,57 @@ class GraphViewerCommandBarComponent extends Component {
         onChange={this.onExpansionLevelChange} type="number" min="1" max="5" ariaLabel="Select expansion level" ariaLive="assertive" role="menuitem" />
     </div>
   )
+
+  renderDisplayNameSelectionItem = () => {
+    const options = [ {
+      text: DEFAULT_DISPLAY_NAME_PROPERTY,
+      key: DEFAULT_DISPLAY_NAME_PROPERTY
+    },
+    ...this.props.displayNameProperties.map(property => (
+      {
+        key: property.displayName,
+        text: property.displayName,
+        data: property
+      })) ];
+    const onChange = (_e, option) => {
+      if (option) {
+        this.props.setSelectedDisplayNameProperty(option.key);
+      }
+    };
+
+    return (<div className="display-name-container">
+      <Icon iconName="Rename" className="display-name-icon" />
+      <ComboBox
+        scrollSelectedToTop={1}
+        selectedKey={this.props.selectedDisplayNameProperty}
+        className="display-name-combobox"
+        options={options}
+        autoComplete="on"
+        onRenderUpperContent={() => (
+          <div className={`display-name-combobox-fallback-description${this.props.isDisplayNameAsteriskPresent ? " asterisk-present" : ""}`}>
+            {this.props.t("graphViewerCommandBarComponent.displayName.fallbackLabelDescription")}
+          </div>
+        )}
+        onRenderOption={optionProps => (
+          <>
+            {optionProps.text}
+            {optionProps.data && <span
+              title={this.props.t("graphViewerCommandBarComponent.displayName.occurrenceTitle")}
+              className="display-name-occurrence-count">
+              ({optionProps.data.count})
+            </span>}
+          </>)}
+        styles={{
+          root: {
+            "&::after": {
+              border: "1px solid #353535"
+            }
+          }
+        }}
+        calloutProps={{ calloutMaxHeight: 600, directionalHint: DirectionalHint.right, calloutMinWidth: 200}}
+        onChange={onChange} />
+    </div>);
+  }
 
   renderButton = props => (
     <CommandBarButton {...props}
@@ -213,6 +277,11 @@ class GraphViewerCommandBarComponent extends Component {
     return (
       <>
         <div className="commands-wrap">
+          <CommandBar className="gv-commandbar light-command-bar"
+            farItems={this.displayNameItems}
+            buttonAs={this.renderDisplayNameSelectionItem}
+            ariaLabel="graphViewerCommandBarComponent.render.commandBarAriaLabel"
+            areLive="assertive" />
           <CommandBar className="gv-commandbar button-group light-command-bar"
             farItems={this.buttonGroupItems}
             buttonAs={this.renderButton}
