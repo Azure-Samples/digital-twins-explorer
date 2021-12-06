@@ -771,7 +771,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   onNodeHover = ({ target: node }) => {
     this.removePopper();
-    const { category, label, modelId } = node.data();
+    const { category, label, modelId, properties: nodeProperties } = node.data();
     if (node !== this.graphControl && category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
       this.canRenderPopper = true;
       this.hoverTimeout = setTimeout(async () => {
@@ -782,7 +782,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           if (this.canRenderPopper) {
             node.popper({
               content: () => {
-                const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
+                const contentDiv = this.getPopperContent(nodeProperties?.$dtId || label, modelId, displayName, description, properties, relationships);
                 document.body.appendChild(contentDiv);
                 return contentDiv;
               },
