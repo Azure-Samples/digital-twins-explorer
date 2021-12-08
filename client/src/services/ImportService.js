@@ -24,7 +24,16 @@ class ImportService {
     return null;
   }
 
+  formatJsonNumberIntoString = data => {
+    for (const twin of data.digitalTwinsGraph.digitalTwins) {
+      if (typeof twin.$dtId === "number") {
+        twin.$dtId = twin.$dtId.toString();
+      }
+    }
+  }
+
   async save(data) {
+    this.formatJsonNumberIntoString(data);
     let dataImported = false;
     if (data.digitalTwinsModels && data.digitalTwinsModels.length > 0) {
       await this.saveModels(data);

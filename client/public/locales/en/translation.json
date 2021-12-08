@@ -102,6 +102,12 @@
             "ariaLabel": "Choose layout",
             "text": "Choose layout"
         },
+        "displayName": {
+            "ariaLabel": "Select twin display name property",
+            "text": "Select twin display name property",
+            "fallbackLabelDescription": "Twins missing the selected property will display: *$dtId.",
+            "occurrenceTitle": "The count of models with this property present"
+        },
         "render": {
             "commandBarAriaLabel": "Use left and right arrow keys to navigate between commands"
         }

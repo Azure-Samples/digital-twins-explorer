@@ -211,18 +211,47 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
-  addTwins(twins) {
-    const mapped = twins
-      .filter(x => this.graphControl.$id(x.$dtId).length === 0)
-      .map(x => ({
-        data: {
-          id: x.$dtId,
-          label: x.$dtId,
-          modelId: x.$metadata.$model,
-          category: "Twin"
-        }
-      }));
+  componentDidUpdate(prevProps) {
+    if (prevProps.displayNameProperty !== this.props.displayNameProperty) {
+      if (this.graphControl) {
+        let isDisplayNameAsteriskPresent = false;
+        this.graphControl.nodes().forEach(twin => {
+          const label = twin.data().properties?.[this.props.displayNameProperty];
+          if (!label) {
+            isDisplayNameAsteriskPresent = true;
+          }
+          twin.data("label", label ?? `*${twin.data().id}`);
+        });
+        this.props.setIsDisplayNameAsteriskPresent(isDisplayNameAsteriskPresent);
+      }
+    }
+  }
 
+  getLabel(twin) {
+    return twin[this.props.displayNameProperty] ?? `*${twin.$dtId}`;
+  }
+
+  addTwins(twins) {
+    let isDisplayNameAsteriskPresent = false;
+    const mapped = twins
+      .filter(twin => this.graphControl.$id(twin.$dtId).length === 0)
+      .map(twin => {
+        const label = this.getLabel(twin);
+        if (!label) {
+          isDisplayNameAsteriskPresent = true;
+        }
+        return ({
+          data: {
+            id: twin.$dtId,
+            label: this.getLabel(twin),
+            properties: twin,
+            modelId: twin.$metadata.$model,
+            category: "Twin"
+          }
+        });
+      });
+
+    this.props.setIsDisplayNameAsteriskPresent(isDisplayNameAsteriskPresent);
     this.graphControl.add(mapped);
   }
 
@@ -742,7 +771,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   onNodeHover = ({ target: node }) => {
     this.removePopper();
-    const { category, label, modelId } = node.data();
+    const { category, label, modelId, properties: nodeProperties } = node.data();
     if (node !== this.graphControl && category === "Twin" && !this.isFetchingTwinData && !this.contextMenuIsOpen) {
       this.canRenderPopper = true;
       this.hoverTimeout = setTimeout(async () => {
@@ -753,7 +782,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           if (this.canRenderPopper) {
             node.popper({
               content: () => {
-                const contentDiv = this.getPopperContent(label, modelId, displayName, description, properties, relationships);
+                const contentDiv = this.getPopperContent(nodeProperties?.$dtId || label, modelId, displayName, description, properties, relationships);
                 document.body.appendChild(contentDiv);
                 return contentDiv;
               },

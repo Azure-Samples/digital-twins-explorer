@@ -3,15 +3,49 @@
 
 import { storageService } from "./StorageService";
 import { REL_TYPE_OUTGOING } from "./Constants";
+import { configService } from "./ConfigService";
 
 const StorageKeyName = "settings";
 const EnvStorageKeyName = "environments";
+const DefaultDisplayName = "$dtId";
 
 class SettingsService {
 
   constructor() {
     this.settings = storageService.getLocalStorageObject(StorageKeyName)
-      || { caching: false, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal" };
+      || { caching: false, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal",
+        possibleDisplayNameProperties: [], selectedDisplayNameProperty: {} };
+  }
+
+  get selectedDisplayNameProperty() {
+    return (async () => {
+      const { appAdtUrl } = await configService.getConfig();
+      const selectedDisplayNameProperty = this.settings?.selectedDisplayNameProperty?.[appAdtUrl];
+      return selectedDisplayNameProperty ?? DefaultDisplayName;
+    })();
+  }
+
+  set selectedDisplayNameProperty(selectedDisplayNameProperty) {
+    (async () => {
+      const { appAdtUrl } = await configService.getConfig();
+      if (this.settings.selectedDisplayNameProperty) {
+        this.settings.selectedDisplayNameProperty[appAdtUrl] = selectedDisplayNameProperty;
+      } else {
+        this.settings.selectedDisplayNameProperty = {
+          [appAdtUrl]: selectedDisplayNameProperty
+        };
+      }
+      this.save();
+    })();
+  }
+
+  get possibleDisplayNameProperties() {
+    return this.settings.possibleDisplayNameProperties || [];
+  }
+
+  set possibleDisplayNameProperties(possibleDisplayNameProperties) {
+    this.settings.possibleDisplayNameProperties = possibleDisplayNameProperties;
+    this.save();
   }
 
   get caching() {
