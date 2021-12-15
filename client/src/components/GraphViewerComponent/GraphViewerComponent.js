@@ -178,7 +178,7 @@ class GraphViewerComponent extends React.Component {
         this.cyRef.current.clearSelection();
       }
       const allTwins = await this.getTwinsData(query, overlayResults);
-      if (!this.state.couldNotDisplay) {
+      if (allTwins.length > 0) {
         await this.getRelationshipsData(allTwins, 30, false, !overlayResults, REL_TYPE_OUTGOING);
         if (selectedNode) {
           const selected = allTwins.find(t => t.$dtId === selectedNode.id);
@@ -231,6 +231,7 @@ class GraphViewerComponent extends React.Component {
       if (this.cyRef.current) {
         this.cyRef.current.clearTwins();
       }
+
       await apiService.query(query, async data => {
         if (data.twins.length > 0) {
           this.setState({ couldNotDisplay: false, noResults: false, relationshipsOnly: false });
