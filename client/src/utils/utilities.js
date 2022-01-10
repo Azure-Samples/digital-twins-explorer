@@ -68,7 +68,11 @@ export function addNavigator(cy, navigationOptions, container) {
       // Add navigator image alt for accessibility purposes
       const imgEl = document.getElementById(container.replace("#", "")).getElementsByTagName("img")[0];
       if (imgEl) {
-        imgEl.setAttribute("alt", "graph navigator");
+        if (imgEl.src) {
+          imgEl.setAttribute("alt", "graph navigator");
+        } else {
+          imgEl.removeAttribute("alt");
+        }
       }
     } catch (e) {
       // Retry the render function after a timeout
