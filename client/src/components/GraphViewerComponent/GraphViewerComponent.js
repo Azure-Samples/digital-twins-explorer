@@ -92,7 +92,6 @@ class GraphViewerComponent extends React.Component {
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
       this.cyRef.current.addTwins([ data ]);
-      this.cyRef.current.doLayout();
     });
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
@@ -427,11 +426,10 @@ class GraphViewerComponent extends React.Component {
     }
   }
 
-  onTwinDelete = async ids => {
+  onTwinDelete = ids => {
     if (ids) {
       this.cyRef.current.removeTwins(ids);
       this.cyRef.current.clearSelection();
-      await this.cyRef.current.doLayout();
     } else {
       this.cyRef.current.clearTwins();
     }
