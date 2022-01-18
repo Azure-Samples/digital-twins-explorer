@@ -476,13 +476,13 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   doLayout() {
     const cy = this.graphControl;
+    const modelColors = settingsService.getModelColors();
     cy.batch(() => {
       const types = {};
       const mtypes = {};
       const rtypes = {};
       const el = cy.nodes("*");
       const rels = cy.edges("*");
-
       // Color by type attribute
       for (let i = 0; i < el.length; i++) {
         types[el[i].data("type")] = `#${this.getColor(i)}`;
@@ -493,9 +493,10 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
       // Color by model type
       for (let i = 0; i < el.length; i++) {
-        mtypes[el[i].data("modelId")] = {
-          backgroundColor: `#${this.getColor(i)}`,
-          backgroundImage: this.getBackgroundImage(el[i].data("modelId"))
+        const modelId = el[i].data("modelId");
+        mtypes[modelId] = {
+          backgroundColor: modelColors[modelId],
+          backgroundImage: this.getBackgroundImage(modelId)
         };
       }
       for (const t of Object.keys(mtypes)) {

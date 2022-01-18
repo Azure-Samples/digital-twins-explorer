@@ -4,6 +4,7 @@
 import { storageService } from "./StorageService";
 import { REL_TYPE_OUTGOING } from "./Constants";
 import { configService } from "./ConfigService";
+import { colors } from "../components/GraphViewerComponent/GraphViewerCytoscapeComponent/config";
 
 const StorageKeyName = "settings";
 const EnvStorageKeyName = "environments";
@@ -15,6 +16,7 @@ class SettingsService {
     this.settings = storageService.getLocalStorageObject(StorageKeyName)
       || { caching: false, eagerLoading: false, queries: [], relTypeLoading: REL_TYPE_OUTGOING, relExpansionLevel: 1, contrast: "normal",
         possibleDisplayNameProperties: [], selectedDisplayNameProperty: {} };
+    this.modelColors = [];
   }
 
   get selectedDisplayNameProperty() {
@@ -100,6 +102,18 @@ class SettingsService {
   set relExpansionLevel(relExpansionLevel) {
     this.settings.relExpansionLevel = relExpansionLevel;
     this.save();
+  }
+
+  setModelColors(modelIds) {
+    this.modelColors = [];
+    for (let i = 0; i < modelIds.length; i++) {
+      const im = i % colors.length;
+      this.modelColors[modelIds[i]] = `#${(colors[(colors.length - 1) - im])}`;
+    }
+  }
+
+  getModelColors() {
+    return this.modelColors;
   }
 
   get environments() {
