@@ -5,6 +5,8 @@ import { ReactComponent as ExpansionDirection } from '../../assets/ExpansionDire
 import { ReactComponent as ExpansionLevel } from '../../assets/ExpansionLevel.svg';
 import { ReactComponent as SetToCenter } from '../../assets/SetToCenter.svg';
 import { ReactComponent as ChooseLayout } from '../../assets/ChooseLayout.svg';
+import { ReactComponent as SwapRelationship } from '../../assets/SwapRelationship.svg';
+import { ReactComponent as WarningRelationship } from '../../assets/WarningRelationship.svg';
 import "./IconService.scss";
 
 const initIcons = () => {
@@ -21,7 +23,9 @@ const initIcons = () => {
             'ExpansionDirection': <ExpansionDirection className="ms-Button-icon iconWhite" style={iconStyles} />,
             'ExpansionLevel': <ExpansionLevel className="ms-Button-icon iconWhite" style={iconStyles} />,
             'SetToCenter': <SetToCenter className="ms-Button-icon" style={iconStyles} />,
-            'ChooseLayout': <ChooseLayout className="ms-Button-icon iconWhite" style={iconStyles} />
+            'ChooseLayout': <ChooseLayout className="ms-Button-icon iconWhite" style={iconStyles} />,
+            'SwapRelationship': <SwapRelationship className="ms-Button-icon" style={iconStyles} />,
+            'WarningRelationship': <WarningRelationship className="ms-Button-icon iconWhite" style={iconStyles} />
         }
     };
 
