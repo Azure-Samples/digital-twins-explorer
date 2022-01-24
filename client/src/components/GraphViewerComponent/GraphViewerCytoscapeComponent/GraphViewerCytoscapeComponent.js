@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/* eslint-disable max-lines-per-function */
+/* eslint-disable */
 
 import React from "react";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -474,7 +474,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     });
   }
 
-  doLayout() {
+  doLayout(nodeColorUpdateOnly = false) {
     const cy = this.graphControl;
     const modelColors = settingsService.getModelColors();
     cy.batch(() => {
@@ -514,7 +514,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
           });
         }
       }
-
       // Color relationships by label
       for (let i = 0; i < rels.length; i++) {
         rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
@@ -524,11 +523,15 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       }
     });
 
-    return new Promise(resolve => {
-      const layout = cy.layout(GraphViewerCytoscapeLayouts[this.layout]);
-      layout.on("layoutstop", () => resolve());
-      layout.run();
-    });
+    if (nodeColorUpdateOnly) {
+        return true;
+    } else {
+        return new Promise(resolve => {
+          const layout = cy.layout(GraphViewerCytoscapeLayouts[this.layout]);
+          layout.on("layoutstop", () => resolve());
+          layout.run();
+      });
+    }
   }
 
   setLayout(layout) {
