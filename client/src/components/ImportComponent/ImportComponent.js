@@ -54,7 +54,9 @@ export class ImportComponent extends Component {
   }
 
   focus = async () => {
-    await this.cyRef.current.doLayout();
+    if (this.cyRef.current) {
+      await this.cyRef.current.doLayout();
+    }
   }
 
   onSaveClicked = async () => {
