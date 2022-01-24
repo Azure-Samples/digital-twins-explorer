@@ -92,6 +92,8 @@ class GraphViewerComponent extends React.Component {
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
       this.cyRef.current.addTwins([ data ]);
+      this.cyRef.current.updateNodeColors();
+      this.cyRef.current.zoomToFit();
     });
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
