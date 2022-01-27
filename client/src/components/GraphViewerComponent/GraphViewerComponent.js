@@ -485,6 +485,7 @@ class GraphViewerComponent extends React.Component {
     if (relationship) {
       this.cyRef.current.removeRelationships([ getUniqueRelationshipId(relationship) ]);
       await this.cyRef.current.doLayout();
+      this.setState({ selectedEdges: null });
     }
   }
 
