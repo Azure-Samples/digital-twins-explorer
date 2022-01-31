@@ -45,17 +45,17 @@
     float: right;
   }
   .warning-icon-wrapper {
-    background-color: red;
-    height: 60px;
+    background-color: #FFD4DD;
+    height: 45px;
     margin-bottom: 10px;
   }
   .warning-icon {
     float: left;
-    margin-top: 15px
+    margin-top: 7px
   }
   .warning-text {
     float: right;
-    background-color: var(--background-color2);
+    background-color: #FFD4DD;
     margin: 1px;
     width: 190px;
     height: 95%
@@ -63,5 +63,7 @@
   .warning-label {
     font-weight: 400;
     padding-left: 5px;
+    margin-top: -4px;
+    color: black;
   }
 }
