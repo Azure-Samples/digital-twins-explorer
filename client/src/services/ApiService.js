@@ -136,7 +136,7 @@ class ApiService {
       const isFinalOp = i === operations.length - 1;
       const basePropertyName = op === REL_TYPE_INCOMING ? "$targetId" : "$sourceId";
       let count = 1;
-      const twinIdsList = twinIds.map(twinId => `'${twinId}'`);
+      const twinIdsList = twinIds.map(twinId => `'${twinId.replaceAll("'", "\\'")}'`);
       const query = `SELECT * FROM RELATIONSHIPS r WHERE r.${basePropertyName} IN [${twinIdsList.join(",")}]`;
       for await (const page of this.client.queryTwins(query).byPage()) {
         print(`Ran query for relationships for twins ${twinIds}, page ${count++}:`, "info");
