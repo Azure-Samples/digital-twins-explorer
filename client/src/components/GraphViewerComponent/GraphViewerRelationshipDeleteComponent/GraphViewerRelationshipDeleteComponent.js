@@ -33,12 +33,10 @@ class GraphViewerRelationshipDeleteComponent extends Component {
 
   async deleteRelationship(edge) {
     try {
-      const { source } = edge;
-      let { id } = edge;
-      id = id.split("_").pop();
-      print(`*** Deleting relationship ${id}`, "info");
-      await apiService.deleteRelationship(source, id);
-      eventService.publishDeleteRelationship({ $sourceId: source, $relationshipId: id });
+      const { source, relationshipId } = edge;
+      print(`*** Deleting relationship ${relationshipId}`, "info");
+      await apiService.deleteRelationship(source, relationshipId);
+      eventService.publishDeleteRelationship({ $sourceId: source, $relationshipId: relationshipId });
     } catch (exc) {
       exc.customMessage = "Error deleting relationship";
       eventService.publishError(exc);
