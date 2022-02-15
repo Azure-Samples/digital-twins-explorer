@@ -386,7 +386,6 @@ export class GraphViewerCytoscapeComponent extends React.Component {
         checked.push(rel);
       }
     }
-
     this.graphControl.add(checked);
     this.updateNodeColors();
   }
@@ -517,7 +516,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
       }
       // Color relationships by label
       for (let i = 0; i < rels.length; i++) {
-        rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
+        if (!rtypes[rels[i].data("label")]) {
+          rtypes[rels[i].data("label")] = `#${this.getColor(i)}`;
+        }
       }
       for (const r of Object.keys(rtypes)) {
         cy.elements(`edge[label="${r}"]`).style("line-color", rtypes[r]);
