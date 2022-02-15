@@ -388,6 +388,7 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
 
     this.graphControl.add(checked);
+    this.updateNodeColors();
   }
 
   getRelationships() {
