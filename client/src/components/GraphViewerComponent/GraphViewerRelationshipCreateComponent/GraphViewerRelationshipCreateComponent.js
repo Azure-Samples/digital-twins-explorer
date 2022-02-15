@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { TextField, DefaultButton, Dropdown } from "office-ui-fabric-react";
+import { TextField, DefaultButton, Dropdown, IconButton, Label } from "office-ui-fabric-react";
 import { v4 as uuidv4 } from "uuid";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
@@ -12,6 +12,8 @@ import "../GraphViewerComponentShared.scss";
 import { eventService } from "../../../services/EventService";
 import { ModelService } from "../../../services/ModelService";
 
+const swapIconName = "SwapRelationship";
+const warningIconName = "WarningRelationship";
 export class GraphViewerRelationshipCreateComponent extends Component {
 
   constructor(props) {
@@ -20,7 +22,11 @@ export class GraphViewerRelationshipCreateComponent extends Component {
       isLoading: false,
       relationshipItems: [],
       relationshipId: null,
-      hasRequiredRelError: false
+      hasRequiredRelError: false,
+      hasRelationships: true,
+      hasSwapExecuted: true,
+      sourceId: "",
+      targetId: ""
     };
   }
 
@@ -57,11 +63,10 @@ export class GraphViewerRelationshipCreateComponent extends Component {
 
   save = async () => {
     const { onCreate } = this.props;
-    const { relationshipId, relationshipItems } = this.state;
+    const { relationshipId, relationshipItems, sourceId, targetId } = this.state;
     if (relationshipId === null) {
       this.setState({ hasRequiredRelError: true });
     } else {
-      const { sourceId, targetId } = this.getNodes();
       this.setState({ isLoading: true });
       try {
         const id = uuidv4();
@@ -88,18 +93,16 @@ export class GraphViewerRelationshipCreateComponent extends Component {
   }
 
   open = async () => {
+    const { sourceModelId } = this.state;
     this.setState({ showModal: true, isLoading: true });
-    setTimeout(() => {
-      document.getElementById("create-relationship-heading").focus();
-    }, 200);
-
-    const { selectedNode, selectedNodes } = this.props;
-    const sourceModelId = selectedNodes.find(x => x.id !== selectedNode.id).modelId;
-    const targetModelId = selectedNode.modelId;
 
     try {
-      const relationshipItems = await new ModelService().getRelationships(sourceModelId, targetModelId);
-      this.setState({ relationshipItems });
+      const { selectedNode, selectedNodes } = this.props;
+      const source = selectedNodes.find(x => x.id !== selectedNode.id);
+      const target = selectedNode;
+      this.setState({ sourceId: source.id, targetId: target.id });
+      const relationshipItems = await new ModelService().getRelationships(source.modelId, target.modelId);
+      this.setState({ hasRelationships: relationshipItems.length > 0, relationshipItems });
     } catch (exc) {
       this.setState({ relationshipItems: [] });
       exc.customMessage = `Error in retrieving model. Requested ${sourceModelId}`;
@@ -109,42 +112,70 @@ export class GraphViewerRelationshipCreateComponent extends Component {
     this.setState({ isLoading: false });
   }
 
-  getNodes() {
-    const { selectedNode, selectedNodes } = this.props;
-    const source = selectedNodes && selectedNodes.find(x => x.id !== selectedNode.id);
-    const sourceId = source ? source.id : "";
-    const targetId = selectedNode ? selectedNode.id : "";
-
-    return { sourceId, targetId };
+  swap = async () => {
+    this.setState(({ hasSwapExecuted }) => ({ hasSwapExecuted: !hasSwapExecuted }));
+    const { sourceModelId, hasSwapExecuted } = this.state;
+    this.setState({ isLoading: true });
+    try {
+      const { selectedNode, selectedNodes } = this.props;
+      let source = selectedNodes.find(x => x.id !== selectedNode.id);
+      let target = selectedNode;
+      if (hasSwapExecuted) {
+        source = selectedNode;
+        target = selectedNodes.find(x => x.id !== selectedNode.id);
+      }
+      this.setState({ sourceId: source.id, targetId: target.id });
+      const relationshipItems = await new ModelService().getRelationships(source.modelId, target.modelId);
+      this.setState({ hasRelationships: relationshipItems.length > 0, relationshipItems });
+    } catch (exc) {
+      this.setState({ relationshipItems: [] });
+      exc.customMessage = `Error in retrieving model. Requested ${sourceModelId}`;
+      eventService.publishError(exc);
+    }
+    this.setState({ isLoading: false });
   }
 
   render() {
-    const { relationshipItems, relationshipId, isLoading, showModal, hasRequiredRelError } = this.state;
-    const { sourceId, targetId } = this.getNodes();
+    const { relationshipItems, relationshipId, isLoading, showModal, hasRequiredRelError, sourceId, targetId, hasRelationships } = this.state;
 
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
         <h2 className="heading-2" tabIndex="0" id="create-relationship-heading">Create Relationship</h2>
         <h4>Source ID</h4>
         <TextField disabled readOnly id="sourceIdField" ariaLabel="Source ID" className="modal-input" styles={this.getStyles} value={sourceId} />
+        <div className="btn-icon">
+          <IconButton iconOnly="true" iconProps={{ iconName: swapIconName }} title="Swap Relationship" ariaLabel="Swap Relationship" onClick={this.swap} />
+        </div>
         <h4>Target ID</h4>
         <TextField disabled readOnly id="targetIdField" ariaLabel="Target ID" className="modal-input" styles={this.getStyles} value={targetId} />
-        <h4>Relationship</h4>
-        <Dropdown
-          tabIndex="0"
-          ariaLabel="Select an option"
-          required
-          placeholder="Select an option"
-          className="modal-input"
-          selectedKey={relationshipId}
-          options={relationshipItems.map((q, i) => ({ key: i, text: q }))}
-          styles={{
-            dropdown: { width: 208 }
-          }}
-          errorMessage={hasRequiredRelError ? "Please select a relationship" : null}
-          onChange={this.onSelectedRelChange} />
+        <h4>Relationship</h4> {
+          hasRelationships && <div>
+            <Dropdown
+              tabIndex="0"
+              ariaLabel="Select an option"
+              required
+              placeholder="Select an option"
+              className="modal-input"
+              selectedKey={relationshipId}
+              options={relationshipItems.map((q, i) => ({ key: i, text: q }))}
+              styles={{
+                dropdown: { width: 208 }
+              }}
+              errorMessage={hasRequiredRelError ? "Please select a relationship" : null}
+              onChange={this.onSelectedRelChange} />
+          </div>
+        } {
+          !hasRelationships && <div className="warning-icon-wrapper">
+            <div className="warning-icon">
+              <IconButton iconOnly="true" iconProps={{ iconName: warningIconName }} title="Warning Relationship" ariaLabel="Warning  Relationship" />
+            </div>
+            <div className="warning-text">
+              <Label className="warning-label">No relationship available, try swapping source and target</Label>
+            </div>
+          </div>
+        }
         <div className="btn-group">
-          <DefaultButton className="modal-button save-button" onClick={this.save}>Save</DefaultButton>
+          <DefaultButton className="modal-button save-button" onClick={this.save} disabled={!hasRelationships}>Save</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
         </div>
       </ModalComponent>

@@ -29,33 +29,56 @@ class StandardExcelImportFormat {
     }
 
     const data = new DataModel();
-
+    const errors = [];
     for (let i = 1; i < resp.rows.length; i++) {
       const row = resp.rows[i];
 
       const twinId = row[headers[IdColumn]];
       if (!twinId) {
-        throw new Error(`Missing twin ID on row ${i}`);
+        errors.push(`Missing twin ID on row ${i}`);
+        continue;
       }
 
-      const modelId = row[headers[ModelColumn]];
-      const initDataRaw = row[headers[InitialDataColumn]];
-      const initData = initDataRaw ? JSON.parse(initDataRaw) : {};
-      initData.$metadata = { $model: modelId };
-      if (modelId) {
-        data.digitalTwinsGraph.digitalTwins.push({ $dtId: twinId, ...initData });
-      }
+      try {
+        const modelId = row[headers[ModelColumn]];
+        const initDataRaw = row[headers[InitialDataColumn]];
+        const initData = initDataRaw ? JSON.parse(initDataRaw) : {};
+        initData.$metadata = { $model: modelId };
+        if (modelId) {
+          const addedTwin = data.digitalTwinsGraph.digitalTwins.find(twin => twin.$dtId === twinId);
+          if (addedTwin) {
+            errors.push(`Twin ID is duplicated on row ${i}`);
+            continue;
+          }
+          data.digitalTwinsGraph.digitalTwins.push({ $dtId: twinId, ...initData });
+        }
 
-      const parent = row[headers[RelationshipFromColumn]];
-      const relationship = row[headers[RelationshipTypeColumn]];
-      if (parent && relationship) {
-        data.digitalTwinsGraph.relationships.push({
-          $sourceId: parent,
-          $targetId: twinId,
-          $relationshipName: relationship,
-          $relationshipId: uuidv4()
-        });
+        const parent = row[headers[RelationshipFromColumn]];
+        const relationship = row[headers[RelationshipTypeColumn]];
+        if (parent) {
+          const parentTwin = data.digitalTwinsGraph.digitalTwins.find(twin => twin.$dtId === twinId);
+          if (!parentTwin) {
+            errors.push(`Parent Twin with ID ${parent} is not defined yet on row ${i}`);
+            continue;
+          }
+          if (!relationship) {
+            errors.push(`Relationship parent is defined with ID ${parent} but there isn't a relationship name on row ${i}`);
+            continue;
+          }
+          data.digitalTwinsGraph.relationships.push({
+            $sourceId: parent,
+            $targetId: twinId,
+            $relationshipName: relationship,
+            $relationshipId: uuidv4()
+          });
+        }
+      } catch (error) {
+        errors.push(`${error.message} on row ${i}`);
       }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(errors.join("\n"));
     }
 
     return data;

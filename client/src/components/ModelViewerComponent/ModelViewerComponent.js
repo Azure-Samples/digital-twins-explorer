@@ -126,6 +126,7 @@ class ModelViewerComponent extends Component {
     sortArray(items, "displayName", "key");
 
     this.originalItems = items.slice(0, items.length);
+    settingsService.setModelColors(items.map(item => item.key));
     this.setState({ items, isLoading: false });
   }
 

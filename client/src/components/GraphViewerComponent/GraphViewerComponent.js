@@ -92,7 +92,8 @@ class GraphViewerComponent extends React.Component {
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
       this.cyRef.current.addTwins([ data ]);
-      this.cyRef.current.doLayout();
+      this.cyRef.current.updateNodeColors();
+      this.cyRef.current.zoomToFit();
     });
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
@@ -427,11 +428,10 @@ class GraphViewerComponent extends React.Component {
     }
   }
 
-  onTwinDelete = async ids => {
+  onTwinDelete = ids => {
     if (ids) {
       this.cyRef.current.removeTwins(ids);
       this.cyRef.current.clearSelection();
-      await this.cyRef.current.doLayout();
     } else {
       this.cyRef.current.clearTwins();
     }
@@ -467,10 +467,9 @@ class GraphViewerComponent extends React.Component {
     this.setState({ canShowAllRelationships: true });
   }
 
-  onRelationshipCreate = async relationship => {
+  onRelationshipCreate = relationship => {
     if (relationship) {
       this.cyRef.current.addRelationships([ relationship ]);
-      await this.cyRef.current.doLayout();
       this.setState({ selectedNode: null, selectedNodes: null });
       this.cyRef.current.unselectSelectedNodes();
       this.cyRef.current.clearSelection();
@@ -481,10 +480,10 @@ class GraphViewerComponent extends React.Component {
     }
   }
 
-  onRelationshipDelete = async relationship => {
+  onRelationshipDelete = relationship => {
     if (relationship) {
       this.cyRef.current.removeRelationships([ getUniqueRelationshipId(relationship) ]);
-      await this.cyRef.current.doLayout();
+      this.setState({ selectedEdges: null });
     }
   }
 

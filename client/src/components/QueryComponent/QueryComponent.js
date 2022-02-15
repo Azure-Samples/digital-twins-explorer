@@ -29,19 +29,40 @@ class QueryComponent extends Component {
     this.state = {
       queries: [],
       selectedQuery: defaultQuery,
+      selectedQueryMultiline: defaultQuery,
       selectedQueryKey: null,
       queryKeyToBeRemoved: "",
       showSaveQueryModal: false,
       showConfirmDeleteModal: false,
       showConfirmOverwriteModal: false,
       newQueryName: "",
-      isOverlayResultsChecked: false
+      isOverlayResultsChecked: false,
+      multiline: false,
+      multilineHolder: false,
+      isFocused: false,
+      disabled: false,
+      rowCount: 2
     };
   }
 
   componentDidMount() {
     this.setState({ queries: settingsService.queries });
     eventService.subscribeEnvironmentChange(this.clearAfterEnvironmentChange);
+  }
+
+  onKeyFunction = event => {
+    this.setState({ disabled: false });
+    const enterPressed = event.key === "Enter";
+    if (event.shiftKey && enterPressed) {
+      if (!this.state.multilineHolder) {
+        this.setState({ selectedQueryMultiline: event.target.value });
+      }
+      this.setState({ multiline: true, multilineHolder: true });
+      this.queryField.focus();
+    } else if (enterPressed) {
+      this.executeQuery(event);
+      event.preventDefault();
+    }
   }
 
   componentWillUnmount() {
@@ -62,7 +83,23 @@ class QueryComponent extends Component {
   }
 
   onChange = evt => {
-    this.setState({ selectedQuery: evt.target.value, selectedQueryKey: null });
+    this.setState({ selectedQuery: evt.target.value, selectedQueryKey: null, selectedQueryMultiline: evt.target.value });
+    const count = evt.target.value.split("").filter(c => c === "\n").length;
+    this.setState({ rowCount: count + 1, multilineHolder: count !== 0, multiline: count !== 0 });
+  }
+
+  onFocusGained = () => {
+    if (this.state.multilineHolder) {
+      this.setState(prevState => ({ selectedQuery: prevState.selectedQueryMultiline, multiline: true }));
+    }
+  }
+
+  onFocusLost = () => {
+    this.setState(prevState => ({ disabled: true, multiline: false, selectedQuery: prevState.selectedQueryMultiline.replaceAll("\n", " ") }));
+  }
+
+  onMouseOver = () => {
+    this.setState({ disabled: false });
   }
 
   onChangeQueryName = evt => {
@@ -170,7 +207,7 @@ class QueryComponent extends Component {
 
   render() {
     const { queries, selectedQuery, selectedQueryKey, showSaveQueryModal, newQueryName,
-      showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked } = this.state;
+      showConfirmDeleteModal, showConfirmOverwriteModal, isOverlayResultsChecked, disabled, multiline, rowCount, isFocused } = this.state;
 
     return (
       <>
@@ -183,20 +220,26 @@ class QueryComponent extends Component {
                 selectedKey={selectedQueryKey}
                 options={queries.map(q => ({ key: q.name, text: q.name }))}
                 onRenderOption={this.onRenderOption}
+                onKeyDown={this.onMouseOver}
                 role="combobox"
                 styles={{
                   dropdown: { width: 200 }
                 }}
-                onChange={this.onSelectedQueryChange} />
+                onChange={this.onSelectedQueryChange} onFocus={this.onFocusOther} />
             </div>
             <FocusZone handleTabKey={FocusZoneTabbableElements.all} defaultActiveElement="#queryField">
               <form onSubmit={this.executeQuery}>
-                <TextField id="queryField" className="qc-query" styles={this.getStyles} role="search" value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query" />
+                <TextField id="queryField" className="qc-query" styles={this.getStyles} role="search" value={selectedQuery} onChange={this.onChange} ariaLabel="Enter a query"
+                  onFocus={this.onFocusGained} multiline={multiline} rows={rowCount} autoAdjustHeight="true" isFocused={isFocused} onBlur={this.onFocusLost} disabled={disabled}
+                  onMouseOver={this.onMouseOver} onKeyDown={this.onKeyFunction} ref={input => {
+                    this.queryField = input;
+                  }} />
               </form>
             </FocusZone>
             <div className="qc-queryControls">
-              <FocusZone onKeyUp={this.handleOverlayResultsKeyUp}>
-                <Checkbox label={this.props.t("queryComponent.overlayResults")} checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange} boxSide="end" />
+              <FocusZone onKeyUp={this.handleOverlayResultsKeyUp} onKeyDown={this.onMouseOver} >
+                <Checkbox label={this.props.t("queryComponent.overlayResults")} checked={isOverlayResultsChecked} onChange={this.onOverlayResultsChange}
+                  boxSide="end" />
               </FocusZone>
               <DefaultButton className="query-button" onClick={this.executeQuery} ariaLive="assertive">
                 {this.props.t("queryComponent.defaultButton")}

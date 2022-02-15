@@ -224,9 +224,10 @@ export const coseOptions = {
 
 export const klayOptions = {
   name: "klay",
-  nodeDimensionsIncludeLabels: false, // Boolean which changes whether label dimensions are included when calculating node dimensions
+  nodeDimensionsIncludeLabels: true, // Boolean which changes whether label dimensions are included when calculating node dimensions
   fit: true, // Whether to fit
-  padding: 20, // Padding on fit
+  padding: 30, // Padding on fit
+  spacingFactor: undefined,
   animate: true, // Whether to transition the node positions
   animateFilter: function () {
     return true;

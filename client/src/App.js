@@ -137,7 +137,9 @@ class App extends Component {
     eventService.subscribeCloseComponent(component => {
       switch (component) {
         case "importComponent":
-          this.setState(prevState => ({ layout: { ...prevState.layout, showImport: false, importFile: null } }));
+          this.setState(prevState => ({ layout: { ...prevState.layout, showImport: false, importFile: null } }), () => {
+            this.handleMainContentPivotChange("graph-viewer");
+          });
           break;
         default:
           break;
