@@ -6,7 +6,7 @@ import { Icon } from "office-ui-fabric-react";
 
 import GraphViewerCommandBarComponent from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
 import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
-import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
+import GraphViewerRelationshipCreateComponent from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
 import GraphViewerRelationshipDeleteComponent from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";

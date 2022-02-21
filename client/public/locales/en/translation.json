@@ -127,6 +127,15 @@
     "graphViewerRelationshipDeleteComponent": {
         "heading": "Are you sure?"
     },
+    "graphViewerRelationshipCreateComponent": {
+        "creationError": "Error creating relationship",
+        "retrievingError": "Error in retrieving model. Requested",
+        "swapRelationship": "Swap Relationship",
+        "optionSelection": "Select an option",
+        "selectRelationship": "Please select a relationship",
+        "warningRelationship":"Warning Relationship",
+        "warningMessage": "No relationship available, try swapping source and target"
+    },
     "graphViewerTermManagementComponent": {
         "menuItems": {
             "ariaLabel": "add outgoing relationships",
