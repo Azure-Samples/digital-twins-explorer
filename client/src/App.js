@@ -33,6 +33,7 @@ import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 import { eventService } from "./services/EventService";
 import { settingsService } from "./services/SettingsService";
 import { ModelService } from "./services/ModelService";
+import { exportService } from "./services/ExportService";
 import themeVariables from "./theme/variables";
 import { darkFabricTheme, darkFabricThemeHighContrast } from "./theme/DarkFabricTheme";
 import logo from "./assets/logo192.png";
@@ -130,9 +131,7 @@ class App extends Component {
       });
     });
     eventService.subscribeExport((evt) => {
-      this.setState(prevState => ({ layout: { ...prevState.layout, showExport: true }, exportedQuery: evt.query }), () => {
-        this.setState({ mainContentSelectedKey: "export" });
-      });
+      this.createDownload(evt.query);
     });
     eventService.subscribeCloseComponent(component => {
       switch (component) {
@@ -272,6 +271,33 @@ class App extends Component {
       }
       return newState;
     });
+  }
+
+  async createDownload(query) {
+    
+    this.setState({ isLoading: true });
+    let data = null;
+    try {
+      data = await exportService.save(query);
+    } catch (exc) {
+      exc.customMessage = "Error in exporting graph";
+      eventService.publishError(exc);
+    }
+
+    if (data) {
+      const blob = new Blob([ JSON.stringify(data) ], { type: "application/json" });
+      const downloadUrl = URL.createObjectURL(blob);
+      let downloadLink = document.createElement("a");
+      downloadLink.setAttribute("href", downloadUrl);
+      downloadLink.setAttribute("download", "ExportedGraph");
+      downloadLink.style.visibility = "hidden";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+    }
+
+    this.setState({ isLoading: false });
   }
 
   handleModelViewerResizeMouseMove = e => {
