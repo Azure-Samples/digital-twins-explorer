@@ -24,7 +24,7 @@ import { TwinViewerComponent } from "./components/TwinViewerComponent/TwinViewer
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
 import QueryComponent from "./components/QueryComponent/QueryComponent";
 import { ImportComponent } from "./components/ImportComponent/ImportComponent";
-import { ExportComponent } from "./components/ExportComponent/ExportComponent";
+import TabularViewComponent from "./components/TabularViewComponent/TabularViewComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
 import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
 import { ErrorMessageComponent } from "./components/ErrorMessageComponent/ErrorMessage";
@@ -103,7 +103,7 @@ class App extends Component {
         drawerHeight: 20,
         showImport: false,
         importFile: null,
-        showExport: false,
+        showTabularView: false,
         showOutput: false,
         showConsole: false
       },
@@ -112,7 +112,8 @@ class App extends Component {
       leftPanelSelectedKey: "models",
       contrast: contrastOptions.normal,
       possibleDisplayNameProperties: [],
-      selectedDisplayNameProperty: ""
+      selectedDisplayNameProperty: "",
+      relationships: []
     };
     for (const x of this.optionalComponents) {
       this.state[x.id] = { visible: false };
@@ -132,6 +133,9 @@ class App extends Component {
     });
     eventService.subscribeExport((evt) => {
       this.createDownload(evt.query);
+    });
+    eventService.subscribeOpenTabularView((relationships) => {
+      this.setState(prevState => ({ mainContentSelectedKey: "tabularView", layout: { ...prevState.layout, showTabularView: true }, relationships}));
     });
     eventService.subscribeCloseComponent(component => {
       switch (component) {
@@ -412,8 +416,8 @@ class App extends Component {
         this.setState({ mainContentSelectedKey: "graph-viewer" });
       });
     }
-    if (item.itemKey === "export") {
-      this.setState(prevState => ({ layout: { ...prevState.layout, showExport: false } }), () => {
+    if (item.itemKey === "tabularView") {
+      this.setState(prevState => ({ layout: { ...prevState.layout, showTabularView: false } }), () => {
         this.setState({ mainContentSelectedKey: "graph-viewer" });
       });
     }
@@ -485,7 +489,7 @@ class App extends Component {
                       <PivotItem style={{ height: "100%" }} itemKey="model-graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.modelGraphViewer")}  ariaLabel={this.props.t("app.goldenLayoutConfig.modelGraphViewer")} ariaLive="assertive" />
                       {layout.showImport && <PivotItem style={{ height: "100%" }} itemKey="import" headerText={this.props.t("app.importComponentConfig.title")} ariaLabel={this.props.t("app.importComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
-                      {layout.showExport && <PivotItem style={{ height: "100%" }} itemKey="export" headerText={this.props.t("app.exportComponentConfig.title")} ariaLabel={this.props.t("app.exportComponentConfig.title")} ariaLive="assertive"
+                      {layout.showTabularView && <PivotItem style={{ height: "100%" }} itemKey="tabularView" headerText={this.props.t("app.tabularViewComponentConfig.title")} ariaLabel={this.props.t("app.tabularViewComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
                     </Pivot>
                     <div className="tab-pivot-panel" role="main">
@@ -498,8 +502,8 @@ class App extends Component {
                       {layout.showImport && <div className={mainContentSelectedKey === "import" ? "show" : "hidden"}>
                         <ImportComponent file={layout.importFile} ref={this.importRef} />
                       </div>}
-                      {layout.showExport && <div className={mainContentSelectedKey === "export" ? "show" : "hidden"}>
-                        <ExportComponent query={this.state.exportedQuery}/>
+                      {layout.showTabularView && <div className={mainContentSelectedKey === "tabularView" ? "show" : "hidden"}>
+                        <TabularViewComponent relationships={this.state.relationships} />
                       </div>}
                     </div>
                   </div>

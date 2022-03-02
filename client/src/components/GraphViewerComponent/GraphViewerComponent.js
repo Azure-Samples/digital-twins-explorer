@@ -246,6 +246,7 @@ class GraphViewerComponent extends React.Component {
           }
         } else if (data.relationships.length > 0) {
           this.setState({ couldNotDisplay: true, relationshipsOnly: true });
+          this.relationships = data.relationships;
         } else if (data.other.length > 0) {
           this.setState({ couldNotDisplay: true, relationshipsOnly: false });
         } else {
@@ -891,10 +892,16 @@ class GraphViewerComponent extends React.Component {
               <div className="alert--message">
                 {noResults ? <span>No results found. </span>
                   : <>
-                    {relationshipsOnly ? <span>You can only render relationships if a twin is returned too. </span>
+                    {relationshipsOnly
+                      ? <><span>A graph may only be rendered if the results contain a twin. </span>
+                        <span>Click here to open the </span>
+                        <a onClick={() => {
+                          eventService.publishOpenTabularView(this.relationships);
+                          this.setState({ couldNotDisplay: false });
+                        }}>Tabular Relationships View</a></>
                       : <span>The query returned results that could not be displayed or overlayed. </span>}
                     {!outputIsOpen && <>
-                      <span>Open the </span>
+                      <span> or open the </span>
                       <a onClick={() => {
                         eventService.publishOpenOptionalComponent("output");
                         this.setState({ couldNotDisplay: false });
