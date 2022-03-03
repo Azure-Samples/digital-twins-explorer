@@ -3,8 +3,16 @@
 
 @import "../../theme/theme.scss";
 
-.tabular-view {
-  .ms-DetailsList {
-    overflow-x: hidden;
+.tab-pivot-panel {
+  .tabular-view {
+    &.ev-grid{
+      overflow-y: auto;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    .ms-DetailsList {
+      overflow-x: hidden;
+    }
   }
 }
