@@ -30,7 +30,9 @@ export class GraphViewerCytoscapeComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hideContextMenu: false
+      hideContextMenu: false,
+      initialX: 0,
+      initialY: 0
     };
     this.graphControl = null;
     this.navControlId = _uniqueId("graph-viewer-nav");
@@ -233,6 +235,8 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   addTwins(twins) {
     let isDisplayNameAsteriskPresent = false;
+    const { initialX, initialY } = this.state;
+    this.setState({ initialX: initialX + 50 });
     const mapped = twins
       .filter(twin => this.graphControl.$id(twin.$dtId).length === 0)
       .map(twin => {
@@ -247,6 +251,10 @@ export class GraphViewerCytoscapeComponent extends React.Component {
             properties: twin,
             modelId: twin.$metadata.$model,
             category: "Twin"
+          },
+          position: {
+            x: initialX,
+            y: initialY
           }
         });
       });
@@ -538,6 +546,36 @@ export class GraphViewerCytoscapeComponent extends React.Component {
 
   setLayout(layout) {
     this.layout = layout;
+  }
+
+  setNewNodesInitialPositions() {
+    const cy = this.graphControl;
+    let firstSingleNode = true;
+    let initialX = 0;
+    let initialY = 0;
+    let leftMostX = 0;
+    let topMostY = 0;
+    cy.nodes().forEach(node => {
+      if (node.degree() === 0) {
+        if (firstSingleNode) {
+          initialX = node.position().x;
+          initialY = node.position().y;
+          firstSingleNode = false;
+        }
+        if (initialX < node.position().x) {
+          initialX = node.position().x;
+          initialY = node.position().y;
+        }
+      } else {
+        leftMostX = leftMostX > node.position().x ? node.position().x : leftMostX;
+        topMostY = topMostY > node.position().y ? node.position().y : topMostY;
+      }
+    });
+    if (firstSingleNode) {
+      this.setState({ initialX: leftMostX - 50, initialY: topMostY - 50 });
+    } else {
+      this.setState({ initialX: initialX + 50, initialY });
+    }
   }
 
   updateModelIcon(modelId) {

@@ -91,6 +91,7 @@ class GraphViewerComponent extends React.Component {
     eventService.subscribeAddRelationship(data => data && this.onRelationshipCreate(data));
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
+      this.cyRef.current.setNewNodesInitialPositions();
       this.cyRef.current.addTwins([ data ]);
       this.cyRef.current.updateNodeColors();
       this.cyRef.current.zoomToFit();
@@ -282,7 +283,9 @@ class GraphViewerComponent extends React.Component {
 
       const twinsChunks = this.modelService.chunkModelsList(currentTwins, 100);
       const bs = new BatchService({
-        refresh: () => this.cyRef.current.doLayout(),
+        refresh: () => {
+          this.cyRef.current.doLayout();
+        },
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
         items: twinsChunks,
         action: (twinsList, resolve, reject) => {
