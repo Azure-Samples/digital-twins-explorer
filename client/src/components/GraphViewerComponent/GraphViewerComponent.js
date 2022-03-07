@@ -6,7 +6,7 @@ import { Icon } from "office-ui-fabric-react";
 
 import GraphViewerCommandBarComponent from "./GraphViewerCommandBarComponent/GraphViewerCommandBarComponent";
 import { GraphViewerCytoscapeComponent, GraphViewerCytoscapeLayouts } from "./GraphViewerCytoscapeComponent/GraphViewerCytoscapeComponent";
-import { GraphViewerRelationshipCreateComponent } from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
+import GraphViewerRelationshipCreateComponent from "./GraphViewerRelationshipCreateComponent/GraphViewerRelationshipCreateComponent";
 import { GraphViewerRelationshipViewerComponent } from "./GraphViewerRelationshipViewerComponent/GraphViewerRelationshipViewerComponent";
 import { GraphViewerTwinDeleteComponent } from "./GraphViewerTwinDeleteComponent/GraphViewerTwinDeleteComponent";
 import GraphViewerRelationshipDeleteComponent from "./GraphViewerRelationshipDeleteComponent/GraphViewerRelationshipDeleteComponent";
@@ -91,6 +91,7 @@ class GraphViewerComponent extends React.Component {
     eventService.subscribeAddRelationship(data => data && this.onRelationshipCreate(data));
     eventService.subscribeDeleteRelationship(data => data && this.onRelationshipDelete(data));
     eventService.subscribeCreateTwin(data => {
+      this.cyRef.current.setNewNodesInitialPositions();
       this.cyRef.current.addTwins([ data ]);
       this.cyRef.current.updateNodeColors();
       this.cyRef.current.zoomToFit();
@@ -246,6 +247,7 @@ class GraphViewerComponent extends React.Component {
           }
         } else if (data.relationships.length > 0) {
           this.setState({ couldNotDisplay: true, relationshipsOnly: true });
+          this.relationships = data.relationships;
         } else if (data.other.length > 0) {
           this.setState({ couldNotDisplay: true, relationshipsOnly: false });
         } else {
@@ -281,7 +283,9 @@ class GraphViewerComponent extends React.Component {
 
       const twinsChunks = this.modelService.chunkModelsList(currentTwins, 100);
       const bs = new BatchService({
-        refresh: () => this.cyRef.current.doLayout(),
+        refresh: () => {
+          this.cyRef.current.doLayout();
+        },
         update: p => this.updateProgress(baseline + (i * baselineChunk) + ((p / 100) * baselineChunk)),
         items: twinsChunks,
         action: (twinsList, resolve, reject) => {
@@ -891,10 +895,16 @@ class GraphViewerComponent extends React.Component {
               <div className="alert--message">
                 {noResults ? <span>No results found. </span>
                   : <>
-                    {relationshipsOnly ? <span>You can only render relationships if a twin is returned too. </span>
+                    {relationshipsOnly
+                      ? <><span>A graph may only be rendered if the results contain a twin. </span>
+                        <span>Click here to open the </span>
+                        <a onClick={() => {
+                          eventService.publishOpenTabularView(this.relationships);
+                          this.setState({ couldNotDisplay: false });
+                        }}>Tabular Relationships View</a></>
                       : <span>The query returned results that could not be displayed or overlayed. </span>}
                     {!outputIsOpen && <>
-                      <span>Open the </span>
+                      <span> or open the </span>
                       <a onClick={() => {
                         eventService.publishOpenOptionalComponent("output");
                         this.setState({ couldNotDisplay: false });

@@ -2,8 +2,9 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { TextField, DefaultButton, Dropdown, IconButton, Label } from "office-ui-fabric-react";
+import { TextField, DefaultButton, Dropdown, IconButton, MessageBar, MessageBarType } from "office-ui-fabric-react";
 import { v4 as uuidv4 } from "uuid";
+import { withTranslation } from "react-i18next";
 
 import ModalComponent from "../../ModalComponent/ModalComponent";
 import { apiService } from "../../../services/ApiService";
@@ -13,8 +14,7 @@ import { eventService } from "../../../services/EventService";
 import { ModelService } from "../../../services/ModelService";
 
 const swapIconName = "SwapRelationship";
-const warningIconName = "WarningRelationship";
-export class GraphViewerRelationshipCreateComponent extends Component {
+class GraphViewerRelationshipCreateComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -76,7 +76,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
           onCreate({ $sourceId: sourceId, $relationshipId: id, $relationshipName: rel, $targetId: targetId });
         }
       } catch (exc) {
-        exc.customMessage = "Error creating relationship";
+        exc.customMessage = this.props.t("graphViewerRelationshipCreateComponent.creationError");
         eventService.publishError(exc);
       }
       this.setState({ isLoading: false, showModal: false });
@@ -105,7 +105,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
       this.setState({ hasRelationships: relationshipItems.length > 0, relationshipItems });
     } catch (exc) {
       this.setState({ relationshipItems: [] });
-      exc.customMessage = `Error in retrieving model. Requested ${sourceModelId}`;
+      exc.customMessage = `${this.props.t("graphViewerRelationshipCreateComponent.retrievingError")} ${sourceModelId}`;
       eventService.publishError(exc);
     }
 
@@ -129,7 +129,7 @@ export class GraphViewerRelationshipCreateComponent extends Component {
       this.setState({ hasRelationships: relationshipItems.length > 0, relationshipItems });
     } catch (exc) {
       this.setState({ relationshipItems: [] });
-      exc.customMessage = `Error in retrieving model. Requested ${sourceModelId}`;
+      exc.customMessage = `${this.props.t("graphViewerRelationshipCreateComponent.retrievingError")} ${sourceModelId}`;
       eventService.publishError(exc);
     }
     this.setState({ isLoading: false });
@@ -144,7 +144,8 @@ export class GraphViewerRelationshipCreateComponent extends Component {
         <h4>Source ID</h4>
         <TextField disabled readOnly id="sourceIdField" ariaLabel="Source ID" className="modal-input" styles={this.getStyles} value={sourceId} />
         <div className="btn-icon">
-          <IconButton iconOnly="true" iconProps={{ iconName: swapIconName }} title="Swap Relationship" ariaLabel="Swap Relationship" onClick={this.swap} />
+          <IconButton iconOnly="true" iconProps={{ iconName: swapIconName }} title={this.props.t("graphViewerRelationshipCreateComponent.swapRelationship")}
+            ariaLabel={this.props.t("graphViewerRelationshipCreateComponent.swapRelationship")} onClick={this.swap} />
         </div>
         <h4>Target ID</h4>
         <TextField disabled readOnly id="targetIdField" ariaLabel="Target ID" className="modal-input" styles={this.getStyles} value={targetId} />
@@ -152,28 +153,34 @@ export class GraphViewerRelationshipCreateComponent extends Component {
           hasRelationships && <div>
             <Dropdown
               tabIndex="0"
-              ariaLabel="Select an option"
+              ariaLabel={this.props.t("graphViewerRelationshipCreateComponent.optionSelection")}
               required
-              placeholder="Select an option"
+              placeholder={this.props.t("graphViewerRelationshipCreateComponent.optionSelection")}
               className="modal-input"
               selectedKey={relationshipId}
               options={relationshipItems.map((q, i) => ({ key: i, text: q }))}
               styles={{
                 dropdown: { width: 208 }
               }}
-              errorMessage={hasRequiredRelError ? "Please select a relationship" : null}
+              errorMessage={hasRequiredRelError ? this.props.t("graphViewerRelationshipCreateComponent.selectRelationship") : null}
               onChange={this.onSelectedRelChange} />
           </div>
-        } {
-          !hasRelationships && <div className="warning-icon-wrapper">
-            <div className="warning-icon">
-              <IconButton iconOnly="true" iconProps={{ iconName: warningIconName }} title="Warning Relationship" ariaLabel="Warning  Relationship" />
-            </div>
-            <div className="warning-text">
-              <Label className="warning-label">No relationship available, try swapping source and target</Label>
-            </div>
-          </div>
         }
+        { !hasRelationships && <div className="div-MessageBar-Relationship"><MessageBar
+          aria-label={this.props.t("graphViewerRelationshipCreateComponent.warningRelationship")}
+          className="ms-MessageBar-Relationship"
+          messageBarType={MessageBarType.error}
+          role="alert"
+          styles={{
+            root: {
+              position: "absolute",
+              top: 0,
+              zIndex: 1
+            }
+          }}
+          isMultiline>
+          {this.props.t("graphViewerRelationshipCreateComponent.warningMessage")}
+        </MessageBar></div>}
         <div className="btn-group">
           <DefaultButton className="modal-button save-button" onClick={this.save} disabled={!hasRelationships}>Save</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
@@ -183,3 +190,5 @@ export class GraphViewerRelationshipCreateComponent extends Component {
   }
 
 }
+
+export default withTranslation("translation", { withRef: true })(GraphViewerRelationshipCreateComponent);

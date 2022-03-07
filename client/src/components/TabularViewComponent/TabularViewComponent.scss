@@ -1,0 +1,18 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../theme/theme.scss";
+
+.tab-pivot-panel {
+  .tabular-view {
+    &.ev-grid{
+      overflow-y: auto;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    .ms-DetailsList {
+      overflow-x: hidden;
+    }
+  }
+}

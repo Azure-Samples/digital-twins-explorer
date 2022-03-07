@@ -24,7 +24,7 @@ import { TwinViewerComponent } from "./components/TwinViewerComponent/TwinViewer
 import { OutputComponent } from "./components/OutputComponent/OutputComponent";
 import QueryComponent from "./components/QueryComponent/QueryComponent";
 import { ImportComponent } from "./components/ImportComponent/ImportComponent";
-import { ExportComponent } from "./components/ExportComponent/ExportComponent";
+import TabularViewComponent from "./components/TabularViewComponent/TabularViewComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
 import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
 import { ErrorMessageComponent } from "./components/ErrorMessageComponent/ErrorMessage";
@@ -33,6 +33,7 @@ import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 import { eventService } from "./services/EventService";
 import { settingsService } from "./services/SettingsService";
 import { ModelService } from "./services/ModelService";
+import { exportService } from "./services/ExportService";
 import themeVariables from "./theme/variables";
 import { darkFabricTheme, darkFabricThemeHighContrast } from "./theme/DarkFabricTheme";
 import logo from "./assets/logo192.png";
@@ -102,7 +103,7 @@ class App extends Component {
         drawerHeight: 20,
         showImport: false,
         importFile: null,
-        showExport: false,
+        showTabularView: false,
         showOutput: false,
         showConsole: false
       },
@@ -111,7 +112,8 @@ class App extends Component {
       leftPanelSelectedKey: "models",
       contrast: contrastOptions.normal,
       possibleDisplayNameProperties: [],
-      selectedDisplayNameProperty: ""
+      selectedDisplayNameProperty: "",
+      relationships: []
     };
     for (const x of this.optionalComponents) {
       this.state[x.id] = { visible: false };
@@ -130,9 +132,10 @@ class App extends Component {
       });
     });
     eventService.subscribeExport((evt) => {
-      this.setState(prevState => ({ layout: { ...prevState.layout, showExport: true }, exportedQuery: evt.query }), () => {
-        this.setState({ mainContentSelectedKey: "export" });
-      });
+      this.createDownload(evt.query);
+    });
+    eventService.subscribeOpenTabularView((relationships) => {
+      this.setState(prevState => ({ mainContentSelectedKey: "tabularView", layout: { ...prevState.layout, showTabularView: true }, relationships}));
     });
     eventService.subscribeCloseComponent(component => {
       switch (component) {
@@ -274,6 +277,33 @@ class App extends Component {
     });
   }
 
+  async createDownload(query) {
+    
+    this.setState({ isLoading: true });
+    let data = null;
+    try {
+      data = await exportService.save(query);
+    } catch (exc) {
+      exc.customMessage = "Error in exporting graph";
+      eventService.publishError(exc);
+    }
+
+    if (data) {
+      const blob = new Blob([ JSON.stringify(data) ], { type: "application/json" });
+      const downloadUrl = URL.createObjectURL(blob);
+      let downloadLink = document.createElement("a");
+      downloadLink.setAttribute("href", downloadUrl);
+      downloadLink.setAttribute("download", "ExportedGraph");
+      downloadLink.style.visibility = "hidden";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+    }
+
+    this.setState({ isLoading: false });
+  }
+
   handleModelViewerResizeMouseMove = e => {
     this.resizeModelViewerEndX = e.screenX - this.resizeModelViewerStartX;
     if (this.resizeModelViewerEndX >= layoutConfig.minItemWidth) {
@@ -386,8 +416,8 @@ class App extends Component {
         this.setState({ mainContentSelectedKey: "graph-viewer" });
       });
     }
-    if (item.itemKey === "export") {
-      this.setState(prevState => ({ layout: { ...prevState.layout, showExport: false } }), () => {
+    if (item.itemKey === "tabularView") {
+      this.setState(prevState => ({ layout: { ...prevState.layout, showTabularView: false } }), () => {
         this.setState({ mainContentSelectedKey: "graph-viewer" });
       });
     }
@@ -459,7 +489,7 @@ class App extends Component {
                       <PivotItem style={{ height: "100%" }} itemKey="model-graph-viewer" headerText={this.props.t("app.goldenLayoutConfig.modelGraphViewer")}  ariaLabel={this.props.t("app.goldenLayoutConfig.modelGraphViewer")} ariaLive="assertive" />
                       {layout.showImport && <PivotItem style={{ height: "100%" }} itemKey="import" headerText={this.props.t("app.importComponentConfig.title")} ariaLabel={this.props.t("app.importComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
-                      {layout.showExport && <PivotItem style={{ height: "100%" }} itemKey="export" headerText={this.props.t("app.exportComponentConfig.title")} ariaLabel={this.props.t("app.exportComponentConfig.title")} ariaLive="assertive"
+                      {layout.showTabularView && <PivotItem style={{ height: "100%" }} itemKey="tabularView" headerText={this.props.t("app.tabularViewComponentConfig.title")} ariaLabel={this.props.t("app.tabularViewComponentConfig.title")} ariaLive="assertive"
                         onRenderItemLink={this.renderClosablePivotItem} />}
                     </Pivot>
                     <div className="tab-pivot-panel" role="main">
@@ -472,8 +502,8 @@ class App extends Component {
                       {layout.showImport && <div className={mainContentSelectedKey === "import" ? "show" : "hidden"}>
                         <ImportComponent file={layout.importFile} ref={this.importRef} />
                       </div>}
-                      {layout.showExport && <div className={mainContentSelectedKey === "export" ? "show" : "hidden"}>
-                        <ExportComponent query={this.state.exportedQuery}/>
+                      {layout.showTabularView && <div className={mainContentSelectedKey === "tabularView" ? "show" : "hidden"}>
+                        <TabularViewComponent relationships={this.state.relationships} />
                       </div>}
                     </div>
                   </div>

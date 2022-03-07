@@ -309,6 +309,14 @@ class EventService {
     this._on("export", callback);
   }
 
+  publishOpenTabularView(relationships) {
+    this._emit("tabularView", relationships);
+  }
+
+  subscribeOpenTabularView(callback) {
+    this._on("tabularView", callback);
+  }
+
   publishLoading(isLoading) {
     this._emit("loading", isLoading);
   }
