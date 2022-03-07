@@ -160,11 +160,11 @@ class ApiService {
     return list;
   }
 
-  async addRelationship(sourceId, targetId, relationshipType, relationshipId) {
+  async addRelationship(sourceId, targetId, relationshipType, relationshipId, properties) {
     await this.initialize();
 
     return await this.client.upsertRelationship(sourceId, relationshipId,
-      { $relationshipName: relationshipType, $targetId: targetId });
+      { ...properties, $relationshipName: relationshipType, $targetId: targetId });
   }
 
   async queryModels() {
@@ -353,13 +353,13 @@ class CachedApiService extends ApiService {
     this.cache.models = models;
   }
 
-  async addRelationship(sourceId, targetId, relationshipType, relationshipId) {
+  async addRelationship(sourceId, targetId, relationshipType, relationshipId, properties) {
     for (const id of [ sourceId, targetId ]) {
       if (this.cache.relationships[id]) {
         delete this.cache.relationships[id];
       }
     }
-    return await super.addRelationship(sourceId, targetId, relationshipType, relationshipId);
+    return await super.addRelationship(sourceId, targetId, relationshipType, relationshipId, properties);
   }
 
   async deleteRelationship(twinId, relationshipId) {
