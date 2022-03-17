@@ -151,7 +151,8 @@ class QueryComponent extends Component {
   }
 
   onSelectedQueryChange = (e, i) => {
-    this.setState(prevState => ({ selectedQuery: prevState.queries.find(q => q.name === i.key).query, selectedQueryKey: i.key }));
+    this.setState(prevState => ({ selectedQuery: prevState.queries.find(q => q.name === i.key).query,
+      selectedQueryKey: i.key, selectedQueryMultiline: prevState.queries.find(q => q.name === i.key).query, multilineHolder: false }));
   }
 
   confirmDeleteQuery = e => {
