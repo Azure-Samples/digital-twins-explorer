@@ -94,7 +94,7 @@ class GraphViewerComponent extends React.Component {
       this.cyRef.current.setNewNodesInitialPositions();
       this.cyRef.current.addTwins([ data ]);
       this.cyRef.current.updateNodeColors();
-      this.cyRef.current.zoomToFit();
+      this.cyRef.current.zoomToFit(true);
     });
     eventService.subscribeConfigure(evt => {
       if (evt.type === "end" && evt.config) {
