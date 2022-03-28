@@ -942,8 +942,13 @@ export class GraphViewerCytoscapeComponent extends React.Component {
     }
   }
 
-  zoomToFit() {
+  zoomToFit(avoidUpperLayer) {
     this.graphControl.fit();
+    if (avoidUpperLayer) {
+      const fitZoom = this.graphControl.zoom();
+      this.graphControl.zoom(fitZoom * 0.85);
+      this.graphControl.pan({ x: this.graphControl.pan().x + (fitZoom * 50), y: this.graphControl.pan().y + (fitZoom * 50) });
+    }
   }
 
   center() {
