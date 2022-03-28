@@ -23,6 +23,10 @@
         },
         "errorPage": "Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue."
     },
+    "errorMessages": {
+        "error": "Error",
+        "chinaSupport": "The Azure Digital Twins Explorer is not fully supported in China yet."
+    },
     "errorBoundary": {
         "modalHeader": "Something went wrong...",
         "messageHeader": "Message",
