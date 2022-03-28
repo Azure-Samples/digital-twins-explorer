@@ -27,7 +27,7 @@ import { ImportComponent } from "./components/ImportComponent/ImportComponent";
 import TabularViewComponent from "./components/TabularViewComponent/TabularViewComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
 import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
-import { ErrorMessageComponent } from "./components/ErrorMessageComponent/ErrorMessage";
+import ErrorMessageComponent from "./components/ErrorMessageComponent/ErrorMessage";
 import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 
 import { eventService } from "./services/EventService";
