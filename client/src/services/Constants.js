@@ -24,3 +24,4 @@ export const DETAIL_MIN_WIDTH = 24;
 export const PROPERTY_INSPECTOR_DEFAULT_WIDTH = 35;
 export const STRING_DTDL_TYPE = "dtmi:dtdl:instance:Schema:string;2";
 export const DEFAULT_DISPLAY_NAME_PROPERTY = "$dtId";
+export const API_VERSION = "2021-06-30-preview";
