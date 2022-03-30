@@ -5,7 +5,7 @@ import { DigitalTwinsClient } from "@azure/digital-twins-core";
 import { DefaultHttpClient } from "@azure/core-http";
 import { BatchService } from "./BatchService";
 import { configService } from "./ConfigService";
-import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING } from "./Constants";
+import { REL_TYPE_ALL, REL_TYPE_INCOMING, REL_TYPE_OUTGOING, API_VERSION } from "./Constants";
 import { print } from "./LoggingService";
 import { settingsService } from "./SettingsService";
 import { eventService } from "./EventService";
@@ -51,6 +51,7 @@ class CustomHttpClient {
 
   sendRequest(httpRequest) {
     const url = new URL(httpRequest.url);
+    url.searchParams.set("api-version", API_VERSION);
     httpRequest.headers.set("x-adt-host", url.hostname);
 
     const baseUrl = new URL(window.location.origin);
@@ -76,7 +77,6 @@ class ApiService {
     const nullTokenCredentials = {
       getToken: () => null
     };
-
     const httpClient = new CustomHttpClient();
     this.client = new DigitalTwinsClient(appAdtUrl, nullTokenCredentials, { httpClient });
   }
