@@ -1,4 +1,4 @@
-FROM node:current-slim
+FROM node:lts-slim
 
 # Install required dependencies
 RUN apt-get update
@@ -15,7 +15,7 @@ WORKDIR /usr/src/app/client
 # where available (npm@5+)
 COPY ./client/package*.json ./
 WORKDIR /usr/src/app/client/src
-RUN npm install
+RUN npm install & npx browserslist@latest --update-db
 
 # Bundle app source
 WORKDIR /usr/src/app
