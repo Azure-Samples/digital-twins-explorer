@@ -1,7 +1,11 @@
 {
     "app": {
-        "exportComponentConfig": {
-            "title": "EXPORT"
+        "tabularViewComponentConfig": {
+            "title": "RELATIONSHIPS",
+            "name": "Name",
+            "source": "Source",
+            "target": "Target",
+            "relationshipID": "Relationship ID"
         },
         "goldenLayoutConfig": {
             "queryComponent": "QUERY EXPLORER",
@@ -18,6 +22,10 @@
             "output": "Output"
         },
         "errorPage": "Azure Digital Twins Explorer has encountered an error. Please refresh the page to continue."
+    },
+    "errorMessages": {
+        "error": "Error",
+        "chinaSupport": "The Azure Digital Twins Explorer is not fully supported in China yet."
     },
     "errorBoundary": {
         "modalHeader": "Something went wrong...",
@@ -126,6 +134,15 @@
     },
     "graphViewerRelationshipDeleteComponent": {
         "heading": "Are you sure?"
+    },
+    "graphViewerRelationshipCreateComponent": {
+        "creationError": "Error creating relationship",
+        "retrievingError": "Error in retrieving model. Requested",
+        "swapRelationship": "Swap Relationship",
+        "optionSelection": "Select an option",
+        "selectRelationship": "Please select a relationship",
+        "warningRelationship":"Warning Relationship",
+        "warningMessage": "No relationship available, try swapping source and target"
     },
     "graphViewerTermManagementComponent": {
         "menuItems": {

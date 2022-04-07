@@ -275,7 +275,6 @@
 
 .ms-TextField.qc-query
 .ms-TextField-wrapper {
-  z-index: 101;
   position: fixed;
   margin-top: -38px;
   margin-left: 225px;
@@ -285,12 +284,8 @@
 .ms-TextField--multiline
 .ms-TextField-wrapper {
   z-index: 101;
-  position: fixed;
-  height: auto;
-  margin-top: 32px;
-  margin-left: 225px;
-  width: calc(100% - 550px);
 }
+
 
 .ms-TextField--multiline
 .ms-TextField-fieldGroup {
