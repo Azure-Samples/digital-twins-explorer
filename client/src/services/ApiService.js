@@ -316,7 +316,7 @@ class CachedApiService extends ApiService {
 
   async deleteModel(id) {
     this.cache.models = [];
-    return await super.deleteModel(id);
+    await super.deleteModel(id);
   }
 
   async getModelById(id) {

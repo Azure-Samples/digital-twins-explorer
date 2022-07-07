@@ -39,9 +39,9 @@ export const SaveQueryDialogComponent = ({ isVisible, onChange, onConfirm, onCan
         <form onSubmit={onConfirm}>
           <h2 className="heading-2">Save Query</h2>
           <TextField id="queryNameField" className="query-name-input" styles={getStyles} value={query} onChange={onChange}
-            required autoFocus />
+            data-testid="queryNameField" required autoFocus />
           <div className="btn-group">
-            <PrimaryButton type="submit" className="modal-button save-button" onClick={onConfirm}>Save</PrimaryButton>
+            <PrimaryButton type="submit" className="modal-button save-button" onClick={onConfirm} data-testid="saveQuery">Save</PrimaryButton>
             <DefaultButton className="modal-button cancel-button" onClick={onCancel}>Cancel</DefaultButton>
           </div>
         </form>

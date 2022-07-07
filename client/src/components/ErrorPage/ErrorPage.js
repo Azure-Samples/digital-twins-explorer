@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-import { DefaultButton } from "office-ui-fabric-react/lib/";
+import { DefaultButton } from "office-ui-fabric-react";
 import logo from "../../assets/logo192.png";
 import "./ErrorPage.scss";
 import { useTranslation } from "react-i18next";

@@ -13,7 +13,8 @@ export const ConfirmQueryDialogComponent = ({ title, description, action, isVisi
           <h2 className="heading-2">{title}</h2>
           {description && <p>{description}</p>}
           <div className="btn-group">
-            <PrimaryButton type="submit" id={defaultActiveElementId} className="modal-button save-button" onClick={onConfirm}>
+            <PrimaryButton type="submit" id={defaultActiveElementId} className="modal-button save-button" onClick={onConfirm}
+              data-testid="deleteQueryButton">
               {action}
             </PrimaryButton>
             <DefaultButton className="modal-button cancel-button" onClick={onCancel}>Cancel</DefaultButton>

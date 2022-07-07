@@ -19,12 +19,16 @@ export class ModelViewerViewComponent extends Component {
       showModal: false,
       model: null
     };
+
+    this.headerRef = React.createRef();
   }
 
   async open(item) {
     this.setState({ showModal: true, isLoading: true, model: null });
     setTimeout(() => {
-      document.getElementById("model-information-heading").focus();
+      if (this.headerRef.current) {
+        this.headerRef.current.focus();
+      }
     }, 200);
 
     let data = {};
@@ -49,7 +53,7 @@ export class ModelViewerViewComponent extends Component {
     return (
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="mv-model-view-modal">
         <form onSubmit={this.close}>
-          <h2 className="heading-2" id="model-information-heading" tabIndex="0">{this.props.t("modelViewerViewComponent.heading")}</h2>
+          <h2 className="heading-2" id="model-information-heading" tabIndex="0" ref={this.headerRef}>{this.props.t("modelViewerViewComponent.heading")}</h2>
           <div className="pre-wrapper modal-scroll">
             {model && <pre tabIndex="0" id="code-container">
               <code className="language-json">

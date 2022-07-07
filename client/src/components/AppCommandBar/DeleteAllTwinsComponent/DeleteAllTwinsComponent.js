@@ -77,7 +77,8 @@ export default class DeleteAllTwinsComponent extends Component {
       <ModalComponent isVisible={showModal} isLoading={isLoading} className="gc-dialog">
         <h2 className="heading-2">{this.props.t("deleteAllTwinsComponent.heading")}</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button save-button" onClick={this.confirm} id="modal-save-cta--all-twins">{this.props.t("deleteAllTwinsComponent.deleteButton")}</DefaultButton>
+          <DefaultButton className="modal-button save-button" onClick={this.confirm} id="modal-save-cta--all-twins"
+            data-testid="deleteTwins">{this.props.t("deleteAllTwinsComponent.deleteButton")}</DefaultButton>
           <DefaultButton className="modal-button cancel-button" onClick={this.cancel} id="modal-cancel-cta--all-twins">{this.props.t("deleteAllTwinsComponent.cancelButton")}</DefaultButton>
         </div>
       </ModalComponent>

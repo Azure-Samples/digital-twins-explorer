@@ -54,8 +54,8 @@ export class ModelViewerDeleteComponent extends Component {
       <ModalComponent isVisible={showModal} className="mv-delete">
         <h2 className="heading-2">{this.props.t("modelViewerDeleteComponent.heading")}</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button confirm-button" onClick={this.delete}>{this.props.t("modelViewerDeleteComponent.confirm")}</DefaultButton>
-          <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>{this.props.t("modelViewerDeleteComponent.cancel")}</DefaultButton>
+          <DefaultButton className="modal-button confirm-button" data-testid="confirm" onClick={this.delete}>{this.props.t("modelViewerDeleteComponent.confirm")}</DefaultButton>
+          <DefaultButton className="modal-button cancel-button" data-testid="cancel" onClick={this.cancel}>{this.props.t("modelViewerDeleteComponent.cancel")}</DefaultButton>
         </div>
       </ModalComponent>
     );
