@@ -57,7 +57,7 @@
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
-    "start": "react-scripts start",
+    "start": "react-scripts --max_old_space_size=4096 start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -79,9 +79,15 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.17.2",
+    "@babel/preset-env": "^7.16.11",
+    "@testing-library/react": "^12.1.3",
+    "@testing-library/user-event": "^13.5.0",
     "@types/to-json-schema": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^4.0.0",
+    "babel-jest": "^26.6.0",
+    "canvas": "^2.9.0",
     "eslint": "^7.5.0",
     "eslint-plugin-react": "^7.20.3",
     "npm-force-resolutions": "0.0.10"

@@ -82,9 +82,11 @@ export class ModelViewerCreateComponent extends Component {
           <form onSubmit={this.save}>
             <h2 className="heading-2">{this.props.t("modelViewerCreateComponent.heading")}</h2>
             <TextField required errorMessage={error} id="outlined-required" className="name-input" styles={this.getStyles}
-              value={name} onChange={this.onNameChange} autoFocus ariaLabel={this.props.t("modelViewerCreateComponent.heading")} />
+              value={name} onChange={this.onNameChange} autoFocus ariaLabel={this.props.t("modelViewerCreateComponent.heading")}
+              data-testid="twinNameInput" />
             <div className="btn-group">
-              <PrimaryButton type="submit" className="modal-button save-button" onClick={this.save}>{this.props.t("modelViewerCreateComponent.saveButton")}</PrimaryButton>
+              <PrimaryButton type="submit" className="modal-button save-button"
+                data-testid="saveTwin">{this.props.t("modelViewerCreateComponent.saveButton")}</PrimaryButton>
               <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>{this.props.t("modelViewerCreateComponent.cancelButton")}</DefaultButton>
             </div>
           </form>

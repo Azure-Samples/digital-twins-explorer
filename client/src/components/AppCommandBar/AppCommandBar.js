@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { Component } from "react";
-import { CommandBar } from "office-ui-fabric-react/lib/";
+import { CommandBar } from "office-ui-fabric-react";
 import { withTranslation } from "react-i18next";
 
 import { ConfigurationFormComponent } from "../ConfigurationFormComponent/ConfigurationFormComponent";
@@ -50,7 +50,7 @@ class AppCommandBar extends Component {
           iconProps: { iconName: "Signin" },
           split: true,
           onClick: () => this.updateAdtUrlSettings(),
-          className: "app-toolbarButtons"
+          className: "app-toolbarButtons sign-in"
         },
         {
           key: "settings",

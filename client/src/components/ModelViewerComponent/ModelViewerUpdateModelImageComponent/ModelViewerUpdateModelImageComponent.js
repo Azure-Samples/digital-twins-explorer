@@ -50,9 +50,9 @@ export class ModelViewerUpdateModelImageComponent extends Component {
       <ModalComponent isVisible={showModal} className="mv-delete">
         <h2 className="heading-2">Model Image</h2>
         <div className="btn-group">
-          <DefaultButton className="modal-button confirm-button" onClick={this.update}>Replace</DefaultButton>
-          <DefaultButton className="modal-button confirm-button" onClick={this.delete}>Delete</DefaultButton>
-          <DefaultButton className="modal-button cancel-button" onClick={this.cancel}>Cancel</DefaultButton>
+          <DefaultButton className="modal-button confirm-button" onClick={this.update} data-testid="updateModelImage">Replace</DefaultButton>
+          <DefaultButton className="modal-button confirm-button" onClick={this.delete} data-testid="deleteModelImage">Delete</DefaultButton>
+          <DefaultButton className="modal-button cancel-button" onClick={this.cancel} data-testid="cancel">Cancel</DefaultButton>
         </div>
       </ModalComponent>
     );
