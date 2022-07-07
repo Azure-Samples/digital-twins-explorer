@@ -102,7 +102,8 @@ export class PreferencesFormComponent extends Component {
             {optionalComponentsState.map(comp => (
               <Toggle key={comp.id} id={`show${capitalizeName(comp.id)}Field`} className="configuration-input"
                 checked={comp.show} onChange={() => this.onToggleOptionalComponentChange(comp.id)}
-                label={capitalizeName(comp.name)} inlineLabel onKeyDown={e => this.handleToggleKeypress(e, comp.id)} />))}
+                label={capitalizeName(comp.name)} inlineLabel onKeyDown={e => this.handleToggleKeypress(e, comp.id)}
+                data-testid={`show${capitalizeName(comp.id)}Field`} />))}
             <h2 className="heading-2">{this.props.t("preferencesFormComponent.heading3")}</h2>
             <Toggle id="highContrastField" className="configuration-input"
               checked={contrast === "high-contrast"} onChange={this.toggleHighContrastMode} label={this.props.t("preferencesFormComponent.highContrastField")} inlineLabel />

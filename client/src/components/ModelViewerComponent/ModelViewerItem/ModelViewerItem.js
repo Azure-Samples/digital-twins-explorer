@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React from "react";
-import { mergeStyleSets } from "office-ui-fabric-react/lib/Styling";
+import { mergeStyleSets } from "@uifabric/merge-styles";
 import { Stack } from "office-ui-fabric-react";
 import ModelViewerItemCommandBarComponent from "../ModelViewerItemCommandBarComponent/ModelViewerItemCommandBarComponent";
 import { withTranslation } from "react-i18next";

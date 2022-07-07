@@ -439,8 +439,7 @@ class App extends Component {
                   <img src={logo} width={20} height={20} alt="" />
                   <h1 className="top-bar-title">Azure Digital Twins Explorer</h1>
                 </div>
-                <AppCommandBar optionalComponents={optionalComponentsState}
-                  optionalComponentsState={optionalComponentsState}
+                <AppCommandBar optionalComponentsState={optionalComponentsState}
                   toggleOptionalComponent={this.toggleOptionalComponent}
                   toggleHighContrastMode={this.toggleHighContrastMode}
                   contrast={contrast} />

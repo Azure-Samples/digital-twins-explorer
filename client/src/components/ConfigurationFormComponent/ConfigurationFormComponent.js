@@ -193,7 +193,7 @@ export class ConfigurationFormComponent extends Component {
           handleTabKey={FocusZoneTabbableElements.all}
           isCircularNavigation
           defaultActiveElement="#appClientIdField">
-          <form onSubmit={this.saveConfigurationsSettings}>
+          <form>
             <h2 className="heading-2">{this.props.t("configurationFormComponent.heading")}</h2>
             <div className="select-settings">
               <Dropdown
@@ -213,14 +213,16 @@ export class ConfigurationFormComponent extends Component {
                 className="configuration-input"
                 styles={this.getStyles}
                 value={appAdtUrl}
-                onChange={this.onAppAdtUrlChange} />
+                onChange={this.onAppAdtUrlChange}
+                data-testid="urlInput" />
             </div>
             <p> {this.props.t("configurationFormComponent.detail")}</p>
             <div className="btn-group">
               <PrimaryButton
                 type="submit"
                 className="modal-button save-button"
-                onClick={this.saveConfigurationsSettings}>
+                onClick={this.saveConfigurationsSettings}
+                data-testid="saveConfiguration">
                 {this.props.t("configurationFormComponent.saveButton")}
               </PrimaryButton>
               {this.state.isEnvironmentSelected && <DefaultButton

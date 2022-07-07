@@ -216,6 +216,7 @@ class QueryComponent extends Component {
           <div className="qc-queryBox">
             <div className="qc-label">
               <Dropdown
+                data-testid="savedQueryDropdown"
                 placeholder={this.props.t("queryComponent.savedQueries")}
                 ariaLabel={this.props.t("queryComponent.savedQueries")}
                 selectedKey={selectedQueryKey}
@@ -234,7 +235,7 @@ class QueryComponent extends Component {
                   onFocus={this.onFocusGained} multiline={multiline} rows={rowCount} autoAdjustHeight="true" isFocused={isFocused} onBlur={this.onFocusLost} disabled={disabled}
                   onMouseOver={this.onMouseOver} onKeyDown={this.onKeyFunction} ref={input => {
                     this.queryField = input;
-                  }} />
+                  }} data-testid="queryInput" />
               </form>
             </FocusZone>
             <div className="qc-queryControls">
@@ -245,8 +246,8 @@ class QueryComponent extends Component {
               <DefaultButton className="query-button" onClick={this.executeQuery} ariaLive="assertive">
                 {this.props.t("queryComponent.defaultButton")}
               </DefaultButton>
-              <IconButton className="query-save-button"
-                iconProps={{ iconName: this.props.t("queryComponent.iconButton"), style: { color: "black" } }}
+              <IconButton className="query-save-button" data-testid="saveQueryButton"
+                iconProps={{ iconName: "Save", style: { color: "black" } }}
                 title={this.props.t("queryComponent.iconButton")} ariaLabel="Save query" ariaLive="assertive"
                 onClick={this.saveQueryButtonClicked} />
             </div>

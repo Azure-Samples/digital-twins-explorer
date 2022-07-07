@@ -369,6 +369,7 @@ class GraphViewerComponent extends React.Component {
         // Get latest
         const { selectedNode } = this.state;
         if (data && selectedNode.id === e.selectedNode.id) {
+          debugger;//eslint-disable-line
           eventService.publishSelection({ selection: data, selectionType: "twin" });
         } else {
           eventService.publishSelection();
