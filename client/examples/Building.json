@@ -1,0 +1,19 @@
+{
+  "@id": "dtmi:example:Building;1",
+  "@type": "Interface",
+  "displayName": "Building",
+  "@context": "dtmi:dtdl:context;2",
+  "contents": [
+    {
+        "@type": "Property",
+        "name": "Date",
+        "schema": "integer"
+      },
+    {
+      "@type": "Relationship",
+      "name": "contains",
+      "displayName": "contains",
+      "target": "dtmi:example:Floor;1"
+    }
+  ]
+}
