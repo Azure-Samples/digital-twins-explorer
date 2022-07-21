@@ -8,6 +8,7 @@
       "@type": "Relationship",
       "name": "contains",
       "displayName": "contains",
+      "target": "dtmi:example:Room;1",
       "properties": [
         {
           "name": "ownershipUser",
