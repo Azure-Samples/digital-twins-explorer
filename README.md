@@ -85,6 +85,10 @@ In addition to local operation, you can also run Azure Digital Twins Explorer as
 
 ### Running in the cloud
 
+From a command prompt in the `deployment` folder, run the `deploy.sh` script to automatically deploy adt-explorer to the cloud.
+
+Alternatively you can also perform the deployment manually following these steps:
+
 1. Deploy the ARM template called `template.json` located under the `deployment` folder into your Azure subscription.
 1. Package the client app using `npm run build`. You may need to set `NODE_OPTIONS=--max_old_space_size=4096` if you receive memory-related errors.
 1. From the new `build` file, upload each file to the `web` container in the new storage account created by the ARM template.
