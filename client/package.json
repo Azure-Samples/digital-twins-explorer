@@ -53,7 +53,8 @@
   },
   "resolutions": {
     "immer": "8.0.1",
-    "underscore": "1.12.1"
+    "underscore": "1.12.1",
+    "tsiclient": "1.4.16"
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
