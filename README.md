@@ -85,7 +85,7 @@ In addition to local operation, you can also run Azure Digital Twins Explorer as
 
 ### Running in the cloud
 
-You might want to run your Azure Digital Twins explorer app in the cloud to host your custom version of the explorer for your organization, or to access an Azure Digital Twins instance that uses [private link](https://learn.microsoft.com/azure/digital-twins/concepts-security#private-network-access-with-azure-private-link) to disable public access.
+You might want to run your Azure Digital Twins Explorer app in the cloud to host your custom version of the explorer for your organization, or to access an Azure Digital Twins instance that uses [private link](https://learn.microsoft.com/azure/digital-twins/concepts-security#private-network-access-with-azure-private-link) to disable public access.
 
 1. Deploy the ARM template called `template.json` located under the `deployment` folder into your Azure subscription.
 1. Package the client app using `npm run build`. You may need to set `NODE_OPTIONS=--max_old_space_size=4096` if you receive memory-related errors.
