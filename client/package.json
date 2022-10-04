@@ -59,7 +59,7 @@
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "start": "react-scripts start",
-    "build": "react-scripts --max_old_space_size=4096 build",
+    "build": "react-scripts --max_old_space_size=8192 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint ."
