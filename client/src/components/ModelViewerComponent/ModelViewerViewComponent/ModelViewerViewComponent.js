@@ -52,7 +52,7 @@ export class ModelViewerViewComponent extends Component {
           <h2 className="heading-2" id="model-information-heading" tabIndex="0">{this.props.t("modelViewerViewComponent.heading")}</h2>
           <div className="pre-wrapper modal-scroll">
             {model && <pre tabIndex="0" id="code-container">
-              <code className="language-json">
+              <code className="language-js">
                 {JSON.stringify(model, null, 1)}
               </code>
             </pre>}

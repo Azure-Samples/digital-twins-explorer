@@ -35,7 +35,7 @@ const ModelUploadMessageBar = ({ modelUploadResults, onDismiss, t }) => {
                     {
                         lastUploadResults.current &&
                         <pre tabIndex="0" id="code-container">
-                            <code className="language-json">
+                            <code className="language-js">
                                 {JSON.stringify(lastUploadResults.current, null, 2)}
                             </code>
                         </pre>
