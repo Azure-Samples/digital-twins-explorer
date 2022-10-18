@@ -101,7 +101,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
             <h3>Incoming</h3>
             <div className="relationships">
               <pre>
-                <code className="language-json">
+                <code className="language-js">
                   {JSON.stringify(incomingRelationships, null, 1)}
                 </code>
               </pre>
@@ -114,7 +114,7 @@ export class GraphViewerRelationshipViewerComponent extends Component {
             <h3>Outgoing</h3>
             <div className="relationships">
               <pre>
-                <code className="language-json">
+                <code className="language-js">
                   {JSON.stringify(outgoingRelationships, null, 1)}
                 </code>
               </pre>

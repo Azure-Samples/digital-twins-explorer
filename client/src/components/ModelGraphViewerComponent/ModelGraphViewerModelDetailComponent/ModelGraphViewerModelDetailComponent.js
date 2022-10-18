@@ -43,7 +43,7 @@ export class ModelGraphViewerModelDetailComponent extends React.Component {
         <div className="detail-title">Model Detail</div>
         {model && (
           <pre tabIndex="0">
-            <code className="language-json">
+            <code className="language-js">
               {JSON.stringify(model, null, 1)}
             </code>
           </pre>

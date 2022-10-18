@@ -25,7 +25,7 @@ export class PropertyInspectorPatchInformationComponent extends Component {
         <h2 className="heading-2">Patch Information</h2>
         <div className="patch-json-data">
           <pre>
-            <code className="language-json">
+            <code className="language-js">
               {JSON.stringify(patch, null, 2)}
             </code>
           </pre>
