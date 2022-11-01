@@ -1,10 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+/* This code is used for local development purposes only
+Library consumers are responsible for creating server side middleware
+as necessary and appropriate for their scenarios */
+
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function (app) {
+  // Client identity should always be verified in hosted implementations
+  // DefaultAzureCredential is used for local development purposes only
   const credentialDigitalTwins = new DefaultAzureCredential();
   const credentialRBAC = new DefaultAzureCredential();
   const credentialGraph = new DefaultAzureCredential();
