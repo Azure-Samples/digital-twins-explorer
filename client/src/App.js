@@ -27,7 +27,8 @@ import { ImportComponent } from "./components/ImportComponent/ImportComponent";
 import TabularViewComponent from "./components/TabularViewComponent/TabularViewComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
 import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
-import ErrorMessageComponent from "./components/ErrorMessageComponent/ErrorMessage";
+import ErrorMessageModal from "./components/ErrorMessageComponent/ErrorMessageModal";
+import ErrorMessageBar from "./components/ErrorMessageComponent/ErrorMessageBar";
 import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 
 import { eventService } from "./services/EventService";
@@ -456,6 +457,7 @@ class App extends Component {
                 <Text as={"h2"} variant={'small'} className="query-explorer-header" aria-label={this.props.t("app.goldenLayoutConfig.queryComponent")}>{this.props.t("app.goldenLayoutConfig.queryComponent")}</Text>
                 <QueryComponent onQueryExecuted={() => this.handleMainContentPivotChange('graph-viewer')}/>
               </div>
+              <ErrorMessageBar />
               <div className="main-area" style={{ height: `calc(100vh - 155px - ${(layout.showConsole || layout.showOutput) ? layout.drawerHeight : 0}%)` }}>
                 <Stack horizontal style={{ height: "100%" }}>
                   <div style={{width: `${layout.modelViewerWidth}%` }}>
@@ -535,7 +537,7 @@ class App extends Component {
             </Stack>
           </div>
         </ErrorBoundary>
-        <ErrorMessageComponent />
+        <ErrorMessageModal />
         { isLoading && <LoaderComponent /> }
       </>
     );

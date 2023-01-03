@@ -25,7 +25,8 @@
     },
     "errorMessages": {
         "error": "Error",
-        "chinaSupport": "The Azure Digital Twins Explorer is not fully supported in China yet."
+        "chinaSupport": "The Azure Digital Twins Explorer is not fully supported in China yet.",
+        "incompatibleLanguageVersion": "We do not fully support DTDL v3 at this time. Errors and inconsistencies are expected."
     },
     "errorBoundary": {
         "modalHeader": "Something went wrong...",
