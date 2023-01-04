@@ -377,6 +377,14 @@ class EventService {
     this._on("focustwinviewer", buildCallback(callback));
   }
 
+  publishHideWarningMessage() {
+    this._emit("hideWarningMessage");
+  }
+
+  subscribeHideWarningMessage(callback) {
+    this._on("hideWarningMessage", buildCallback(callback));
+  }
+
   _emit = (name, payload) => this._action({ type: "publish", name, payload });
 
   _off = (name, payload) => this._action({ type: "unsubscribe", name, payload });

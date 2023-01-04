@@ -26,7 +26,8 @@
     "errorMessages": {
         "error": "Error",
         "chinaSupport": "The Azure Digital Twins Explorer is not fully supported in China yet.",
-        "incompatibleLanguageVersion": "We do not fully support DTDL v3 at this time. Errors and inconsistencies are expected."
+        "incompatibleLanguageVersion": "This ADT Instance contains DTDL v3 models, which the ADT Explorer does not yet fully support.",
+        "closeButton": "Close alert"
     },
     "errorBoundary": {
         "modalHeader": "Something went wrong...",

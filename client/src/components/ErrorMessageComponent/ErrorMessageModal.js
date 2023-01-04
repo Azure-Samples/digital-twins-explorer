@@ -13,6 +13,7 @@ import { rbacService} from "../../services/RBACService";
 import { configService } from "../../services/ConfigService";
 
 import "./ErrorMessage.scss";
+import { isDtdlVersion3 } from "./ErrorMessageHelper";
 
 export class ErrorMessageModal extends Component {
 
@@ -37,7 +38,7 @@ export class ErrorMessageModal extends Component {
       let auth = false;
       let v3 = false;
 
-      if ((exc?.name === "DocumentParseError" && exc?.innerError?.details?.url === "dtmi:dtdl:context;3") || exc?.message === "Invalid context. context is undefined") {
+      if (isDtdlVersion3(exc)) {
         v3 = true;
       } else if (exc && exc.name === "RestError" && exc.statusCode === 403) {
         errorMessage = CUSTOM_AUTH_ERROR_MESSAGE;

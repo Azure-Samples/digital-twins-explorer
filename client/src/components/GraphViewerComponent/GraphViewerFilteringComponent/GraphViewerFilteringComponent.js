@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { withTranslation } from "react-i18next";
 
 import {
@@ -8,6 +8,8 @@ import {
   PivotItem
 } from "office-ui-fabric-react";
 import GraphViewerTermManagementComponent from "../GraphViewerTermManagementComponent/GraphViewerTermManagementComponent";
+import { eventService } from "../../../services/EventService";
+import { isDtdlVersion3 } from "../../ErrorMessageComponent/ErrorMessageHelper";
 
 const GraphViewerFilteringComponent = ({
   toggleFilter,
@@ -36,9 +38,22 @@ const GraphViewerFilteringComponent = ({
 }) => {
   const filterButtonText = canSelectAllFilter ? selectAllFilteredText : t("graphViewerFilteringComponent.deselectAll");
   const highlightButtonText = canSelectAllHighlight ? selectAllHighlightedText : t("graphViewerFilteringComponent.deselectAll");
+
+  const [ state, setState ] = useState({containerClass: "gc-controls"});
+
+  useEffect(() => {
+    eventService.subscribeError(exc => {
+      if (isDtdlVersion3(exc)) {
+        setState({containerClass: "gc-controls-with-error"});
+      }
+    });
+    eventService.subscribeHideWarningMessage(() => {
+      setState({containerClass: "gc-controls"});
+    });
+  });
   return (
     <>
-      <div className="gc-controls">
+      <div className={state.containerClass}>
         <Stack horizontal={false}>
           <div className="controls_buttonGroup">
             <IconButton
