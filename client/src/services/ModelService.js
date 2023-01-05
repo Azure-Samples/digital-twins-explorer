@@ -77,8 +77,8 @@ export class ModelService {
       this.modelGraph = new JsonldGraph([
         { uri: "dtmi:iotcentral:context;2", context: iotCentralContext },
         { uri: "dtmi:dtdl:context;2", context },
-        { uri: "dtmi:dtdl:context;3", context3 },
-        { uri: "dtmi:dtdl:extension:quantitativeTypes;1", quantitativeTypes}
+        { uri: "dtmi:dtdl:context;3", context: context3 },
+        { uri: "dtmi:dtdl:extension:quantitativeTypes;1", context: quantitativeTypes}
       ]);
       await this._loadGraph(models.map(x => x.model));
     }
@@ -88,8 +88,8 @@ export class ModelService {
     this.modelGraph = new JsonldGraph([
       { uri: "dtmi:iotcentral:context;2", context: iotCentralContext },
       { uri: "dtmi:dtdl:context;2", context },
-      { uri: "dtmi:dtdl:context;3", context3 },
-      { uri: "dtmi:dtdl:extension:quantitativeTypes;1", quantitativeTypes}
+      { uri: "dtmi:dtdl:context;3", context: context3 },
+      { uri: "dtmi:dtdl:extension:quantitativeTypes;1", context: quantitativeTypes}
     ]);
     await this._loadGraph(models);
   }
