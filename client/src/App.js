@@ -27,7 +27,8 @@ import { ImportComponent } from "./components/ImportComponent/ImportComponent";
 import TabularViewComponent from "./components/TabularViewComponent/TabularViewComponent";
 import { ConsoleComponent } from "./components/ConsoleComponent/ConsoleComponent";
 import AppCommandBar from "./components/AppCommandBar/AppCommandBar";
-import ErrorMessageComponent from "./components/ErrorMessageComponent/ErrorMessage";
+import ErrorMessageModal from "./components/ErrorMessageComponent/ErrorMessageModal";
+import ErrorMessageBar from "./components/ErrorMessageComponent/ErrorMessageBar";
 import LoaderComponent from "./components/LoaderComponent/LoaderComponent";
 
 import { eventService } from "./services/EventService";
@@ -447,6 +448,7 @@ class App extends Component {
               </Stack>
             </div>
             <Stack className="work-area">
+              <ErrorMessageBar />
               <ModelUploadMessageBar
                 modelUploadResults={this.state.modelUploadResults}
                 onDismiss={() => this.setState({ modelUploadResults: null })}
@@ -535,7 +537,7 @@ class App extends Component {
             </Stack>
           </div>
         </ErrorBoundary>
-        <ErrorMessageComponent />
+        <ErrorMessageModal />
         { isLoading && <LoaderComponent /> }
       </>
     );

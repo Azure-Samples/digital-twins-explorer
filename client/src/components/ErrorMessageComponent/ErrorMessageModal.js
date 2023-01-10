@@ -13,8 +13,9 @@ import { rbacService} from "../../services/RBACService";
 import { configService } from "../../services/ConfigService";
 
 import "./ErrorMessage.scss";
+import { isDtdlVersion3 } from "./ErrorMessageHelper";
 
-export class ErrorMessageComponent extends Component {
+export class ErrorMessageModal extends Component {
 
   constructor(props) {
     super(props);
@@ -35,8 +36,11 @@ export class ErrorMessageComponent extends Component {
       let message = "";
       let errorMessage = "";
       let auth = false;
+      let v3 = false;
 
-      if (exc && exc.name === "RestError" && exc.statusCode === 403) {
+      if (isDtdlVersion3(exc)) {
+        v3 = true;
+      } else if (exc && exc.name === "RestError" && exc.statusCode === 403) {
         errorMessage = CUSTOM_AUTH_ERROR_MESSAGE;
         message = CUSTOM_AUTH_ERROR_MESSAGE;
         auth = true;
@@ -54,7 +58,8 @@ export class ErrorMessageComponent extends Component {
       this.setState({
         errorMessage,
         stackErrorMessage: exc.stack ? exc.stack.replace(/\n/g, "<br>").replace(/ /gi, "&nbsp") : null,
-        showModal: true,
+        // Don't show modal for v3 dtdl issue
+        showModal: !v3,
         showFixAuth: auth
       });
     });
@@ -93,6 +98,7 @@ export class ErrorMessageComponent extends Component {
 
   render() {
     const { showModal, errorMessage, stackErrorMessage, showFixAuth, showAuthSpinner, showAuthStatus, showAuthResponse, showAdtChinaWarningMessage } = this.state;
+
     let authComponent = "";
     if (showFixAuth) {
       authComponent = <DefaultButton className="modal-button close-button" onClick={this.fixPermissions} style={{width: 150}}>Assign yourself data reader access</DefaultButton>;
@@ -147,4 +153,4 @@ export class ErrorMessageComponent extends Component {
 
 }
 
-export default withTranslation("translation", { withRef: true })(ErrorMessageComponent);
+export default withTranslation("translation", { withRef: true })(ErrorMessageModal);
