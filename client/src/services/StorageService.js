@@ -9,7 +9,10 @@ class StorageService {
     try {
       return JSON.parse(localStorage.getItem(name));
     } catch (e) {
-      return {appAdtUrl: ""};
+      if (name === "configuration") {
+        return {appAdtUrl: ""};
+      }
+      return {};
     }
   }
 
