@@ -43,7 +43,7 @@
     "react-excel-renderer": "^1.1.0",
     "react-i18next": "^11.8.13",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.1",
+    "react-scripts": "^5.0.1",
     "sass": "^1.32.4",
     "system": "^2.0.1",
     "to-json-schema": "^0.2.5",
