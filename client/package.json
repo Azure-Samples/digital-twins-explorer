@@ -29,7 +29,7 @@
     "immer": "^9.0.6",
     "jsoneditor": "^9.5.6",
     "jsoneditor-react": "^3.1.1",
-    "jsonld-graph": "^3.0.10",
+    "jsonld-graph": "^6.1.1",
     "jsonlint": "^1.6.3",
     "msal": "^1.2.1",
     "office-ui-fabric-react": "^7.168.0",
