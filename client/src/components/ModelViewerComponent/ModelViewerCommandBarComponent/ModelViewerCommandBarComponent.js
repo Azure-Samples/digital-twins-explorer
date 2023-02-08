@@ -16,24 +16,24 @@ class ModelViewerCommandBarComponent extends Component {
     super(props);
     this.buttonClass = this.props.buttonClass;
     this.delete = React.createRef();
-
-    this.downloadFilesAsZip = async () => {
-      let list = [];
-      try {
-        list = await apiService.queryModels(false);
-        const zipResult = OatPublicUtils.createZipFileFromModels({models: list.map(li => li.model)});
-        if (zipResult.status === "Success") {
-          zipResult.file.generateAsync({ type: "blob" }).then(content => {
-            const fileName = "ADT-Instance-Models.zip";
-            Utils.downloadFile(content, fileName);
-          });
-        }
-      } catch (exc) {
-        exc.customMessage = "Error downloading models";
-        eventService.publishError(exc);
-      }
-    };
   }
+
+  downloadFilesAsZip = async () => {
+    let list = [];
+    try {
+      list = await apiService.queryModels(false);
+      const zipResult = OatPublicUtils.createZipFileFromModels({models: list.map(li => li.model)});
+      if (zipResult.status === "Success") {
+        zipResult.file.generateAsync({ type: "blob" }).then(content => {
+          const fileName = "ADT-Instance-Models.zip";
+          Utils.downloadFile(content, fileName);
+        });
+      }
+    } catch (exc) {
+      exc.customMessage = "Error downloading models";
+      eventService.publishError(exc);
+    }
+  };
 
   farItems = [
     {
