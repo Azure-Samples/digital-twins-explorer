@@ -4,6 +4,9 @@
 import React, { Component } from "react";
 import { CommandBar } from "office-ui-fabric-react";
 import { withTranslation } from "react-i18next";
+import { OatPublicUtils, Utils } from "@microsoft/iot-cardboard-js";
+import { apiService } from "../../../services/ApiService";
+import { eventService } from "../../../services/EventService";
 
 import ModelViewerDeleteAllModelsComponent from "../ModelViewerDeleteAllModelsComponent/ModelViewerDeleteAllModelsComponent";
 
@@ -13,9 +16,36 @@ class ModelViewerCommandBarComponent extends Component {
     super(props);
     this.buttonClass = this.props.buttonClass;
     this.delete = React.createRef();
+
+    this.downloadFilesAsZip = async () => {
+      let list = [];
+      try {
+        list = await apiService.queryModels(false);
+        const zipResult = OatPublicUtils.createZipFileFromModels({models: list.map(li => li.model)});
+        if (zipResult.status === "Success") {
+          zipResult.file.generateAsync({ type: "blob" }).then(content => {
+            const fileName = "ADT-Instance-Models.zip";
+            Utils.downloadFile(content, fileName);
+          });
+        }
+      } catch (exc) {
+        exc.customMessage = "Error downloading models";
+        eventService.publishError(exc);
+      }
+    };
   }
 
   farItems = [
+    {
+      key: "downloadModelsAsZip",
+      text: this.props.t("modelViewerCommandBarComponent.farItems.downloadAllModels.text"),
+      ariaLabel: this.props.t("modelViewerCommandBarComponent.farItems.downloadAllModels.text"),
+      iconProps: { iconName: "DownloadDocument" },
+      onClick: () => this.downloadFilesAsZip(),
+      iconOnly: true,
+      className: this.buttonClass,
+      role: "menuitem"
+    },
     {
       key: "uploadModelImages",
       text: this.props.t("modelViewerCommandBarComponent.farItems.uploadModelImages.text"),
