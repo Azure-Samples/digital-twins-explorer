@@ -9,7 +9,7 @@
         },
         "goldenLayoutConfig": {
             "queryComponent": "QUERY EXPLORER",
-            "modelViewer":  "MODELS",
+            "modelViewer": "MODELS",
             "twinViewer": "TWINS",
             "graph": "TWIN GRAPH",
             "modelGraphViewer": "MODEL GRAPH"
@@ -41,7 +41,7 @@
         "closeButton": "Close",
         "viewDetails": "View details"
     },
-    "appCommandBar" : {
+    "appCommandBar": {
         "keyboardShortcuts": {
             "ariaLabel": "keyboard shortcuts",
             "text": "Keyboard Shortcuts",
@@ -65,7 +65,7 @@
             "ariaLabel": "settings",
             "text": "Settings"
         },
-        "commandBar" : {
+        "commandBar": {
             "ariaLabel": "Use left and right arrow keys to navigate between commands"
         }
     },
@@ -75,7 +75,7 @@
         "detail": "Configuration data is saved in local storage.",
         "heading": "Azure Digital Twins URL",
         "saveButton": "Save"
-    }, 
+    },
     "deleteAllTwinsComponent": {
         "cancelButton": "Cancel",
         "deleteButton": "Delete",
@@ -143,7 +143,7 @@
         "swapRelationship": "Swap Relationship",
         "optionSelection": "Select an option",
         "selectRelationship": "Please select a relationship",
-        "warningRelationship":"Warning Relationship",
+        "warningRelationship": "Warning Relationship",
         "warningMessage": "No relationship available, try swapping source and target"
     },
     "graphViewerTermManagementComponent": {
@@ -156,7 +156,7 @@
         "textFieldPlaceholder": "Match term",
         "clearAll": "Clear all"
     },
-    "importCommandBar":{
+    "importCommandBar": {
         "ariaLabel": "Use left and right arrow keys to navigate between commands"
     },
     "modelGraphViewerCommandBarComponent": {
@@ -182,12 +182,12 @@
             "header2": "Highlight"
         }
     },
-    "modelGraphViewerRelationshipsToggle":{
+    "modelGraphViewerRelationshipsToggle": {
         "componentsToggle": "toggle components",
         "inheritancesToggle": "toggle inheritances",
         "relationshipsToggle": "toggle relationships"
     },
-    "modelGraphViewerTermManagementComponent":{
+    "modelGraphViewerTermManagementComponent": {
         "menuItems": {
             "superTypes": {
                 "text": "Add supertype",
@@ -216,21 +216,24 @@
     "modelViewerCommandBarComponent": {
         "farItems": {
             "deleteModels": {
-                "text":"Delete all Models",
+                "text": "Delete all Models",
                 "ariaLabel": "delete all models"
             },
             "downloadModels": {
-                "text":"Refresh Models",
+                "text": "Refresh Models",
                 "ariaLabel": "Refresh all models"
             },
             "uploadModel": {
-                "text":"Upload a Model"
+                "text": "Upload a Model"
             },
             "uploadModelsDirectory": {
-                "text":"Upload a directory of Models"
+                "text": "Upload a directory of Models"
             },
             "uploadModelImages": {
-                "text":"Upload Model images"
+                "text": "Upload Model images"
+            },
+            "downloadAllModels": {
+                "text": "Download all models as a Zip file"
             }
         },
         "render": {
@@ -243,7 +246,7 @@
         "heading": "New Twin name",
         "saveButton": "Save"
     },
-    "modelViewerDeleteComponent" : {
+    "modelViewerDeleteComponent": {
         "heading": "Are you sure?",
         "confirm": "Delete",
         "cancel": "Cancel"
@@ -262,14 +265,14 @@
             "uploadModel": "Upload Model image",
             "viewModel": "View Model"
         },
-        "ariaLabel":"Use left and right arrow keys to navigate between commands"
+        "ariaLabel": "Use left and right arrow keys to navigate between commands"
     },
     "modelViewerViewComponent": {
         "heading": "Model Information",
         "defaultButton": "Close"
     },
     "preferencesFormComponent": {
-        "ariaLabel":"Close Preferences Modal",
+        "ariaLabel": "Close Preferences Modal",
         "heading1": "Performance",
         "heading2": "View",
         "heading3": "Display Settings",
