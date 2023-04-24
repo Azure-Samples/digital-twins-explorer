@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@azure/digital-twins-core": "^1.0.3",
-    "@azure/identity": "^1.2.4",
+    "@azure/digital-twins-core": "^1.1.0",
+    "@azure/identity": "^1.5.2",
     "@microsoft/iot-cardboard-js": "^1.0.0-beta.361",
     "@microsoft/signalr": "^3.1.11",
     "@types/react": "^16.14.2",
