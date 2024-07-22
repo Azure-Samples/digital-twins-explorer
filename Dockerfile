@@ -2,7 +2,7 @@ FROM node:current-slim
 
 # Install required dependencies
 RUN apt-get update
-RUN apt-get -y install curl python make g++
+RUN apt-get -y install curl python3 make g++
 
 # Install the Azure CLI, which will be required for authentication
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
